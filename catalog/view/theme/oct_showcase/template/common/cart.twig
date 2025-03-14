@@ -1,0 +1,12 @@
+{% if oct_popup_cart_status is defined and oct_popup_cart_status %}
+<button title="{{ oct_cart }}" id="cart" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between header-buttons-cart fsz-12 align-items-center align-self-stretch" type="button" onclick="octPopupCart();">
+{% else %}
+<button title="{{ oct_cart }}" id="cart" type="button" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between header-buttons-cart fsz-12 align-items-center align-self-stretch" onclick="location = '{{ cart }}';">
+{% endif %}
+    <svg fill="none" width="16" height="16" viewBox="0 0 16 22" xmlns="http://www.w3.org/2000/svg">
+        <path stroke="#1C1C28" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" d="M1.833 7.041h16.333v14H1.833zm3.5 0a4.667 4.667 0 019.334 0"/>
+    </svg>
+    <span class="text-lowercase">{{ oct_cart }}</span>
+    <span class="header-buttons-cart-quantity px-1">{{ total_products }}</span>
+</button>
+<span class="d-none" {% if oct_showcase_data.isbuttoninteractive is defined %}data-cart-ids="{{ cart_product_ids }}"{% endif %} data-cart-text="{{ cart_text }}" data-cart-text-in="{{ cart_text_in }}"></span>

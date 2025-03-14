@@ -1,0 +1,240 @@
+{{ header }}
+<div id="sreview-reviews" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+    <nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+            {% for breadcrumb in breadcrumbs %}
+                {% if loop.last %}
+                    <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+                {% else %}
+                    <li class="breadcrumb-item sc-breadcrumb-item">
+                        <a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+    <script type="application/ld+json">
+        {
+            "@context": "http://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {% for breadcrumb in breadcrumbs %}
+                    {% if loop.first %}
+                    {% else %}
+                        {
+                            "@type": "ListItem",
+                            "position": {{ loop.index -1 }},
+                            "item": {
+                                "@id": "{{ breadcrumb.href }}",
+                                "name": "{{ breadcrumb.text }}"
+                            }
+                        }{% if not loop.last %},{% endif %}
+                    {% endif %}
+                {% endfor %}
+            ]
+        }
+    </script>
+    <main class="main">
+        <div class="row">
+            <div class="col-12 sc-page-title pb-3">
+                <h1>{{ heading_title }}</h1>
+            </div>
+        </div>
+        {{ content_top }}
+        <div class="row sc-store-reviews">
+            <div id="content" class="col-12">
+                <div class="content-block p-3 p-md-4 mobile-no-radius">
+                    <div class="d-flex flex-column flex-md-row justify-content-md-between sc-store-reviews-top">
+                        <div class="mb-3 mb-md-4">
+                            <div class="sc-product-content-title d-flex align-items-center">
+                                <div class="sc-product-content-title-icon d-flex align-items-center justify-content-center br-4">
+                                    <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--product-content-reviews-icon" alt="" width="16" height="16">
+                                </div>
+                                <span class="fsz-24 fw-600 dark-text">{{ text_review_total }}: {{ review_total }}</span>
+                            </div>
+                            <div class="sc-product-content-reviews-rating fw-600 mt-3 mb-1">
+                                <span class="fsz-32 dark-text">{{ store_rating }}</span><span class="fsz-20 light-text"> / 5</span>
+                            </div>
+                            <div class="sc-product-content-reviews-rating-text light-text fsz-14">{{ text_store_rating }}</div>
+                        </div>
+                        <div class="sc-store-reviews-rating">
+                            {% for store_rating_with_subject in store_rating_with_subjects %}
+                                <div class="sc-product-content-reviews-rating-item d-flex align-items-center justify-content-between justify-content-sm-end">
+                                    <div class="fw-600 dark-text">{{ store_rating_with_subject.name }}</div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="sc-product-content-reviews-rating-stars d-flex align-items-center mx-3">
+                                            {% for i in 1..5 %}
+                                                {% if store_rating_with_subject.value < i %}
+                                                    <span class="sc-module-rating-star"></span>
+                                                {% else %}
+                                                    <span class="sc-module-rating-star sc-module-rating-star-is"></span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <div class="sc-product-content-reviews-rating-value text-center">{{ store_rating_with_subject.value }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="button" class="sc-btn sc-btn-primary br-4 d-xl-none mt-4 sc-store-reviews-form-toggle">{{ button_write_review }}</button>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', () => {
+                            addActiveClassToElement('.sc-store-reviews-form-toggle', '.sc-store-reviews-form');
+
+                            document.querySelector('.sc-store-reviews-form-toggle').addEventListener('click', (e) => {
+                                const target = e.target;
+                                target.classList.add('d-none');
+                            });
+                        });
+                    </script>
+                    <div class="row mt-4">
+                        <div class="col-xl-7 col-xxl-8 dark-text fsz-14 order-1 order-xl-0">
+                            {% if not reviews %}
+                            <p class="fw-500 fsz-20">{{ text_empty }}</p>
+                            {% endif %}
+                            {% for review in reviews %}
+                                <div class="sc-product-content-reviews-item p-3 br-4">
+                                    <div class="sc-product-content-reviews-item-top d-flex align-items-start justify-content-between">
+                                        <div class="sc-product-content-reviews-item-info">
+                                            <div class="sc-last-reviews-author d-flex align-items-center">
+                                                <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--review-author-icon" alt="user-icon" width="50" height="50">
+                                                <div class="sc-last-reviews-author-info ps-3">
+                                                    <div class="sc-last-reviews-author-name fw-600 dark-text">
+                                                        {{ review.author }}
+                                                    </div>
+                                                    <div class="sc-last-reviews-date fsz-12 light-text">
+                                                        {{ review.date_added }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <div class="sc-product-content-reviews-rating-stars d-flex align-items-center mb-2">
+                                                {% for i in 1..5 %}
+                                                    {% if review.avg_rating_stars < i %}
+                                                        <span class="sc-module-rating-star"></span>
+                                                    {% else %}
+                                                        <span class="sc-module-rating-star sc-module-rating-star-is"></span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <div class="sc-dropdown-box">
+                                                <span class="blue-link sc-dropdown-toggle">{{ review.avg_rating }}</span>
+                                                <div class="sc-dropdown">
+                                                    <div class="sc-dropdown-inner br-4 p-3">
+                                                        {% for rev in review.review_subject_array %}
+                                                            <div class="dark-text">
+                                                                <span class="fw-600">{{ rev.name }}</span>
+                                                                -
+                                                                {{ rev.rating }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="sc-product-content-reviews-item-text pt-3">
+                                        {{ review.text }}
+                                    </div>
+                                    {% if review.admin_text is defined and review.admin_text is not empty %}
+                                        <div class="sc-product-content-reviews-item-answer p-3 br-4 mt-3">
+                                            <div class="fw-600 dark-text mb-3">{{ admin_text }}</div>
+                                            <p>{{ review.admin_text }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            {{ pagination }}
+                            {% if description %}
+                                <div class="sc-store-reviews-description">
+                                    {{ description }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-xl-5 col-xxl-4 order-0 order-xl-1">
+                            <div class="sc-store-reviews-form sticky-xl-top br-4">
+                                <form method="post" enctype="multipart/form-data" id="add-review-form">
+                                    <div class="fsz-20 dark-text fw-700">{{ text_review_write }}</div>
+                                    <div class="fw-500 light-text my-4">{{ text_review_criteria }}:</div>
+                                    {% if subjects %}
+                                        {% for subject in subjects %}
+                                            <div class="sc-store-reviews-form-item d-flex align-items-center justify-content-between mb-4">
+                                                <label class="fw-500 dark-text pe-2">{{ subject.name }}</label>
+                                                <div class="sc-module-rating-stars d-flex align-items-center" id="block-rev-{{ subject.oct_sreview_subject_id }}">
+                                                    <label class="sc-module-rating-star sc-module-rating-star-is"><input class="d-none" type="radio" name="rating[{{ subject.oct_sreview_subject_id }}]" value="1" checked/></label>
+                                                    <label class="sc-module-rating-star sc-module-rating-star-is"><input class="d-none" type="radio" name="rating[{{ subject.oct_sreview_subject_id }}]" value="2" checked/></label>
+                                                    <label class="sc-module-rating-star sc-module-rating-star-is"><input class="d-none" type="radio" name="rating[{{ subject.oct_sreview_subject_id }}]" value="3" checked/></label>
+                                                    <label class="sc-module-rating-star sc-module-rating-star-is"><input class="d-none" type="radio" name="rating[{{ subject.oct_sreview_subject_id }}]" value="4" checked/></label>
+                                                    <label class="sc-module-rating-star sc-module-rating-star-is"><input class="d-none" type="radio" name="rating[{{ subject.oct_sreview_subject_id }}]" value="5" checked/></label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                        <script>
+                                            window.addEventListener('DOMContentLoaded', () => {
+                                                reviewsRating('#add-review-form');
+                                            });
+                                        </script>
+                                    {% endif %}
+                                    <div class="form-group pb-3">
+                                        <label for="inputStoreReviewName" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ entry_name }}</label>
+                                        <input type="text" name="author" value="{{ author }}" class="form-control" id="inputStoreReviewName" placeholder="{{ entry_name }}" inputmode="text">
+                                    </div>
+                                    <div class="form-group pb-3">
+                                        <label for="inputStoreReviewComment" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ entry_review }}</label>
+                                        <textarea name="text" class="form-control" id="inputStoreReviewComment" placeholder="{{ entry_review }}" rows="6"></textarea>
+                                    </div>
+                                    <div class="fsz-12 light-text">{{ text_note }}</div>
+                                    <div class="form-group-20 pb-3">
+                                        {{ captcha }}
+                                    </div>
+                                    <button type="submit" class="sc-btn sc-btn-primary br-2 w-100">{{ button_send_review }}</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </main>
+    {{ content_bottom }}
+</div>
+<script>
+    $("#inputStoreReviewName, #inputStoreReviewComment").on("change paste keyup", function() {
+        $(this).removeClass('error_style');
+    });
+
+    $('#add-review-form').on('submit', function(event) {
+        event.preventDefault();
+        $.ajax({
+            type: 'post',
+            url: 'index.php?route=octemplates/module/oct_sreview_reviews/write',
+            dataType: 'json',
+            data: $('#add-review-form').serialize(),
+            cache: false,
+            success: function(json) {
+                if (json['error']) {
+                    $('#rm-add-review-modal .text-danger').remove();
+                    let errorOption = '';
+
+                    $.each(json['error'], function(i, val) {
+                        $('#add-review-form [name="' + i + '"]').addClass('error_style');
+                        errorOption += '<div class="alert-text-item">' + val + '</div>';
+                    });
+
+                    scNotify('danger', errorOption);
+                } else {
+                    if (json['success']) {
+                        scNotify('success', json['success']);
+                        $('input[name=\'author\']').val('');
+                        $('textarea[name=\'text\']').val('');
+                        $('input[name=\'rating\']:checked').prop('checked', false);
+                        $('#add-review-form .sc-module-rating-star-is').removeClass('sc-module-rating-star-is');
+                    }
+                }
+            }
+        });
+    });
+</script>
+{{ footer }}

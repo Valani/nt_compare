@@ -1,0 +1,63 @@
+{{ header }}
+<div id="account-address" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ text_address_book }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		{% if success %}
+			<script>
+				scNotify('success', '{{ success }}');
+			</script>
+		{% endif %}
+		{% if error_warning %}
+			<script>
+				scNotify('warning', '{{ error_warning }}');
+			</script>
+		{% endif %}
+		<div class="row sc-account-row">
+			{{ column_left }}
+		    {% if column_left and column_right %}
+		    	{% set class = 'col-xl-6' %}
+		    {% elseif column_left or column_right %}
+		    	{% set class = 'col-xl-9' %}
+		    {% else %}
+		    	{% set class = 'col-xl-12' %}
+		    {% endif %}
+		    <div id="content" class="{{ class }}">
+			    <div class="content-block p-3 p-md-4 mobile-no-radius">
+					{% if addresses %}
+						{% for result in addresses %}
+							<div class="content-block p-3 mobile-no-radius mb-4">
+								<div class="mb-3 d-flex justify-content-between align-items-center">
+									<a href="{{ result.update }}" class="blue-link fsz-14">{{ button_edit }}</a>
+									<a href="{{ result.delete }}" class="d-flex align-items-center red fsz-14"><i class="fas fa-times"></i><span class="ms-1">{{ button_delete }}</span></a>
+								</div>
+								<div class="dark-text">{{ result.address }}</div>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="fw-500 dark-text mb-3">{{ text_empty }}</div>
+					{% endif %}
+					<a href="{{ add }}" class="sc-btn sc-btn-primary br-4 sc-account-login-button">+ {{ button_new_address }}</a>
+			    </div>
+		    </div>
+		    {{ column_right }}
+		</div>
+		{{ content_bottom }}
+	</main>
+</div>
+{{ footer }}

@@ -1,0 +1,346 @@
+{{ header }}
+<div id="product-manufacturer" class="container-fluid container-lg flex-grow-1">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+    {% if oct_showcase_data.micro is defined and oct_showcase_data.micro %}
+    <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement":
+        [
+            {% for breadcrumb in breadcrumbs %}
+                {% if loop.first %}
+                {% else %}
+                {
+                    "@type": "ListItem",
+                    "position": {{ loop.index -1 }},
+                    "item":
+                    {
+                        "@id": "{{ breadcrumb.href }}",
+                        "name": "{{ breadcrumb.text }}"
+                    }
+                }{% if not loop.last %},{% endif %}
+                {% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    {% endif %}
+    <main class="main">
+        <div class="row">
+            <div class="col-12 sc-page-title pb-3">
+                <h1>{{ heading_title }}</h1>
+            </div>
+        </div>
+        <div class="content-top-box">{{ content_top }}</div>
+        <div class="row">
+            {{ column_left }}
+            {% if column_left and column_right %}
+                {% set class = 'col-xl-6 is-cols' %}
+            {% elseif column_left or column_right %}
+                {% set class = 'col-xl-9' %}
+            {% else %}
+                {% set class = 'col-xl-12 no-col' %}
+            {% endif %}
+            <div id="content" class="{{ class }} sc-category">
+                {% if products %}
+                    {% if oct_showcase_data.category_view_sort_oder is defined and(oct_showcase_data.category_view_sort_oder or oct_showcase_data.category_view_sort_oder == 'on') %}
+                        <div class="row sc-category-sort-row pb-sm-2">
+                            <div class="col-12">
+                                <div class="sc-category-sort d-flex justify-content-between content-block">
+                                    <div class="sc-category-sort-limit d-flex align-items-center">
+                                        <div class="sc-category-sort-title pe-3 fw-700 dark-text d-none d-sm-block">{{ text_sort }}</div>
+                                        <select id="input-sort" class="sc-category-sort-select fsz-12 br-4 light-text fw-600" onchange="location = this.value;" aria-label="Sort select">
+                                            {% for sorts in sorts %}
+                                                {% if sorts.value == '%s-%s'|format(sort, order) %}
+                                                    <option value="{{ sorts.href }}" selected="selected">{{ sorts.text }}</option>
+                                                {% else %}
+                                                    <option value="{{ sorts.href }}">{{ sorts.text }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <select id="input-limit" class="sc-category-limit-select fsz-12 br-4 light-text fw-600" onchange="location = this.value;" aria-label="Limit select">
+                                            {% for limits in limits %}
+                                                {% if limits.value == limit %}
+                                                    <option value="{{ limits.href }}" selected="selected">{{ limits.text }}</option>
+                                                {% else %}
+                                                    <option value="{{ limits.href }}">{{ limits.text }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="sc-category-appearance btn-group d-none d-md-flex">
+                                        <button type="button" aria-label="Grid view" id="grid-view" class="sc-btn sc-btn-secondary sc-btn-with-icon sc-category-appearance-btn br-4 active" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ button_grid }}" data-bs-original-title="{{ button_grid }}">
+                                            <span class="sc-btn-icon sc-btn-icon-catalog"></span>
+                                        </button>
+                                        <button type="button" aria-label="List view" id="list-view" class="sc-btn sc-btn-secondary sc-btn-with-icon sc-category-appearance-btn br-4" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ button_list }}" data-bs-original-title="{{ button_list }}">
+                                            <span class="sc-btn-icon sc-btn-icon-list"></span>
+                                        </button>
+                                        <button type="button" aria-label="Price view" id="price-view" class="sc-btn sc-btn-secondary sc-btn-with-icon sc-category-appearance-btn br-4" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ oct_pricelist }}" data-bs-original-title="{{ oct_pricelist }}">
+                                            <span class="sc-btn-icon sc-btn-icon-price"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <script>
+                                    window.addEventListener('DOMContentLoaded', () => {
+                                        switchCategoryDisplay();
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="row gy-2 g-sm-2 sc-module sc-category-products"
+                        {% if oct_showcase_data.category_show_type == '' %} data-type="split"{% endif %}
+                        {% if oct_showcase_data.category_show_type == 'width-100' %} data-type="width100"{% endif %}
+                        {% if oct_showcase_data.category_show_type == 'width-50' %} data-type="width50"{% endif %}
+                        {% if oct_showcase_data.category_show_type == 'width-minimal' %} data-type="minimal"{% endif %}>
+                        {% for product in products %}
+                            <div class="product-layout sc-module-col product-grid col-sm-6 col-md-4 col-lg-3" data-pid="{{ product.product_id }}">
+                                <div class="content-block h-100 d-flex flex-column{% if product.oct_grayscale %} sc-no-stock{% endif %}">
+                                    <div class="sc-module-img position-relative">
+                                        <a href="{{ product.href }}" title="{{ product.name }}">
+                                            <img
+                                                src="{{ product.thumb }}"
+                                                {% if oct_lazyload is defined and oct_lazyload %}
+                                                data-srcset="{{ product.thumb }} 100w"
+                                                srcset="{{ oct_lazy_image }} 100w"
+                                                sizes="100vw"
+                                                class="img-fluid oct-lazy"
+                                                {% else %}
+                                                class="img-fluid"
+                                                {% endif %}
+                                                alt="{{ product.name }}"
+                                                width="{{ product.width }}"
+                                                height="{{ product.height }}"/>
+                                        </a>
+                                        <div class="sc-module-stickers d-flex align-items-center mt-3">
+                                            {% if oct_sticker_you_save and product.you_save %}
+                                                <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-red sc-module-sticker-infinity">{{ product.you_save }}</div>
+                                            {% endif %}
+                                            {% if not product.quantity %}
+                                                <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-green sc-module-sticker-infinity">{{ oct_product_stock }}</div>
+                                            {% endif %}
+                                            {% if product.oct_stickers is not empty %}
+                                                {% for key, oct_sticker in product.oct_stickers %}
+                                                    {% if oct_sticker is not empty and oct_sticker is iterable %}
+                                                        <div class="sc-module-sticker sc-module-sticker-image pe-0 py-0 order-1">
+                                                            <img src="{{ oct_sticker.image }}" alt="{{ oct_sticker.title }}" data-bs-html="true" data-bs-placement="top" data-bs-toggle="popover" data-bs-trigger="hover" title="{{ oct_sticker.title }}" data-bs-content="{{ oct_sticker.description }}" width="24" height="24" />
+                                                        </div>
+                                                    {% elseif oct_sticker is not empty %}
+                                                        <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-{{ key }} order-0">
+                                                            {{ oct_sticker }}
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        <div class="sc-module-btns d-flex flex-column position-absolute">
+                                            {% if oct_popup_view_status %}
+                                            <button type="button" aria-label="Quick view" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4" title="{{ oct_popup_view }}" onclick="octPopUpView('{{ product.product_id }}')">
+                                                <span class="sc-btn-icon sc-btn-icon-viewed"></span>
+                                            </button>
+                                            {% endif %}
+                                            <button type="button" aria-label="Wishlist" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 sc-wishlist-btn" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');">
+                                                <span class="sc-btn-icon sc-btn-icon-wishlist"></span>
+                                            </button>
+                                            <button type="button" aria-label="Compare" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 sc-compare-btn" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}');">
+                                                <span class="sc-btn-icon sc-btn-icon-compare"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="sc-module-caption d-flex flex-column justify-content-between py-md-2 h-100">
+                                        <div class="sc-module-info">
+                                            <a href="{{ product.href }}" class="sc-module-title dark-text fw-700">{{ product.name }}</a>
+                                            <div class="sc-module-product-info">
+                                                {% if product.oct_model is not empty %}
+                                                <div class="sc-module-model light-text fsz-10 mt-2"><span>{{ oct_view_model_cat }}</span>{{ product.oct_model }}</div>
+                                                {% endif %}
+                                                {% if product.rating is not same as(false) %}
+                                                <div class="sc-module-rating d-flex align-items-center mt-2 mb-1 br-4">
+                                                    <div class="sc-module-rating-stars d-flex align-items-center">
+                                                        {% for i in 1..5 %}
+                                                            {% if product.rating < i %}
+                                                                <span class="sc-module-rating-star"></span>
+                                                            {% else %}
+                                                                <span class="sc-module-rating-star sc-module-rating-star-is"></span>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <div class="sc-module-reviews d-flex align-items-center">
+                                                        <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--module-comments-icon" alt="" width="12" height="12" />
+                                                        <span class="dark-text fsz-12 ps-1">{{ product.reviews }}</span>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% if product.price %}
+                                        <div class="sc-module-price-box py-2 mt-auto">
+                                            {% if product.tax %}
+                                            <div class="price-tax fw-300 fsz-12 light-text">
+                                                {{ text_tax }} {{ product.tax }}
+                                            </div>
+                                            {% endif %}
+                                            {% if not product.special %}
+                                            <span class="sc-module-price fw-800 dark-text mt-1">{{ product.price }}</span>
+                                            {% else %}
+                                            <span class="sc-module-price-old light-text fsz-14">{{ product.price }}</span>
+                                            <span class="sc-module-price fw-800 dark-text mt-1">{{ product.special }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="sc-module-cart d-flex align-items-stretch justify-content-between">
+                                        {% if product.can_buy is not empty and product.can_buy %}
+                                            {% if oct_showcase_data.category_view_quantity is defined and oct_showcase_data.category_view_quantity and product.can_buy is not empty %}
+                                            <div class="sc-module-quantity d-flex align-items-center justify-content-center py-1 br-12">
+                                                <button type="button" aria-label="Minus" class="sc-module-quantity-btn d-flex align-items-center justify-content-center sc-minus">
+                                                    <span class="minus"></span>
+                                                </button>
+                                                <input type="text" class="form-control" name="quantity" value="1" aria-label="Quantity" inputmode="numeric">
+                                                <button type="button" aria-label="Plus" class="sc-module-quantity-btn d-flex align-items-center justify-content-center sc-plus">
+                                                    <span class="plus"></span>
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                            <button type="button" aria-label="To cart" class="sc-btn sc-btn-primary sc-btn-with-icon br-4{% if oct_showcase_data.category_view_quantity is defined and oct_showcase_data.category_view_quantity and product.can_buy is not empty %} sc-module-cart-btn{% else %} sc-category-cart-btn" onclick="cart.add('{{ product.product_id }}');{% endif %}">
+                                                <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--btn-cart-icon" alt="" width="20" height="20" class="sc-btn-icon sc-btn-icon-cart-img">
+                                                <span class="sc-btn-text">{{ (product.stock and not product.can_buy) ? product.stock : button_cart }}</span>
+                                            </button>
+                                        {% endif %}
+                                        <input type="hidden" name="product_id" value="{{ product.product_id }}" />
+                                    </div>
+                                    {% if product.oct_atributes is defined and product.oct_atributes %}
+                                    <div class="sc-category-attr p-3 fsz-10 dark-text d-none d-md-block">
+                                        {% for attribute in product.oct_atributes %}
+                                        <div class="sc-category-attr-item">
+                                            <span class="fw-500">{{ attribute.name }}:</span> {{ attribute.text }}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if oct_showcase_data.category_show_more is defined and oct_showcase_data.category_show_more %}
+                        <div class="sc-module-showmore d-flex justify-content-center py-4 oct-load-more">
+                            <button class="sc-btn sc-btn-primary br-4 oct-load-more-button">
+                                <span class="sc-btn-icon sc-btn-icon-showmore"></span>
+                                <span class="sc-btn-text">{{ oct_show_more }}</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                    {{ pagination }}
+                    {% if oct_showcase_data.category_show_more is defined and oct_showcase_data.category_show_more %}
+                        <script>
+                            window.addEventListener('DOMContentLoaded', () => {
+                                let scShowMoreBtn = document.querySelector('.oct-load-more-button');
+                                octCheckPagination();
+
+                                scShowMoreBtn.addEventListener('click', () => {
+                                    octLoadMore({% if oct_lazyload is defined and oct_lazyload %}1{% endif %});
+                                });
+                            });
+                        </script>
+                    {% endif %}
+                    {% if thumb and description %}
+                        <div class="row sc-category-description-row mt-3 mt-md-4">
+                            <div class="col-12">
+                                <div class="sc-category-description content-block content-block-text">
+                                    <div class="d-flex flex-column flex-md-row">
+                                        {% if thumb %}
+                                        <div class="sc-category-description-img">
+                                            <img src="{{ thumb }}" alt="{{ heading_title }}" title="{{ heading_title }}" width="{{ cat_image_width }}" height="{{ cat_image_height }}" />
+                                        </div>
+                                        {% endif %}
+                                        {% if description %}
+                                        <div id="sc-category-description">
+                                            <div class="sc-category-description-text pt-3 pt-md-0 ps-md-3">
+                                                {{ description }}
+                                                <!-- if button enabled -->
+                                                {% if description|length > 700 and (categories or products) and oct_showcase_data.category_desc_up is not defined %}
+                                                <div class="sc-category-description-text-opacity"></div>
+                                                {% endif %}
+                                                <!-- end if -->
+                                            </div>
+                                            <!-- CAT PAGES START -->
+                                            {% if categories_page is defined and categories_page is not empty %}
+                                            <div class="sc-category-categories_page-text mt-3">
+                                                <ul class="category-landing-links list-unstyled ps-0">
+                                                {% for oct_page in categories_page %}
+                                                    {% if oct_page.page_links is not empty %}
+                                                    <li class="category-landing-links-item">
+                                                        <span class="category-landing-links-item-title">{{ oct_page.page_group[language_id] }}</span>
+                                                        {% for link in oct_page.page_links %}
+                                                        <a href="{{ link[language_id].link }}" class="blue-link d-flex-inline align-items-center" title="{{ link[language_id].title }}">{{ link[language_id].title }}</a>
+                                                        {% endfor %}
+                                                    </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                            <!-- CAT PAGES END -->
+                                            <!-- if button enabled -->
+                                            {% if description|length > 700 and (categories or products) and oct_showcase_data.category_desc_up is not defined %}
+                                            <button id="oct-sc-category-more" class="sc-btn sc-btn-secondary br-4 mt-3 ms-md-3"><span class="sc-btn-text">{{ oct_expand }}</span></button>
+                                            {% endif %}
+                                            <!-- end if -->
+                                        </div>
+                                        <!-- if button enabled -->
+                                        {% if description|length > 700 and (categories or products) and oct_showcase_data.category_desc_up is not defined %}
+                                        <style>
+                                            .sc-category-description-text {
+                                                height: 220px;
+                                                display: block;
+                                                overflow: hidden;
+                                            }
+                                        </style>
+                                        <script>
+                                            $('#oct-sc-category-more').click(function(e) {
+                                                e.stopPropagation();
+                                                
+                                                const curHeight = $('.sc-category-description-text').innerHeight();
+                                                $('.sc-category-description-text').css('height', 'auto');
+                                                const autoHeight = $('.sc-category-description-text').innerHeight();
+                                                
+                                                $('.sc-category-description-text').height(curHeight).animate({
+                                                    'height': autoHeight
+                                                });
+                                                
+                                                $('.sc-category-description-text').addClass('expanded');
+                                                $(this).css('display', 'none');
+                                            });
+                                        </script>
+                                        {% endif %}
+                                        <!-- end if -->
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="content-block-p24">
+                        <p>{{ text_empty }}</p>
+                        <a href="{{ continue }}" class="sc-btn sc-btn-primary mt-3 br-4 d-inline-flex">{{ button_continue }}</a>
+                    </div>
+                {% endif %}
+            </div>
+            {{ column_right }}
+        </div>
+        {{ content_bottom }}
+    </main>
+</div>
+{{ footer }}

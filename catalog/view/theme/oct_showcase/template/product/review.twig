@@ -1,0 +1,36 @@
+{% if reviews %}
+	{% for review in reviews %}
+	<div class="sc-product-content-reviews-item p-3">
+		<div class="d-flex align-items-start justify-content-between">
+			<div class="sc-product-content-reviews-item-info">
+				<div class="sc-last-reviews-author d-flex align-items-center">
+					<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--review-author-icon" alt="{{ review.author }}" width="50" height="50" />
+					<div class="sc-last-reviews-author-info ps-3">
+						<div class="sc-last-reviews-author-name fw-600 dark-text">{{ review.author }}</div>
+						<div class="sc-last-reviews-date fsz-12 light-text">{{ review.date_added }}</div>
+					</div>
+				</div>
+			</div>
+			<div class="sc-product-content-reviews-rating-stars d-flex align-items-center">
+				{% for i in 1..5 %}
+					{% if review.rating < i %}
+					<span class="sc-module-rating-star"></span>
+					{% else %}
+					<span class="sc-module-rating-star sc-module-rating-star-is"></span>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+		<div class="sc-product-content-reviews-item-text pt-3">{{ review.text }}</div>
+		{% if review.reply %}
+		<div class="sc-product-content-reviews-item-answer p-3 br-4 mt-3">{{ review.reply }}</div>
+		{% endif %}
+	</div>
+	{% endfor %}
+	<div class="pt-4">{{ pagination }}</div>
+{% else %}
+	<div class="d-flex flex-column justify-content-center sc-empty-reviews mb-3 mb-md-0 text-center p-4 br-4">
+		<p class="fw-500 fsz-16 mb-3">{{ oct_text_no_reviews }}</p>
+		<img src="catalog/view/theme/oct_showcase/img/reviews-empty.svg" alt="" class="img-fluid d-block my-5 mx-auto" width="85" height="85">
+	</div>
+{% endif %}

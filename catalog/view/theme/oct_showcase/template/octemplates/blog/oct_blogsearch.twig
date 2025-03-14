@@ -1,0 +1,71 @@
+{{ header }}
+<div class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+		<ul class="breadcrumb sc-breadcrumb fsz-12">
+		{% for breadcrumb in breadcrumbs %}
+			{% if loop.last %}
+				<li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+			{% else %}
+				<li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		<div class="row sc-account-row">
+			{{ column_left }}
+			{% if column_left and column_right %}
+				{% set class = 'col-xl-6' %}
+			{% elseif column_left or column_right %}
+				{% set class = 'col-xl-9' %}
+			{% else %}
+				{% set class = 'col-xl-12' %}
+			{% endif %}
+			<div id="content" class="{{ class }}">
+				{% if articles %}
+					<div class="row mt-0 px-2 px-md-0 g-3 g-xl-4 sc-module sc-blog-category">
+						{% for article in articles %}
+							<div class="sc-last-news-item">
+								<div class="content-block h-100 d-flex flex-column p-0 pb-3 overflow-hidden">
+									<a href="{{ article.href }}" title="{{ article.name }}">
+										<img src="{{ article.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ article.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="oct-lazy img-fluid w-md-100"{% else %} class="img-fluid w-md-100"{% endif %} alt="{{ article.name }}" width="{{ article.width }}" height="{{ article.height }}" />
+									</a>
+									<div class="sc-last-news-caption d-flex flex-column justify-content-between w-100">
+										<div class="sc-last-news-info d-flex align-items-center justify-content-between p-3">
+											<div class="d-flex align-items-center">
+												{% for blog_category_name in article.blog_categories %}
+													<span class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-green me-1">{{ blog_category_name }}</span>
+												{% endfor %}
+											</div>
+											<span class="sc-last-news-item-date fsz-12">{{ article.date_added }}</span>
+										</div>
+										<a class="sc-last-news-title fw-700 fsz-14 dark-text px-3" href="{{ article.href }}">{{ article.name }}</a>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+					{% if pagination|striptags %}
+						<div class="pt-3 pt-md-4">
+							{{ pagination }}
+						</div>
+					{% endif %}
+				{% else %}
+					<div class="content-block">
+						<p class="mb-3 fw-500">{{ text_empty }}</p>
+						<a href="{{ continue }}" class="sc-btn sc-btn-primary br-4 d-inline-flex">{{ button_continue }}</a>
+					</div>
+				{% endif %}
+			</div>
+			{{ column_right }}
+		</div>
+		{{ content_bottom }}
+	</main>
+</div>
+{{ footer }}

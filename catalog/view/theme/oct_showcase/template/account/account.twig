@@ -1,0 +1,96 @@
+{{ header }}
+<div id="account-account" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		{% if success %}
+		<script>
+		scNotify('success', '{{ success }}');
+		</script>
+		{% endif %}
+		<div class="row sc-account-row">
+			{{ column_left }}
+		    {% if column_left and column_right %}
+		    {% set class = 'col-xl-6' %}
+		    {% elseif column_left or column_right %}
+		    {% set class = 'col-xl-9' %}
+		    {% else %}
+		    {% set class = 'col-xl-12' %}
+		    {% endif %}
+		    <div id="content" class="{{ class }}">
+			    <div class="content-block p-3 p-md-4 mobile-no-radius">
+			    	<div class="h3 mt-0">{{ text_my_account }}</div>
+					<hr>
+			      	<p>{{ oct_account_main_text }}</p>
+					<p>{{ oct_account_main_text_contact }} <a href="{{ url_contacts }}">"{{ oct_account_main_contacts }}"</a>.</p>
+					<div class="h3 my-4">{{ oct_account_main_info }}</div>
+					<div class="table-responsive-sm sc-account-table">
+					    <table class="table table-hover">
+					       	<thead class="thead-dark">
+					         	<tr>
+						            <th scope="col">{{ oct_account_name }}</th>
+						            <th scope="col">{{ oct_account_email }}</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+					            <tr>
+					                <td>{{ firstname }}</td>
+					            	<td>
+					            		<div class"d-flex justify-content-between"><span class="me-3">{{ email }}</span>&nbsp;<a href="{{ edit }}" class="blue-link">{{ oct_account_edit }}</a></div>
+					            	</td>
+					          	</tr>
+					        </tbody>
+					    </table>
+					</div>
+					<div class="h3 my-4">{{ text_order }}</div>
+					<div class="table-responsive-sm sc-account-table">
+					    <table class="table table-hover">
+					       	<thead class="thead-dark">
+					         	<tr>
+						            <th scope="col">{{ oct_account_n_order }}</th>
+						            <th scope="col">{{ oct_account_order_status }}</th>
+						            <th scope="col">{{ oct_account_order_date }}</th>
+						            <th scope="col">{{ oct_account_order_amount }}</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+								{% if orders|length >= 1 %}
+								{% for order in orders %}
+					            <tr>
+					                <td><a href="{{ order.href }}">#{{ order.order_id }}</a></td>
+					            	<td>{{ order.status }}</td>
+					            	<td>{{ order.date_added }}</td>
+					            	<td>{{ order.total }}</td>
+					          	</tr>
+								{% endfor %}
+								{% else %}
+					            <tr>
+					            	<td>{{ oct_account_no_orders }}</td>
+					          	</tr>
+								{% endif %}
+					        </tbody>
+					    </table>
+					</div>
+			    </div>
+		    </div>
+		    {{ column_right }}
+		</div>
+		{{ content_bottom }}
+	</main>
+</div>
+{{ footer }}

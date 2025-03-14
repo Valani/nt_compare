@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<!--[if IE 8 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie8"><![endif]-->
+<!--[if IE 9 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html dir="{{ direction }}" lang="{{ lang }}"{% if body_class %} class="body-product"{% endif %}>
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ title }}</title>
+{% if (oct_showcase_data.open_graph is defined and oct_showcase_data.open_graph) and octOpenGraphs is not empty %}
+{% for octOpenGraph in octOpenGraphs %}
+{% if octOpenGraph.content is not empty %}
+<meta property="{{ octOpenGraph.property }}" content="{{ octOpenGraph.content }}" />
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if oct_analytics_google_webmaster_code is defined and oct_analytics_google_webmaster_code is not empty %}
+<meta name="google-site-verification" content="{{ oct_analytics_google_webmaster_code }}" />
+{% endif %}
+{% if oct_analytics_googletm_code is defined and oct_analytics_googletm_code is not empty %}
+<!-- Google Tag Manager -->
+<script id="octGtm">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','{{ oct_analytics_googletm_code }}');</script>
+<!-- End Google Tag Manager -->
+{% endif %}
+<base href="{{ base }}" />
+{% if robots %}
+<meta name="robots" content="{{ robots }}" />
+{% endif %}
+{% if description %}
+<meta name="description" content="{{ description }}" />
+{% endif %}
+{% if keywords %}
+<meta name="keywords" content="{{ keywords }}" />
+{% endif %}
+{% if oct_theme_color is defined and oct_theme_color %}
+<meta name="theme-color" content="{{ oct_theme_color }}"/>
+{% endif %}
+{% for style in styles %}
+{% if oct_preload_styles is defined and oct_preload_styles and oct_minify is defined and oct_minify %}
+<link rel="preload" as="style" href="{{ style.href }}">
+{% endif %}
+<link href="{{ style.href }}" rel="stylesheet" media="{{ style.media }}" />
+{% endfor %}
+{% if oct_preloads %}
+{% for oct_preload in oct_preloads %}
+<link rel="preload" as="image" href="{{ oct_preload }}">
+{% endfor %}
+{% endif %}
+{% for script in scripts %}
+<script src="{{ script }}"></script>
+{% endfor %}
+{% for link in links %}
+<link href="{{ link.href }}" rel="{{ link.rel }}" />
+{% endfor %}
+{% for analytic in analytics %}
+{{ analytic }}
+{% endfor %}
+<script{% if oct_footer_scripts is defined and oct_footer_scripts and oct_minify is defined and oct_minify %} id="dataFonts"{% endif %}>
+    let octFonts = localStorage.getItem('octFonts');
+    if (octFonts !== null) {
+        var octHead  = document.getElementsByTagName('head')[0];
+        var octLink  = document.createElement('link');
+        octLink.rel  = 'stylesheet';
+        octLink.type = 'text/css';
+        octLink.href = location.protocol + '//' + location.host + '/catalog/view/theme/oct_showcase/stylesheet/oct-fonts.css';
+        octLink.media = 'all';
+        octHead.appendChild(octLink);
+    }
+</script>
+</head>
+<body>
+{% if oct_analytics_googletm_code is defined and oct_analytics_googletm_code is not empty %}
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ oct_analytics_googletm_code }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+{% endif %}
+<div id="sidebar" class="sidebar d-xl-none fade">
+    <button type="button" class="sc-btn sc-btn-with-icon no-btn br-4 ms-auto sc-btn-close" data-sidebar="close" aria-label="Close">
+        <span class="sc-btn-icon sc-btn-icon-close"></span>
+    </button>
+    <div class="sidebar-header py-2 ps-4 pe-2 fw-700 dark-text d-flex align-items-center">
+        <span class="sidebar-header-text">{{ oct_menu }}</span>
+    </div>
+    <div id="sc_sidebar_content" class="sidebar-inner"></div>
+</div>
+{% if (oct_information_bar_value is defined and oct_information_bar_value is not empty and oct_information_bar_value) %}
+<div id="oct-infobar">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 d-flex align-items-center justify-content-between flex-column flex-md-row py-3 py-md-4">
+                <div class="oct-infobar-text fsz-12">{{ text_oct_information_bar }}</div>
+                <button type="button" aria-label="Information" id="oct-infobar-btn" class="sc-btn small br-4 mt-3 mt-md-0 ms-md-4">{{ oct_info_bar_close }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$('#oct-infobar-btn').on('click', function () {
+    $('#oct-infobar').addClass('hidden');
+    const date = new Date('{{ oct_information_bar_day_now }}'.replace(/-/g, "/"));
+    date.setTime(date.getTime() + ({{ oct_info_max_day }} * 24 * 60 * 60 * 1000));
+    document.cookie = '{{ oct_information_bar_value }}=1; path=/; expires=' + date.toUTCString();
+});
+</script>
+<style>
+#oct-infobar {background:{{ oct_information_bar_background }};}
+.oct-infobar-text {color:{{ oct_information_bar_color_text }};}
+.oct-infobar-text a {color:{{ oct_information_bar_color_url }};}
+#oct-infobar-btn {background:{{ oct_information_bar_background_button }};color:{{ oct_information_bar_color_text_button }};}
+#oct-infobar-btn:hover {background:{{ oct_information_bar_background_button_hover }};color:{{ oct_information_bar_color_text_button_hover }};}
+</style>
+{% endif %}
+<nav id="top">
+	<div class="container-fluid container-xxl d-flex align-items-center justify-content-between h-100">
+        <div class="top-left d-flex align-items-center">
+            {% if logo %}
+                <div id="logo" class="d-flex align-items-center justify-content-center order-1 order-xl-0">
+                    {% if oct_home is defined and oct_home %}
+                        <span><img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="img-fluid"{% if logo_width is defined and logo_width %} width="{{ logo_width }}"{% endif %}{% if logo_height is defined and logo_height %} height="{{ logo_height }}"{% endif %} /></span>
+                    {% else %}
+                        <a href="{{ home }}">
+                            <img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="img-fluid"{% if logo_width is defined and logo_width %} width="{{ logo_width }}"{% endif %}{% if logo_height is defined and logo_height %} height="{{ logo_height }}"{% endif %} />
+                        </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <h1><a href="{{ home }}">{{ name }}</a></h1>
+            {% endif %}
+            <button id="mobile-menu-button" type="button" class="sc-btn sc-btn-with-icon no-btn br-4 sc-top-btn d-xl-none order-0 order-xl-1 ms-1 me-3" onclick="scSidebar('{{ oct_menu }}', 'menu');" aria-label="Menu">
+                <span class="sc-btn-icon sc-btn-icon-menu"></span>
+            </button>
+            <button id="mobile-search-button" type="button" class="sc-btn sc-btn-with-icon no-btn br-4 sc-top-btn d-md-none order-0 order-xl-1 me-3" onclick="scSidebar('{{ oct_search }}', 'search');" aria-label="Search">
+                <span class="sc-btn-icon sc-btn-icon-search"></span>
+            </button>
+            {% if oct_showcase_data.contact_address[oct_lang_id] is defined and oct_showcase_data.contact_address[oct_lang_id] %}
+                <button id="mobile-locations-button" type="button" class="sc-btn sc-btn-with-icon no-btn br-4 sc-top-btn d-md-none order-2 me-3 ms-auto" onclick="scSidebar('{{ oct_our_address }}', 'locations');" aria-label="Locations">
+                    <span class="sc-btn-icon sc-btn-icon-location"></span>
+                </button>
+                <button type="button" class="sc-btn sc-btn-with-icon no-btn br-4 sc-top-btn d-md-none order-3" onclick="scSidebar('{{ oct_menu }}', 'menu', 'account');" aria-label="Account">
+            {% else %}
+                <button type="button" class="sc-btn sc-btn-with-icon no-btn br-4 sc-top-btn d-md-none order-3 ms-auto" onclick="scSidebar('{{ oct_menu }}', 'menu', 'account');" aria-label="Account">
+            {% endif %}
+                <span class="sc-btn-icon sc-btn-icon-account"></span>
+            </button>
+            {% if header_informations is defined and header_informations is not empty %}
+                <ul class="top-left-links list-unstyled fw-600 fsz-12 d-none d-xl-flex align-items-center">
+                    {% for header_link in header_informations %}
+                    <li><a href="{{ header_link.href }}">{{ header_link.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="top-right d-none d-md-flex align-items-center pe-md-3">
+            {% if contact_open is defined and contact_open or oct_contact_telephones is defined and oct_contact_telephones is not empty %}
+                <div class="sc-dropdown-box">
+                    <div class="sc-dropdown-toggle fw-700 fsz-14">{{ telephone }}</div>
+                    <div class="sc-dropdown">
+                        <div class="sc-dropdown-inner br-4 p-3">
+                            {% if oct_showcase_data.contact_open[oct_lang_id] is defined and oct_showcase_data.contact_open[oct_lang_id] %}
+                                <div class="sc-dropdown-inner-title d-flex align-items-center mb-2">
+                                    <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--dropdown-shedule-icon" alt="" width="24" height="24">
+                                    <span class="fw-500 dark-text ms-2">{{ oct_working_hours }}:</span>
+                                </div>
+                                <ul class="list-unstyled fsz-14 light-text">
+                                    {% for contact_open in oct_contact_opens %}
+                                        <li>{{ contact_open }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            {% if oct_contact_telephones is defined and oct_contact_telephones is not empty %}
+                                <div class="sc-header-location-phones">
+                                    <div class="sc-dropdown-inner-title d-flex align-items-center mt-3 mb-2">
+                                        <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--dropdown-phones-icon" alt="" width="24" height="24">
+                                        <span class="fw-500 dark-text ms-2">{{ oct_our_call }}</span>
+                                    </div>
+                                    <ul class="list-unstyled">
+                                        {% for oct_contact_telephone in oct_contact_telephones %}
+                                            <li class="mb-1"><a href="tel:{{ oct_contact_telephone|replace({" " : "", "-" : "", "(" : "", ")" : ""}) }}" class="blue-link">{{ oct_contact_telephone }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            <a href="{{ contact }}" class="sc-btn sc-btn-primary small br-4 w-100 mt-3">{{ oct_go_contact_text }}</a>
+                        </div>
+                    </div>
+                </div>
+                {% if oct_popup_call_phone_status is defined and oct_popup_call_phone_status %}
+                    <span class="fsz-12 fw-600 popup-call-trigger" onclick="octPopupCallPhone();">{{ oct_call_phone }}</span>
+                {% endif %}
+            {% endif %}
+            {% if oct_showcase_data.header_lang is defined %}
+			    {{ language }}
+            {% endif %}
+            {% if oct_showcase_data.header_cur is defined %}
+			    {{ currency }}
+            {% endif %}
+        </div>
+	</div>
+</nav>
+<header class="header py-2{% if oct_expand_menu is defined and oct_expand_menu %} with-slideshow{% endif %}">
+    <div class="container-fluid container-xl position-relative">
+        <div class="row">
+            <div class="col-md-3 d-none d-xl-flex">
+                <button id="menuToggleButton" type="button" class="sc-btn sc-btn-secondary br-4 py-2 px-3 w-100 fsz-14">
+                    <span class="sc-btn-icon sc-btn-icon-catalog"></span>
+                    <span class="sc-btn-text">{{ oct_menu_catalog }}</span>
+                </button>
+            </div>
+            <div class="col-12 col-xl-9">
+                <div class="d-flex align-items-center header-search-box">
+                    {{ search }}
+                    <div class="header-buttons d-flex justify-content-between justify-content-md-end align-items-center pe-md-3">
+                        <button type="button" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between align-items-center d-md-none header-buttons-catalog align-self-stretch" data-menu="open">
+                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_2678_3096)">
+                                    <path d="M6.0999 0.399994H2.0999C1.43716 0.399994 0.899902 0.937252 0.899902 1.59999V5.59999C0.899902 6.26274 1.43716 6.79999 2.0999 6.79999H6.0999C6.76264 6.79999 7.2999 6.26274 7.2999 5.59999V1.59999C7.2999 0.937252 6.76264 0.399994 6.0999 0.399994Z" stroke="#1C1C28"/>
+                                    <path d="M14.9002 0.399994H10.9002C10.2375 0.399994 9.7002 0.937252 9.7002 1.59999V5.59999C9.7002 6.26274 10.2375 6.79999 10.9002 6.79999H14.9002C15.5629 6.79999 16.1002 6.26274 16.1002 5.59999V1.59999C16.1002 0.937252 15.5629 0.399994 14.9002 0.399994Z" stroke="#1C1C28"/>
+                                    <path d="M14.9002 9.20001H10.9002C10.2375 9.20001 9.7002 9.73727 9.7002 10.4V14.4C9.7002 15.0628 10.2375 15.6 10.9002 15.6H14.9002C15.5629 15.6 16.1002 15.0628 16.1002 14.4V10.4C16.1002 9.73727 15.5629 9.20001 14.9002 9.20001Z" stroke="#1C1C28"/>
+                                    <path d="M6.0999 9.20001H2.0999C1.43716 9.20001 0.899902 9.73727 0.899902 10.4V14.4C0.899902 15.0628 1.43716 15.6 2.0999 15.6H6.0999C6.76264 15.6 7.2999 15.0628 7.2999 14.4V10.4C7.2999 9.73727 6.76264 9.20001 6.0999 9.20001Z" stroke="#1C1C28"/>
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_2678_3096">
+                                    <rect width="16" height="16" fill="white" transform="translate(0.5)"/>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <span class="text-lowercase">{{ oct_catalog }}</span>
+                        </button>
+                        {% if product_views_count %}
+                            <button type="button" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between align-items-center d-md-none header-buttons-viewed align-self-stretch" onclick="scSidebar('{{ oct_menu }}', 'menu', 'viewed');">
+                                <svg viewBox="0 0 16 16" width="16" height="16">
+                                    <use href="catalog/view/theme/oct_showcase/img/sprite.svg#include--header-btns-viewed"></use>
+                                </svg>
+                                <span class="text-lowercase">{{ oct_sidebar_views }}</span>
+                                <span class="header-buttons-cart-quantity px-1">{{ viewed_total }}</span>
+                            </button>
+                        {% endif %}
+                        {% if oct_showcase_data.header_account is defined %}
+                            {% if logged %}
+                                <a href="{{ login }}" class="sc-btn sc-btn-with-icon no-btn header-buttons-account d-none d-md-flex flex-column justify-content-between align-items-center align-self-stretch">
+                                    <span class="sc-btn-icon sc-btn-icon-account"></span>
+                                    <span class="text-lowercase">{{ oct_account }}</span>
+                                </a>
+                            {% else %}
+                                <button type="button" onclick="octPopupLogin();" class="sc-btn sc-btn-with-icon no-btn header-buttons-account d-none d-md-flex flex-column justify-content-between fsz-12 align-items-center align-self-stretch">
+                                    <span class="sc-btn-icon sc-btn-icon-account"></span>
+                                    <span class="text-lowercase">{{ oct_account }}</span>
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                        <a href="{{ compare_link }}" {% if oct_showcase_data.isbuttoninteractive is defined %}data-compare-ids="{{ compare_ids }}"{% endif %} data-compare-text="{{ compare_text }}" data-compare-text-in="{{ compare_text_in }}" class="sc-btn sc-btn-with-icon no-btn header-buttons-compare d-flex flex-column justify-content-between fsz-12 align-items-center align-self-stretch">
+                            <svg viewBox="0 0 16 16" width="16" height="16">
+                                <use href="catalog/view/theme/oct_showcase/img/sprite.svg#include--header-btns-compare"></use>
+                            </svg>
+                            <span class="text-lowercase">{{ oct_compare }}</span>
+                            <span class="header-buttons-cart-quantity px-1">{{ compare_total }}</span>
+                        </a>
+                        <a href="{{ wishlist }}" {% if oct_showcase_data.isbuttoninteractive is defined %}data-wishlist-ids="{{ wishlist_ids }}"{% endif %} data-wishlist-text="{{ wishlist_text }}" data-wishlist-text-in="{{ wishlist_text_in }}" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between header-buttons-wishlist fsz-12 align-items-center align-self-stretch">
+                            <svg viewBox="0 0 16 16" width="16" height="16">
+                                <use href="catalog/view/theme/oct_showcase/img/sprite.svg#include--header-btns-wishlist"></use>
+                            </svg>
+                            <span class="text-lowercase">{{ oct_wishlist }}</span>
+                            <span class="header-buttons-cart-quantity px-1">{{ wishlist_total }}</span>
+                        </a>
+                        {{ cart }}
+                    </div>
+                    {% if oct_showcase_data.contact_address[oct_lang_id] is defined and oct_showcase_data.contact_address[oct_lang_id] %}
+                        <div id="sc_sidebar_locations_inner" class="d-none">
+                            <div id="sc_sidebar_locations" class="d-none sidebar-locations p-3">
+                                <div class="sc-location content-block active fsz-12">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sc-location-address fw-700 dark-text pe-4 fsz-14">{{ oct_showcase_data.contact_address[oct_lang_id] }}</div>
+                                        {% if oct_locations %}
+                                            <button type="button" class="sc-btn sc-btn-secondary sc-btn-with-icon br-4 ms-auto p-0 d-flex align-items-center justify-content-center">
+                                                <span class="sc-btn-icon sc-btn-icon-chevron"></span>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    {% if contact_open is defined and contact_open or oct_contact_telephones is defined and oct_contact_telephones is not empty %}
+                                        <div class="sc-location-collapsed">
+                                            {% if oct_contact_telephones is defined and oct_contact_telephones is not empty %}
+                                                <div class="sc-location-phones mb-3">
+                                                    <span class="sidebar-main-menu-item-title fw-600 dark-text">{{ oct_telephones }}</span>
+                                                    {% for oct_contact_telephone in oct_contact_telephones %}
+                                                        <a href="tel:{{ oct_contact_telephone|replace({" " : "", "-" : "", "(" : "", ")" : ""}) }}" class="blue-link fw-500">{{ oct_contact_telephone }}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% if oct_showcase_data.contact_open[oct_lang_id] is defined and oct_showcase_data.contact_open[oct_lang_id] %}
+                                                <div class="sc-location-shedule mb-3">
+                                                    <div class="sidebar-main-menu-item-title fw-600 dark-text mb-2">{{ oct_working_hours }}:</div>
+                                                    {% for contact_open in oct_contact_opens %}
+                                                        <span>{{ contact_open }}</span><br>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% if contact_map is defined and contact_map %}
+                                                <div class="sc-location-map">
+                                                    <div class="sidebar-main-menu-item-title fw-600 mb-3 dark-text">{{ oct_location }}</div>
+                                                    <div id="oct-contact-map" class="not_in"></div>
+                                                </div>
+                                                <script>
+                                                    if (window.innerWidth < 768) {
+                                                        $('#mobile-locations-button').on('click', function() {
+                            						    	octShowMap('{{ contact_map }}', '#oct-contact-map');
+                            							});
+                                                    }
+                        					    </script>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if oct_locations %}
+                                    {% set key = 0 %}
+                                    {% for location in oct_locations %}
+                                        {% set key = key + 1 %}
+                                        <div id="sc-location-{{ key }}" class="sc-location content-block fsz-12">
+                                            <div class="d-flex align-items-center">
+                                                {% if location.address is defined and location.address %}
+                                                    <div class="sc-location-address fw-700 dark-text pe-4 fsz-14">{{ location.address }}</div>
+                                                {% endif %}
+                                                <button type="button" class="sc-btn sc-btn-secondary sc-btn-with-icon br-4 ms-auto p-0 d-flex align-items-center justify-content-center">
+                                                    <span class="sc-btn-icon sc-btn-icon-chevron"></span>
+                                                </button>
+                                            </div>
+                                            {% if location.open is defined and location.open or location.map is defined and location.phone is defined and location.phone %}
+                                                <div class="sc-location-collapsed">
+                                                    {% if location.phone is defined and location.phone %}
+                                                        <div class="sc-location-phones mb-3">
+                                                            <span class="sidebar-main-menu-item-title fw-600 dark-text">{{ oct_telephones }}</span>
+                                                            {% for phone in location.phone %}
+                                                                <a href="tel:{{ phone|replace({" " : "", "-" : "", "(" : "", ")" : ""}) }}" class="blue-link fw-500">{{ phone }}</a>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if location.open is defined and location.open %}
+                                                        <div class="sc-location-shedule mb-3">
+                                                            <div class="sidebar-main-menu-item-title fw-600 dark-text mb-2">{{ oct_working_hours }}:</div>
+                                                            {% for open in location.open %}
+                                                                <span>{{ open }}</span><br>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if location.map is defined and location.map %}
+                                                        <div class="sc-location-map">
+                                                            <div class="sidebar-main-menu-item-title fw-600 mb-3 dark-text">{{ oct_location }}</div>
+                                                            <div id="oct-location-map-{{ key }}" class="not_in"></div>
+                                                        </div>
+                                                        <script>
+                                                            $('body').on('click', '#sc-location-{{ key }}', function(){
+                                                                octShowMap('{{ location.map }}', '#oct-location-map-{{ key }}');
+                                                            });
+                                                        </script>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                                <script>
+                                    window.addEventListener('DOMContentLoaded', () => {
+                                        toggleActiveClass('.sc-location');
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {{ menu }}
+    </div>
+</header>

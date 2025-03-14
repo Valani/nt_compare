@@ -1,0 +1,84 @@
+{{ header }}
+<div id="account-wishlist" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		{% if success %}
+			<script>
+				scNotify('success', '{{ success }}');
+			</script>
+		{% endif %}
+		<div class="row sc-account-row">
+			{{ column_left }}
+		    {% if column_left and column_right %}
+		    	{% set class = 'col-xl-6' %}
+		    {% elseif column_left or column_right %}
+		    	{% set class = 'col-xl-9' %}
+		    {% else %}
+		    	{% set class = 'col-xl-12' %}
+		    {% endif %}
+		    <div id="content" class="{{ class }}">
+			    <div class="content-block p-3 p-md-4 mobile-no-radius">
+					{% if products %}
+						{% for product in products %}
+							<div class="content-block p-3 p-md-4 mb-4">
+								<div class="d-flex flex-column flex-md-row align-items-center">
+										<div class="d-flex align-items-center me-md-4">
+											<a href="{{ product.remove }}" class="sc-btn sc-btn-danger sc-btn-with-icon br-4 me-3 sc-account-wishlist-button" title="{{ button_remove }}"><span class="sc-btn-icon sc-btn-icon-del"></span></a>
+											{% if product.thumb %}
+												<a href="{{ product.href }}"><img src="{{ product.thumb }}"  alt="{{ product.name }}" title="{{ product.name }}" /></a>
+											{% endif %}
+										</div>
+									<div class="text-center text-md-start">
+										<a href="{{ product.href }}" class="dark-text fw-700 my-4 my-md-0 d-inline-block blue-link">{{ product.name }}</a>
+										<div class="light-text small">{{ column_model }}: <span class="dark-text">{{ product.model }}</span></div>
+										<div class="light-text small">{{ column_stock }}: <span class="dark-text">{{ product.stock }}</span></div>
+										{% if product.price %}
+										<div class="mt-4 mt-md-3 mt-lg-0 d-flex flex-column flex-lg-row align-items-lg-center">
+											<div class="dark-text fw-600 me-2">{{ column_price }}:</div>
+											<div class="sc-module-price">
+												{% if not product.special %}
+													<span class="dark-text fw-800 fsz-20">{{ product.price }}</span>
+												{% else %}
+													<span class="text-decoration-line-through fw-400 fsz-14">{{ product.price }}</span>
+													<span class="dark-text fw-800 fsz-20">{{ product.special }}</span>
+												{% endif %}
+											</div>
+										</div>
+										{% endif %}
+									</div>
+									<button type="button" aria-label="To cart" class="sc-btn sc-btn-primary br-4 mt-3 mt-md-0 ms-md-auto sc-module-cart-btn" title="{{ button_cart }}">
+										<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--btn-cart-icon" alt="" width="20" height="20" class="sc-btn-icon sc-btn-icon-cart-img">
+										<span class="sc-btn-text">{{ button_cart }}</span>
+									</button>
+									<input type="hidden" name="product_id" value="{{ product.product_id }}" />
+								</div>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="fw-500 mb-3 dark-text">{{ text_empty }}</div>
+					{% endif %}
+			      	<a href="{{ continue }}" class="sc-btn sc-btn-primary br-4 sc-account-login-button">{{ button_continue }}</a>
+			    </div>
+		    </div>
+		    {{ column_right }}
+		</div>
+		{{ content_bottom }}
+	</main>
+</div>
+{{ footer }}

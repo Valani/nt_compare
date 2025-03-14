@@ -1,0 +1,41 @@
+{% if products is not empty %}
+	<div class="sc-livesearch-list" data-type="minimal">
+		{% for product in products%}
+		    <div class="sc-module-item sc-module-col w-100 mb-3">
+		       	<div class="content-block h-100 d-flex flex-column">
+		       	 	<div class="sc-module-img position-relative">
+			            <a href="{{ product.href }}"><img src="{{ product.image }}" alt="{{ product.name }}" width="80" height="80" /></a>
+			        </div>
+			        <div class="sc-module-caption d-flex flex-column justify-content-between h-100">
+			        	<div class="sc-module-info">
+					        <a href="{{ product.href }}" class="sc-module-title dark-text fw-700">{{ product.name }}</a>
+							<div class="sc-module-stickers d-flex align-items-center mt-2">
+								<div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-{% if product.quantity <= 0 %}red{% else %}green{% endif %} sc-module-sticker-infinity">{{ product.stock }}</div>
+							</div>
+					        {% if model_setting and product.model %}
+					        	<div class="sc-module-model light-text fsz-10 mt-2"><span>{{ oct_live_search_model }}</span>{{ product.model }}</div>
+					        {% endif %}
+					        {% if sku_setting and product.sku %}
+					        	<div class="sc-module-model light-text fsz-10 mt-2"><span>{{ oct_live_search_sku }}</span>{{ product.sku }}</div>
+					        {% endif %}
+				        </div>
+						{% if price_setting %}
+						<div class="sc-module-price-box py-2 mt-auto">
+							{% if product.special %}
+								<span class="sc-module-price-old light-text fsz-14">{{ product.price }}</span>
+								<span class="sc-module-price fw-800 dark-text mt-1">{{ product.special }}</span>
+							{% else %}
+								<span class="sc-module-price fw-800 dark-text mt-1">{{ product.price }}</span>
+							{% endif %}
+						</div>
+						{% endif %}
+			        </div>
+		       	</div>
+		    </div>
+		{% endfor %}
+	</div>
+{% else %}
+	<div class="sc-livesearch-list">
+		{{ oct_live_search_result_empty }}
+	</div>
+{% endif %}

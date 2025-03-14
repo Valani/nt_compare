@@ -1,0 +1,77 @@
+<div class="modal fade" id="subscribeModal" tabindex="-1" aria-labelledby="subscribeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content">
+	        <div class="modal-header p-4">
+	            <h5 class="modal-title fsz-20 d-flex align-items-center justify-content-between" id="subscribeModalLabel">{{ heading_title }}</h5>
+	            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	        </div>
+	        <div id="subscribe-main-block" class="modal-body p-4">
+	            <div class="subscribe-text">
+	            	{{ promo_text }}
+	            </div>
+				{% if thumb %}
+	            	<div class="d-flex align-items-center justify-content-center my-4">
+						<img src="image/{{ thumb }}" alt="subscribe-img" width="150" height="150">
+					</div>
+				{% endif %}
+	            <div class="form-group mb-4">
+					<label for="inputEmailSubscribe" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ enter_email }}</label>
+					<input type="email" name="email" value="{{ email }}" class="form-control" id="inputEmailSubscribe" placeholder="{{ enter_email }}" inputmode="email">
+				</div>
+				{% if text_terms %}
+					<div class="form-check d-flex pb-3">
+						<input id="agreeSubscribeCheck" type="checkbox" class="form-check-input" name="agree">
+						<label class="form-check-label" for="agreeSubscribeCheck">
+							{{ text_terms }}
+						</label>
+					</div>
+				{% endif %}
+				<button type="submit" id="make_subscribe" class="sc-btn sc-btn-primary br-2"><span class="rm-btn-text">{{ button_subscribe }}</span></button>
+				<div class="sc-popup-successs d-none flex-column align-items-center">
+                    <img src="catalog/view/theme/oct_showcase/img/success.svg" alt="" width="150" height="150">
+                    <div id="popupSuccessSubscribeText" class="mb-4 text-center fw-500"></div>
+                    <button type="button" class="sc-btn sc-btn-primary br-2" data-bs-dismiss="modal" aria-label="Close">{{ oct_info_bar_close }}</button>
+                </div>
+			</div>
+	    </div>
+	</div>
+<script>
+$("#inputEmailSubscribe, #agreeSubscribeCheck").on("change paste keyup", function() {
+	$(this).removeClass('error_style');
+});
+$('#make_subscribe').on('click', function() {
+	$.ajax({
+		type: 'post',
+		url:  'index.php?route=octemplates/module/oct_subscribe/makeSubscribe',
+		dataType: 'json',
+		cache: false,
+		data: $('#subscribeModal input[type=\'email\'], #subscribeModal input[type=\'checkbox\']').serialize(),
+		beforeSend: function() {
+			masked('body', true);
+		},
+		complete: function() {
+			masked('body', false);
+		},
+		success: function(json) {
+			if (json['error']) {
+				$('#subscribeModal .text-danger').remove();
+				let errorOption = '';
+
+				$.each(json['error'], function(i, val) {
+					$('#subscribeModal [name="' + i + '"]').addClass('error_style');
+					errorOption += '<div class="alert-text-item">' + val + '</div>';
+				});
+
+				scNotify('danger', errorOption);
+			} else {
+				if (json['output']) {
+					$('#popupSuccessSubscribeText').html(json['output']);
+					$("#subscribe-main-block").html($(".sc-popup-successs"));
+					$(".sc-popup-successs").removeClass("d-none").addClass("d-flex");
+				}
+			}
+		}
+	});
+});
+</script>
+</div>

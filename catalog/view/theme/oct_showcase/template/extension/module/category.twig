@@ -1,0 +1,60 @@
+{% if categories and not oct_detect %}
+<div class="content-block p-0 overflow-hidden">
+	<div class="sc-column-title fsz-20 fw-700 dark-text">{{ text_module_category }}</div>
+	<ul class="list-unstyled sc-column-categories fw-500 fsz-14 p-0">
+		{% for category in categories %}
+			<li class="sc-column-categories-item{% if category.category_id == category_id %} clicked{% endif %}">
+				<span class="d-flex justify-content-between">
+					<a href="{{ category.href }}">{{ category.name }}</a>
+					{% if category.children %}
+					<button class="sc-column-categories-toggle sc-btn sc-btn-secondary sc-btn-with-icon br-4 p-0 d-flex align-items-center justify-content-center" aria-label="Expand">
+                        <span class="sc-btn-icon sc-btn-icon-chevron"></span>
+                    </button>
+					{% endif %}
+				</span>
+				{% if category.children %}
+				<ul class="sc-column-categories-children sc-categories-2 list-unstyled ps-0{% if category.category_id == category_id %} active{% endif %}">
+				{% for child in category.children %}
+					<li class="sc-column-categories-item{% if child.category_id == child_id %} clicked{% endif %}">
+						<span class="d-flex justify-content-between">
+							<a href="{{ child.href }}">{{ child.name }}</a>
+							{% if child.children %}
+								<button type="button" class="sc-column-categories-toggle sc-btn sc-btn-secondary sc-btn-with-icon br-4 p-0 d-flex align-items-center justify-content-center" aria-label="Expand">
+									<span class="sc-btn-icon sc-btn-icon-chevron"></span>
+								</button>
+							{% endif %}
+						</span>
+						{% if child.children %}
+						<ul class="sc-column-categories-children list-unstyled ps-0{% if child.category_id == child_id %} active{% endif %}">
+				        	{% for child_3 in child.children %}
+								<li class="sc-column-categories-item{% if child_3.category_id == ch_id %} clicked{% endif %}">
+									<span class="d-flex justify-content-between">
+										<a href="{{ child_3.href }}">{{ child_3.name }}</a>
+										{% if child_3.children %}
+											<button type="button" class="sc-column-categories-toggle sc-btn sc-btn-secondary sc-btn-with-icon br-4 p-0 d-flex align-items-center justify-content-center" aria-label="Expand">
+												<span class="sc-btn-icon sc-btn-icon-chevron"></span>
+											</button>
+										{% endif %}
+									</span>
+									{% if child_3.children %}
+										<ul class="sc-column-categories-children sc-categories-3 list-unstyled ps-0{% if child_3.category_id == ch_id %} active{% endif %}">
+										{% for child_4 in child_3.children %}
+											<li class="sc-column-categories-item{% if child_4.category_id == child3_id %} active{% endif %}">
+												<span><a href="{{ child_4.href }}">{{ child_4.name }}</a></span>
+											</li>
+										{% endfor %}	
+										</ul>
+									{% endif %}
+								</li>
+							{% endfor %}
+						</ul>
+				        {% endif %}
+			        </li>
+				{% endfor %}
+				</ul>
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endif %}

@@ -1,0 +1,98 @@
+<div class="modal fade" id="callbackModal" tabindex="-1" role="dialog" aria-labelledby="callbackModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content">
+	        <div class="modal-header p-4">
+	            <h5 class="modal-title fsz-20 d-flex align-items-center justify-content-between" id="callbackModalLabel">{{ heading_title }}</h5>
+	            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	        </div>
+	        <div id="call-main-block" class="modal-body p-4">
+				<div class="modal-body-text fsz-14 light-text pb-3">{{ enter_text }}</div>
+		        <form method="post" enctype="multipart/form-data" id="call-phone-form">
+					{% if oct_popup_call_phone_data.name %}
+						<div class="form-group pb-3">
+							<label for="inputCallbackName" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_call_phone_data.name == 2 %}<span class="required">* </span>{% endif %}{{ enter_name }}</label>
+							<input type="text" name="name" value="{{ name }}" class="form-control" id="inputCallbackName" placeholder="{{ enter_name }}" inputmode="text">
+						</div>
+					{% endif %}
+					{% if oct_popup_call_phone_data.telephone %}
+						<div class="form-group pb-3">
+							<label for="inputCallbackPhone" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_call_phone_data.telephone == 2 %}<span class="required">* </span>{% endif %}{{ enter_telephone }}</label>
+							<input type="tel" name="telephone" value="{{ telephone }}" class="form-control" id="inputCallbackPhone" placeholder="{{ enter_telephone }}" inputmode="tel">
+						</div>
+					{% endif %}
+					<input class="input-text" value="" type="hidden" name="url_page" />
+					{% if oct_popup_call_phone_data.comment %}
+						<div class="form-group pb-3">
+							<label for="inputCallbackComment" class="fsz-14 dark-text fw-500 pb-1">{{ enter_comment }}</label>
+							<textarea name="comment" class="form-control" id="inputCallbackComment" placeholder="{{ enter_comment }}"></textarea>
+						</div>
+					{% endif %}
+					{% if text_terms %}
+						<div class="form-check d-flex pb-3">
+							<input id="agreeCallbackCheck" type="checkbox" class="form-check-input" name="agree">
+							<label class="form-check-label" for="agreeCallbackCheck">
+								{{ text_terms }}
+							</label>
+						</div>
+					{% endif %}
+					<button type="submit" class="sc-btn sc-btn-primary br-2">{{ button_send }}</button>
+				</form>
+				<div class="sc-popup-success d-none">
+                    <div class="dark-text fw-600 text-center" id="callbackSuccessText"></div>
+                    <div class="d-flex align-items-center justify-content-center my-4">
+						<img src="catalog/view/theme/oct_showcase/img/success.svg" alt="" width="150" height="150">
+					</div>
+                    <button type="button" class="sc-btn sc-btn-primary br-2" data-bs-dismiss="modal" aria-label="Close">{{ oct_info_bar_close }}</button>
+                </div>
+	        </div>
+	    </div>
+	</div>
+	<script>
+	$("#inputCallbackName, #inputCallbackPhone, #inputCallbackComment, #agreeCallbackCheck").on("change paste keyup", function() {
+		$(this).removeClass('error_style');
+	});
+
+	$('[name="url_page"]').val(window.location.href);
+
+	$('#call-phone-form').on('submit', function( event ) {
+		event.preventDefault();
+		$.ajax({
+			type: 'post',
+			url:  'index.php?route=octemplates/module/oct_popup_call_phone/send',
+			dataType: 'json',
+			cache: false,
+			data: $('#call-phone-form').serialize(),
+			beforeSend: function() {
+				masked('body', true);
+			},
+			complete: function() {
+				masked('body', false);
+			},
+			success: function(json) {
+				if (json['error']) {
+					$('#callbackModal .text-danger').remove();
+					let errorOption = '';
+
+					$.each(json['error'], function(i, val) {
+						$('#callbackModal [name="' + i + '"]').addClass('error_style');
+						errorOption += '<div class="alert-text-item">' + val + '</div>';
+					});
+
+					scNotify('danger', errorOption);
+				} else {
+					if (json['output']) {
+						$("#callbackSuccessText").html(json['output']);
+						$("#call-main-block").html($(".sc-popup-success"));
+						$(".sc-popup-success").removeClass("d-none");
+					}
+				}
+			}
+		});
+	});
+	</script>
+	{% if mask is defined and mask is not empty %}
+	<script>
+	scInputMask('#inputCallbackPhone','{{ mask }}');
+	</script>
+	{% endif %}
+</div>

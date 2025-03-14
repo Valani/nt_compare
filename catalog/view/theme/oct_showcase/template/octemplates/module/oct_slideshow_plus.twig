@@ -1,0 +1,135 @@
+{% if oct_slideshows_plus %}
+<div class="row mt-3 mt-xl-4 sc-slideshow-plus{% if slider_with_megamenu %} with-megamenu{% endif %}">
+	<div class="col-12">
+		<div id="slideshow-plus-{{ module }}" class="sc-slideshow-plus-block h-100">
+			{% set key = 0 %}
+			{% for item_slide in oct_slideshows_plus %}
+				{% set key = key + 1 %}
+				<div class="{% if not full_img %}content-block sc-slideshow-plus-item sc-slideshow-plus-item_{{ key }}{% endif %}">
+					{% if full_img and item_slide.mobile_image %}
+						<div class="sc-slideshow-plus-item-fullimg h-100">
+							<a href="{{ item_slide.link }}" title="{{ item_slide.title }}">
+								<picture>
+									<source srcset="{{ item_slide.mobile_image }}" media="(max-width: 767px)">
+									<source srcset="{{ item_slide.image }}">
+									<img class="img-fluid br-4" src="{{ item_slide.image }}" alt="{{ item_slide.title }}" {% if oct_isMobile is defined %}width="{{ item_slide.mobile_width }}" height="{{ item_slide.mobile_height }}"{% else %}width="{{ item_slide.image_width }}" height="{{ item_slide.image_height }}"{% endif %}{% if key > 1 %} loading="lazy"{% endif %}>
+								</picture>
+							</a>
+						</div>
+					{% else %}
+						<div class="d-flex flex-column flex-md-row justify-content-md-between h-100">
+							<div class="sc-slideshow-plus-info order-1 order-md-0  flex-grow-1 d-flex flex-column">
+								<div class="h1">{{ item_slide.title }}</div>
+								<p class="sc-slideshow-plus-text light-text fw-400">{{ item_slide.description }}</p>
+								<a href="{{ item_slide.link }}" class="sc-btn sc-btn-secondary br-4 mt-auto mt-lg-3 align-self-start">{{ item_slide.button }}</a>
+							</div>
+							{% if not item_slide.full_img %}
+							<a href="{{ item_slide.link }}" class="order-0 order-md-1">
+								<img src="{{ item_slide.image }}" alt="{{ item_slide.title }}" width="{{ item_slide.image_width }}" height="{{ item_slide.image_height }}"{% if key > 1 %} loading="lazy"{% endif %} class="img-fluid mx-auto sc-slideshow-plus-item-img">
+							</a>
+							{% endif %}
+						</div>
+						<style>
+							{% if item_slide.background_color %}
+							#slideshow-plus-{{ module }} .sc-slideshow-plus-item_{{ key }} {background-color: {{ item_slide.background_color }};}
+							{% endif %}
+							{% if item_slide.title_color %}
+							#slideshow-plus-{{ module }} .sc-slideshow-plus-item_{{ key }} .h1 {color: {{ item_slide.title_color }};}
+							{% endif %}
+							{% if item_slide.text_color %}
+							#slideshow-plus-{{ module }} .sc-slideshow-plus-item_{{ key }} p {color: {{ item_slide.text_color }};}
+							{% endif %}
+							{% if item_slide.button_color and item_slide.button_background %}
+							#slideshow-plus-{{ module }} .sc-slideshow-plus-item_{{ key }} .sc-btn {background-color: {{ item_slide.button_background }};}
+							#slideshow-plus-{{ module }} .sc-slideshow-plus-item_{{ key }} .sc-btn {color: {{ item_slide.button_color }};}
+							{% endif %}
+							{% if item_slide.button_color_hover and item_slide.button_background_hover %}
+							#slideshow-plus-{{ module }} .sc-slideshow-plus-item_{{ key }} .sc-btn:hover {background-color: {{ item_slide.button_background_hover }};}
+							#slideshow-plus-{{ module }} .sc-slideshow-plus-item_{{ key }} .sc-btn:hover {color: {{ item_slide.button_color_hover }} !important;}
+							{% endif %}
+						</style>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+		<script>
+			window.addEventListener('DOMContentLoaded', () => {
+				$('#slideshow-plus-{{ module }}').slick({
+					autoplay: true,
+					{% if paginations_status %}dots: true,{% endif %}
+					arrows: false,
+					infinite: true,
+					autoplaySpeed: 5000,
+					slidesToShow: 1
+				});
+			});
+		</script>
+	</div>
+	{% if status_additional_banners %}
+	<div class="col-12 products-of-the-day">
+		<div class="fsz-20 fw-700 pt-4 pb-3">{{ text_promotional_product }}</div>
+		<div id="slideshow-plus-specials-{{ module }}" class="sc-slideshow-plus-specials">
+			{% for product in products %}
+				<div class="content-block-p24 sc-slideshow-plus-specials-item{% if product.oct_grayscale %} sc-no-stock{% endif %}">
+					<div class="d-flex">
+						<a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" width="{{ product.width }}" height="{{ product.height }}" loading="lazy"/></a>
+						<a href="{{ product.href }}" class="sc-slideshow-plus-specials-block-title fw-700 fsz-14 ps-3 dark-text d-inline-block">{{ product.name }}</a>
+					</div>
+					{% if product.price %}
+						<div class="sc-slideshow-plus-specials-block-price d-flex align-items-center mt-auto pt-3">
+							{% if not product.special %}
+							<span class="sc-slideshow-plus-specials-block-price-new dark-text fw-800 fsz-20 ms-2">{{ product.price }}</span>
+							{% else %}
+							<span class="sc-slideshow-plus-specials-block-price-old text-decoration-line-through fw-400 fsz-14">{{ product.price }}</span>
+							<span class="sc-slideshow-plus-specials-block-price-new dark-text fw-800 fsz-20 ms-2">{{ product.special }}</span>
+							{% endif %}
+							<button type="button" aria-label="To cart" class="sc-btn sc-btn-primary sc-btn-with-icon sc-module-cart-btn br-4 ms-auto">
+								<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--btn-cart-icon" alt="" width="20" height="20" class="sc-btn-icon sc-btn-icon-cart-img">
+							</button>
+							<input type="hidden" name="product_id" value="{{ product.product_id }}" />
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+		<script>
+			window.addEventListener('DOMContentLoaded', () => {
+				$('#slideshow-plus-specials-{{ module }}').slick({
+					autoplay: true,
+					dots: false,
+					arrows: true,
+					infinite: true,
+					autoplaySpeed: 5000,
+					slidesToShow: 3,
+					adaptiveHeight: true,
+					prevArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-prev sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center p-0" aria-label="Previous"><span class="sc-btn-icon"></span></button>',
+					nextArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-next sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center p-0" aria-label="Next"><span class="sc-btn-icon"></span></button>',
+					responsive: [{
+						breakpoint: 1600,
+						settings: {
+							slidesToShow: 3
+						}
+					}, 
+					{
+						breakpoint: 1440,
+						settings: {
+							slidesToShow: 2
+						}
+					}, {
+						breakpoint: 768,
+						settings: {
+							slidesToShow: 2
+						}
+					}, {
+						breakpoint: 576,
+						settings: {
+							slidesToShow: 1
+						}
+					}]			
+				});
+			});
+		</script>
+	</div>
+	{% endif %}
+</div>
+{% endif %}

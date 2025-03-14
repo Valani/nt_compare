@@ -1,0 +1,64 @@
+{% if articles %}
+	{% if position == 'column_left' or position == 'column_right' %}
+		<div  class="content-block p-0 overflow-hidden with-border position-relative">
+			<div class="sc-column-title fsz-20 fw-700 dark-text">{{ heading_title }}</div>
+			<div id="sc_blog_column_article-{{ module }}" class="sc-column-blog-articles">
+				{% for article in articles %}
+					<div class="sc-last-news-item w-100">
+						<div class="content-block h-100 d-flex flex-column p-0 pb-3 overflow-hidden border-0">
+							<a href="{{ article.href }}" title="{{ article.name }}">
+								<img src="{{ article.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ article.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="img-fluid oct-lazy"{% else %} class="img-fluid w-md-100"{% endif %} alt="{{ article.name }}" width="{{ article.width }}" height="{{ article.height }}" />
+							</a>
+							<div class="sc-last-news-caption d-flex flex-column justify-content-between w-100">
+								<div class="sc-last-news-info d-flex align-items-center justify-content-between p-3">
+									<div class="d-flex align-items-center">
+										{% for blog_category_name in article.blog_categories %}
+											<span class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-green me-1">{{ blog_category_name }}</span>
+										{% endfor %}
+									</div>
+									<span class="sc-last-news-item-date fsz-12">{{ article.date_added }}</span>
+								</div>
+								<a href="{{ article.href }}" class="sc-last-news-title fw-700 fsz-14 dark-text px-3">{{ article.name }}</a>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<script>
+				$('#sc_blog_column_article-{{ module }}').slick({
+					dots: false,
+					infinite: true,
+					prevArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-prev sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center" aria-label="Previous"><span class="sc-btn-icon"></span></button>',
+					nextArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-next sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center" aria-label="Next"><span class="sc-btn-icon"></span></button>',
+					slidesToShow: 1
+				});
+			</script>
+		</div>
+	{% else %}
+		<div class="row mt-3 mt-md-0 p-3 p-md-0 pt-xl-3 g-3 g-xl-4 sc-module">
+			<div class="sc-module-header fsz-22 dark-text fw-700 text-center text-md-start mt-0 mt-md-2 mb-2">
+				{{ heading_title }}
+			</div>
+			{% for article in articles %}
+				<div class="sc-last-news-item">
+					<div class="content-block h-100 d-flex flex-column p-0 pb-3 overflow-hidden">
+						<a href="{{ article.href }}" title="{{ article.name }}">
+							<img src="{{ article.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ article.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="img-fluid oct-lazy"{% else %} class="img-fluid w-md-100"{% endif %} alt="{{ article.name }}" width="{{ article.width }}" height="{{ article.height }}" />
+						</a>
+						<div class="sc-last-news-caption d-flex flex-column justify-content-between w-100">
+							<div class="sc-last-news-info d-flex flex-column flex-md-row align-items-md-center justify-content-between p-3">
+								<div class="d-flex align-items-center mb-2 mb-md-0">
+									{% for blog_category_name in article.blog_categories %}
+										<span class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-green me-1">{{ blog_category_name }}</span>
+									{% endfor %}
+								</div>
+								<span class="sc-last-news-item-date fsz-12">{{ article.date_added }}</span>
+							</div>
+							<a href="{{ article.href }}" class="sc-last-news-title fw-700 fsz-14 dark-text px-3">{{ article.name }}</a>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	{% endif %}
+{% endif %}

@@ -1,0 +1,110 @@
+{{ header }}
+<div id="oct_stock_notifier" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		{% if success %}
+			<script>
+				scNotify('success', '{{ success }}');
+			</script>
+		{% endif %}
+		<div class="row sc-account-row">
+			{{ column_left }}
+		    {% if column_left and column_right %}
+		    	{% set class = 'col-xl-6' %}
+		    {% elseif column_left or column_right %}
+		    	{% set class = 'col-xl-9' %}
+		    {% else %}
+		    	{% set class = 'col-xl-12' %}
+		    {% endif %}
+		    <div id="content" class="{{ class }}">
+			    <div class="content-block p-3 p-md-4 mobile-no-radius">
+                {% if requests %}
+                    <div class="table-responsive-sm sc-account-table">
+                        <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                            <th>{{ column_product }}</th>
+                            <th class="text-center">{{ column_date_added }}</th>
+                            <th class="text-center">{{ column_status }}</th>
+                            <th class="text-center">{{ column_action }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in requests %}
+                            <tr>
+                                <td class="py-3 fsz-12">
+                                    <a href="{{ request.product_href }}">{{ request.product_name }}</a>
+                                </td>
+                                <td class="py-3 text-center fsz-12">{{ request.subscribed_date }}</td>
+                                <td class="py-3 text-center fsz-14">
+                                    {% if request.status %}
+                                        <div class="text-success fw-500">
+                                            {{ text_status_processed }}
+                                            <br/>
+                                            <span class="fsz-10">{{ request.notified_date }}</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-warning fw-500">{{ text_status_pending }}</div>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-center">
+                                    <button type="button" class="sc-btn sc-btn-danger sc-btn-with-icon br-4 mx-auto" onclick="removeNotifyReguest('{{ request.subscription_id }}'); return false;">
+                                        <span class="sc-btn-icon sc-btn-icon-del"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row my-3 dark-text fsz-14">
+                        <div class="col-sm-6 text-start">{{ pagination }}</div>
+                        <div class="col-sm-6 text-end">{{ results }}</div>
+                    </div>
+                {% else %}
+                   <div class="fw-500 mb-3 dark-text">{{ text_no_requests }}</div>
+                   <a href="{{ continue }}" class="sc-btn sc-btn-primary br-4 sc-account-login-button">{{ button_continue }}</a>
+                {% endif %}
+			    </div>
+		    </div>
+		    {{ column_right }}
+		</div>
+		{{ content_bottom }}
+	</main>
+</div>
+<script>
+function removeNotifyReguest(subscription_id) {
+    if (!confirm('{{ text_confirm_remove }}')) {
+        return false;
+    }
+    $.ajax({
+        url: 'index.php?route=account/oct_stock_notifier/remove',
+        type: 'post',
+        data: 'subscription_id=' + subscription_id,
+        dataType: 'json',
+        success: function(json) {
+            if (json['success']) {
+                location = '{{ continue_redirect }}';
+            }
+        }
+    });
+}
+</script>
+{{ footer }}

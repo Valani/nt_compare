@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>UseShowcaseMobileFilterButton</name>
+	<code>button_001</code>
+	<version>1.0</version>
+	<date>24.12.2022</date>
+	<author>Octemplates</author>
+	<link>https://octemplates.net/</link>
+
+	<file path="catalog/view/theme/oct_showcase/template/product/{category,special,search}.twig">
+		
+		<operation>
+			<search><![CDATA[
+			<div class="ocf-btn-mobile-static ocf-mobile">
+			]]></search>
+			<add position="replace"><![CDATA[
+			<div class="d-xl-none sc-filter-btn sticky-top">
+			]]></add>
+		</operation>
+
+		<operation>
+			<search><![CDATA[
+				<button type="button" class="ocf-btn ocf-btn-default" data-ocf="mobile"><span class="ocf-btn-name">{{ button_ocfilter_mobile }}</span> <i class="ocf-icon ocf-icon-16 ocf-brand ocf-sliders"></i></button>
+			]]></search>
+			<add position="replace"><![CDATA[
+				<button type="button" class="sc-btn sc-btn-primary br-4 mb-3" data-ocf="mobile">
+                    <span class="sc-btn-icon sc-btn-icon-filter"></span>
+                    <span class="sc-btn-text">{{ button_ocfilter_mobile }}</span>
+                </button>
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/view/theme/oct_showcase/template/product/manufacturer_info.twig">
+		<operation>
+		  <search index="0"><![CDATA[{% if products %}]]></search>
+		  <add position="after" offset="1"><![CDATA[
+		  <!-- OCFilter Start -->      
+		  {% if ocfilter_mobile_button %}
+		  <div class="d-xl-none sc-filter-btn sticky-top">
+				<button type="button" class="sc-btn sc-btn-primary br-4 mb-3" data-ocf="mobile">
+                    <span class="sc-btn-icon sc-btn-icon-filter"></span>
+                    <span class="sc-btn-text">{{ button_ocfilter_mobile }}</span>
+                </button>
+		  </div>
+		  {% endif %}   
+		  <!-- /OCFilter End -->
+		  ]]></add>
+		</operation> 
+	</file>
+
+</modification>

@@ -1,0 +1,107 @@
+{% if oct_byoneclick_status is defined and oct_byoneclick_status %}
+<div class="sc-buy-one-click d-flex flex-column flex-sm-row align-items-sm-center p-3">
+	<span class="sc-buy-one-click-title dark-text fw-700 flex-grow-1">{{ oct_product_oneclick }}</span>
+	<form action="javascript:;" id="oct_purchase_byoneclick_form{{ oct_byoneclick_page }}" method="post">
+		<div class="input-group mt-2 mt-sm-0 w-100 w-md-auto">
+			<input type="tel" name="telephone" placeholder="{{ oct_product_oneclick_placeholder }}" id="one_click_input" class="one_click_input form-control" inputmode="tel">
+			{% if oct_byoneclick_product_id is defined and oct_byoneclick_product_id %}
+			<input type="hidden" name="product_id" value="{{ oct_byoneclick_product_id }}" />
+			{% endif %}
+			<input type="hidden" name="oct_byoneclick" value="1" />
+			{% if oct_cart_in is defined and oct_cart_in %}
+			<input type="hidden" name="oct_cart_in" value="1" />
+			{% endif %}
+			<span class="input-group-btn">
+				<button class="sc-btn sc-btn-secondary sc-btn-with-icon br-4 sc-product-one-click-btn" type="button" aria-label="Send">
+					<span class="sc-btn-icon sc-btn-icon-phone"></span>
+				</button>
+			</span>
+		</div>
+	</form>
+</div>
+{% if oct_byoneclick_mask is defined and oct_byoneclick_mask %}
+<script>
+scInputMask ('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} .one_click_input', '{{ oct_byoneclick_mask }}');
+</script>
+{% endif %}
+<script>
+$("#one_click_input").on("change paste keyup", function() {
+	$(this).removeClass('error_style');
+});
+$('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} .sc-product-one-click-btn').on('click', function() {
+	$.ajax({
+        type: 'post',
+        dataType: 'json',
+        url: 'index.php?route=octemplates/module/oct_popup_purchase/makeorder',
+        cache: false,
+        data: $('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }}').serialize(),
+        beforeSend: function() {
+        	$('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} .sc-product-one-click-btn').button('loading');
+			masked('body', true);
+		},
+        complete: function() {
+			$('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} .sc-product-one-click-btn').button('reset');
+			masked('body', false);
+        },
+        success: function(json) {
+	        if (json['error']) {
+				let errorOption = '';
+
+				$.each(json['error'], function(i, val) {
+					if (val) {
+						$('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} [name="' + i + '"]').addClass('error_style');
+						errorOption += '<div class="alert-text-item">' + val + '</div>';
+					}
+				});
+
+				scNotify('danger', errorOption);
+			} else {
+				if (json['success']) {
+					$(this).attr( "disabled", "disabled" );
+					successOption = '<div class="alert-text-item">' + json['success'] + '</div>';
+
+					$('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} #one_click_input').val('');
+					$('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} #one_click_input').removeClass('error_style');
+					$('#oct_purchase_byoneclick_form{{ oct_byoneclick_page }} .sc-product-one-click-btn').prop('disabled', true);
+
+					{% if oct_cart_in is defined and oct_cart_in %}
+						setTimeout(function () {
+							$('#cart .header-buttons-cart-quantity').html(0);
+						}, 100);
+
+						{% if oct_cart_page is defined and oct_cart_page %}
+							setTimeout(function () {
+								document.location.reload(true);
+							}, 3000);
+						{% endif %}
+					{% endif %}
+
+					{% if oct_analytics_google_ecommerce is defined and oct_analytics_google_ecommerce is not empty %}
+		            if (typeof gtag != 'undefined' && json['ecommerce']) {
+		                gtag('event', 'purchase', json['ecommerce']);
+		            }
+		            {% endif %}
+
+					let cartIdsHolder = document.querySelector("[data-cart-ids]");
+
+					if (cartIdsHolder) {
+						cartIdsHolder.dataset.cartIds = '';
+					}
+					
+					setCartBtnAdded(updateOk = true);
+
+					{% if isPopup is defined and isPopup %}
+						octPopupCart(successOption);
+					{% else %}
+						scNotify('success', successOption);
+						{% if oct_byoneclick_page == '_popup_cart' %}
+							scSidebar('{{ oct_cart }}', 'cart');
+						{% endif %}
+					{% endif %}
+				}
+			}
+        }
+    });
+});
+</script>
+{% endif %}

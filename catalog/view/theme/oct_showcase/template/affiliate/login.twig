@@ -1,0 +1,65 @@
+{{ header }}
+<div id="affiliate-login" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+ 	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+    <main class="main">
+        <div class="row">
+            <div class="col-12 sc-page-title pb-3">
+                <h1>{{ heading_title }}</h1>
+            </div>
+        </div>
+        <div class="content-top-box">{{ content_top }}</div>
+        {% if success %}
+            <script>
+                scNotify('success', '{{ success }}');
+            </script>
+        {% endif %}
+        {% if error_warning %}
+            <script>
+                scNotify('warning', '{{ error_warning }}');
+            </script>
+        {% endif %}
+        <div class="row">
+            <div id="content" class="col-12">
+                <div class="content-block p-3 p-md-4 mobile-no-radius">
+                    <div class="h3 mt-0">{{ text_returning_affiliate }}</div>
+                    <hr>
+                    <form action="{{ action }}" method="post" enctype="multipart/form-data">
+                        <div class="form-group mb-3">
+                            <label class="dark-text fsz-14 fw-500 mb-1" for="input-email">{{ entry_email }}</label>
+                            <input type="text" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="input-email" class="form-control"/>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="dark-text fsz-14 fw-500 mb-1" for="input-password">{{ entry_password }}</label>
+                            <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" id="input-password" class="form-control"/>
+                        </div>
+                        <div class="sc-account-login-forgotten mb-3">
+                            <a href="{{ forgotten }}" class="blue-link fw-500 fsz-14">{{ text_forgotten }}</a>
+                        </div>
+                            <button type="submit" class="sc-btn sc-btn-primary br-4 sc-account-login-button">{{ button_login }}</button>
+                            {% if redirect %}
+                                <input type="hidden" name="redirect" value="{{ redirect }}"/>
+                            {% endif %}
+                    </form>
+                </div>
+                <div class="content-block p-3 p-md-4 mobile-no-radius fsz-14 mt-3 mt-md-4">
+                    <div class="h3 mt-0">{{ text_register }}</div>
+                    <hr>
+                    <div class="sc-account-login-text">{{ text_register_account }}</div>
+                    <a href="{{ register }}" class="sc-btn sc-btn-primary br-4 mt-4 sc-account-login-button">{{ button_continue }}</a>
+                </div>
+            </div>
+        </div>
+        {{ content_bottom }}
+    </main>
+</div>
+{{ footer }}

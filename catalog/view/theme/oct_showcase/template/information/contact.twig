@@ -1,0 +1,199 @@
+{{ header }}
+<div id="information-contact" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		<div class="row sc-contact-us">
+			<div id="content" class="col-xl-12">
+				<div class="row g-0 gy-3 g-md-3">
+					<div class="col-xl-6 sc-contact-us-form-box">
+						<div class="content-block p-3 p-md-4 mobile-no-radius h-100">
+							<div class="text-center py-3">
+								<div class="h2 fw-500">{{ text_question_contact }}</div>
+								<div class="light-text fsz-14">{{ text_write_contact }}</div>
+							</div>
+							<hr>
+							<form action="{{ action }}" method="post" enctype="multipart/form-data" class="row pt-3">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="inputContactsName" class="fsz-14 dark-text fw-500 pb-1"><span class="required">*</span> {{ entry_name }}</label>
+										{% if (error_name) or (error_email) or (error_enquiry) or (error_oct_terms) %}
+											<script>
+												scNotify('danger', '{% if error_name %}{{ error_name }}{% endif %}{% if error_email %}<br />{{ error_email }}{% endif %}{% if error_enquiry %}<br />{{ error_enquiry }}{% endif %}{% if error_oct_terms %}<br />{{ error_oct_terms }}{% endif %}');
+											</script>
+										{% endif %}
+										<input type="text" name="name" value="{{ name }}" id="inputContactsName" class="form-control{% if error_name %} error_style{% endif %}" placeholder="{{ entry_name }}" />
+									</div>
+								</div>
+								<div class="col-md-6 pt-3 pt-md-0">
+									<div class="form-group">
+										<label for="inputContactsEmail" class="fsz-14 dark-text fw-500 pb-1"><span class="required">*</span> {{ entry_email }}</label>
+										<input type="email" name="email" value="{{ email }}" id="inputContactsEmail" class="form-control{% if error_email %} error_style{% endif %}" placeholder="{{ entry_email }}" />
+									</div>
+								</div>
+								<div class="col-12">
+									<div class="form-group py-4">
+										<label for="inputContactsComment" class="fsz-14 dark-text fw-500 pb-1"><span class="required">*</span> {{ entry_enquiry }}</label>
+										<textarea name="enquiry" rows="10" id="inputContactsComment" class="form-control{% if error_enquiry %} error_style{% endif %}" rows="7" placeholder="{{ entry_enquiry }}">{{ enquiry }}</textarea>
+									</div>
+									{{ captcha }}
+									{% if text_terms %}
+									<div class="form-check d-flex pb-4">
+										<input id="agreeCheaperCheck" type="checkbox" class="form-check-input{% if error_oct_terms %} error_style{% endif %}" name="scales"{% if scales_in is defined and scales_in %} checked{% endif %}>
+										<label class="form-check-label" for="agreeCheaperCheck">{{ text_terms }}</label>
+									</div>
+									{% endif %}
+									<button class="sc-btn sc-btn-primary br-4" type="submit">{{ button_submit }}</button>
+								</div>
+							</form>
+							<script>
+								$("#inputContactsName, #inputContactsEmail, #inputContactsComment, #agreeCheaperCheck").on("change paste keyup", function() {
+									$(this).removeClass('error_style');
+								});
+							</script>
+						</div>
+					</div>
+					{% if oct_contact_image is defined or contact_address is defined or contact_open is defined or contact_telephone is defined or contact_map is defined %}
+						<div class="col-xl-6">
+							<div class="sc-contact-us-item content-block p-3 p-md-4 mobile-no-radius h-100 overflow-hidden">
+								<div class="sc-contact-us-item-top d-flex justify-content-between">
+									<div class="sc-contact-us-item-info">
+										<div class="sc-contact-us-item-title fw-700 fsz-18 dark-text mb-2">{{ store }}</div>
+										{% if contact_address is defined and contact_address %}
+											<div class="sc-contact-us-item-address light-text fsz-14 mb-4">{{ contact_address }}</div>
+										{% endif %}
+										<div class="sc-contact-us-item-info-bottom row g-3 gx-5">
+											{% if contact_open is defined and contact_open %}
+												<div class="sc-contact-us-item-shedule col-6">
+													<div class="sc-contact-us-item-subtitle d-flex align-items-center mb-3">
+														<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--contacts-shedule-icon" alt="" width="24" height="24">
+														<span class="fw-500 dark-text ps-2">{{ oct_working_hours }}:</span>
+													</div>
+													<ul class="list-unstyled ps-0">
+														{% for open in contact_open %}
+															<li class="fsz-14 light-text">{{ open }}</li>
+														{% endfor %}
+													</ul>
+												</div>
+											{% endif %}
+											{% if contact_telephone is defined and contact_telephone %}
+												<div class="sc-contact-us-item-phones col-6">
+													<div class="sc-contact-us-item-subtitle d-flex align-items-center mb-3">
+														<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--contacts-phone-icon" alt="" width="24" height="24">
+														<span class="fw-500 dark-text ps-2">{{ oct_telephones }}</span>
+													</div>
+													<ul class="list-unstyled ps-0">
+														{% for telephone in contact_telephone %}
+															<li><a href="tel:{{ telephone|replace({" " : "", "-" : "", "(" : "", ")" : ""}) }}" class="blue-link">{{ telephone }}</a></li>
+														{% endfor %}
+													</ul>
+												</div>
+											{% endif %}
+											<div class="col-12">
+												{% if contact_socials is defined and contact_socials %}
+													<div class="sc-contact-us-item-subtitle d-flex align-items-center mb-2 fw-500 dark-text">{{ text_socials_contact }}</div>
+													<div class="sc-footer-socials-box d-flex align-items-center justify-content-start mt-0 pt-0">
+														{% for contact_social in contact_socials %}
+															<a rel="noopener noreferrer" href="{% if contact_social.link %}{{ contact_social.link }}{% else %}javascript:;{% endif %}" class="sc-footer-socials-item sc-footer-socials-item-fa-facebook-f d-flex align-items-center justify-content-center content-block" target="_blank">
+															<i class="{{ contact_social.icone }}"></i></a>
+														{% endfor %}
+													</div>
+												{% endif %}
+											</div>
+										</div>
+									</div>
+									{% if oct_contact_image is defined and oct_contact_image %}
+										<div class="sc-contact-us-item-img">
+											<img src="{{ oct_contact_image }}" alt="{{ store }}" class="br-2 img-fluid" width="330" height="170">
+										</div>
+									{% endif %}
+								</div>
+								{% if contact_map is defined %}
+									<hr>
+									<div class="br-8 overflow-hidden">
+										{{ contact_map }}
+									</div>
+								{% endif %}
+							</div>
+						</div>
+					{% endif %}
+					{% if oct_locations %}
+						{% for location in oct_locations %}
+							<div class="col-xl-6">
+								<div class="sc-contact-us-item content-block p-3 p-md-4 mobile-no-radius h-100 overflow-hidden">
+									<div class="sc-contact-us-item-top d-flex justify-content-between">
+										<div class="sc-contact-us-item-info">
+											<div class="sc-contact-us-item-title fw-700 fsz-18 dark-text mb-2">{{ location.title }}</div>
+											{% if location.link is defined and location.link %}
+												<div class="fsz-14 fw-500 dark-text mb-2">{{ oct_text_contact_site }} <a href="{{ location.link }}" class="blue-link">{{ location.link|replace({"https://" : "", "http://" : ""}) }}</a></div>
+											{% endif %}
+											{% if location.address is defined and location.address %}
+												<div class="sc-contact-us-item-address light-text fsz-14 mb-4">{{ location.address }}</div>
+											{% endif %}
+											<div class="sc-contact-us-item-info-bottom row g-3 gx-5">
+												{% if location.open is defined and location.open %}
+													<div class="sc-contact-us-item-shedule col-6">
+														<div class="sc-contact-us-item-subtitle d-flex align-items-center mb-3">
+															<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--contacts-shedule-icon" alt="" width="24" height="24">
+															<span class="fw-500 dark-text ps-2">{{ oct_working_hours }}:</span>
+														</div>
+														<ul class="list-unstyled ps-0">
+															{% for open in location.open %}
+																<li class="fsz-14 light-text">{{ open }}</li>
+															{% endfor %}
+														</ul>
+													</div>
+												{% endif %}
+												{% if location.phone is defined and location.phone %}
+													<div class="sc-contact-us-item-phones col-6">
+														<div class="sc-contact-us-item-subtitle d-flex align-items-center mb-3">
+															<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--contacts-phone-icon" alt="" width="24" height="24">
+															<span class="fw-500 dark-text ps-2">{{ oct_telephones }}</span>
+														</div>
+														<ul class="list-unstyled ps-0">
+															{% for phone in location.phone %}
+																<li><a href="tel:{{ phone|replace({" " : "", "-" : "", "(" : "", ")" : ""}) }}" class="blue-link">{{ phone }}</a></li>
+															{% endfor %}
+														</ul>
+													</div>
+												{% endif %}
+											</div>
+										</div>
+										{% if location.thumb is defined and location.thumb %}
+											<div class="sc-contact-us-item-img">
+												<img src="{{ location.thumb }}" alt="{{ location.title }}"  class="br-2 img-fluid" width="330" height="170">
+											</div>
+										{% endif %}
+									</div>
+									{% if location.map is defined %}
+										<hr>
+										<div class="br-8 overflow-hidden">
+											{{ location.map }}
+										</div>
+									{% endif %}
+								</div>
+							</div>
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		{{ content_bottom }}
+	</main>
+</div>
+{{ footer }}

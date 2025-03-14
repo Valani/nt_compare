@@ -1,0 +1,136 @@
+{% if reviews %}
+	{% if position == 'column_left' or position == 'column_right' %}
+		<div  class="content-block p-0 overflow-hidden with-border position-relative">
+			<div class="sc-column-title fsz-20 fw-700 dark-text">{{ heading_title }}</div>
+			<div id="sc-column-shop-reviews-{{ module }}" class="sc-column-shop-reviews">
+				{% for review in reviews %}
+				<div class="sc-shop-reviews-item p-3 h-100">
+					<div class="d-flex align-items-start justify-content-between">
+						<div class="sc-product-content-reviews-item-info">
+							<div class="sc-last-reviews-author d-flex align-items-center">
+								<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--review-author-icon" alt="{{ review.author }}" width="50" height="50">
+								<div class="sc-last-reviews-author-info ps-3">
+									<div class="sc-last-reviews-author-name fw-600 dark-text">{{ review.author }}</div>
+									<div class="sc-last-reviews-date fsz-12">{{ review.date_added }}</div>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex flex-column align-items-end">
+							<div class="sc-product-content-reviews-rating-stars d-inline-flex align-items-center mb-2">
+								{% for i in 1..5 %}
+									{% if review.avg_rating_stars < i %}
+										<span class="sc-module-rating-star"></span>
+									{% else %}
+										<span class="sc-module-rating-star sc-module-rating-star-is"></span>
+									{% endif %}
+								{% endfor %}
+							</div>
+							<div class="d-flex flex-column align-items-end position-relative">
+								<span class="blue-link fsz-14 sc-shop-reviews-item-details-link">{{ review.avg_rating }}</span>
+								<div class="sc-shop-reviews-item-details fsz-14 dark-text content-block no-hover-shadow p-2 position-absolute">
+									{% for rev in review.review_subject_array %}
+										<div class="sc-shop-reviews-item-details-item ">
+											<span class="fw-600">{{ rev.name }}</span>
+											-
+											{{ rev.rating }}</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="sc-shop-reviews-item-text pt-3 fsz-12">{{ review.text }}</div>
+				</div>
+				{% endfor %}
+			</div>
+			<script>
+				$('#sc-column-shop-reviews-{{ module }}').slick({
+					dots: false,
+					infinite: true,
+					prevArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-prev sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center" aria-label="Previous"><span class="sc-btn-icon"></span></button>',
+					nextArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-next sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center" aria-label="Next"><span class="sc-btn-icon"></span></button>',
+					slidesToShow: 1
+				});
+			</script>
+		</div>
+	{% else %}
+		<div class="sc-shop-reviews content-block-p24 mt-3 mt-xl-4">
+			<div class="sc-shop-reviews-top d-flex flex-column flex-md-row align-items-start justify-content-md-between pb-4 mb-4">
+				<div class="mb-4 mb-md-0">
+					<div class="sc-product-content-title d-flex align-items-center">
+						<div class="sc-product-content-title-icon d-flex align-items-center justify-content-center br-4">
+							<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--product-content-reviews-icon" alt="" width="16" height="16">
+						</div>
+						<span class="fsz-24 fw-600 dark-text">{{ text_review_total }} ({{ review_total }})</span>
+					</div>
+					<div class="sc-product-content-reviews-rating fw-600">
+						<span class="fsz-32 dark-text">{{ store_rating }}</span>
+						<span class="fsz-20 light-text"> / 5</span>
+					</div>
+					<div class="sc-product-content-reviews-rating-text light-text fsz-14 mb-4">{{ text_store_rating }}</div>
+					<a href="{{ href_all_reviews }}" class="sc-btn sc-btn-primary br-4">{{ see_all_text }}</a>
+				</div>
+				<div class="sc-shop-reviews-rating content-block no-hover-shadow">
+					{% for store_rating_with_subject in store_rating_with_subjects %}
+						<div class="sc-product-content-reviews-rating-item d-flex align-items-center justify-content-between">
+							<div class="fw-600 dark-text sc-shop-reviews-rating-subject">{{ store_rating_with_subject.name }}</div>
+							<div class="d-flex align-items-center justify-content-end flex-grow-1">
+								<div class="sc-product-content-reviews-rating-stars d-flex align-items-center mx-3">
+									{% for i in 1..5 %}
+										{% if store_rating_with_subject.value < i %}
+											<span class="sc-module-rating-star"></span>
+										{% else %}
+											<span class="sc-module-rating-star sc-module-rating-star-is"></span>
+										{% endif %}
+									{% endfor %}
+								</div>
+								<div class="sc-product-content-reviews-rating-value text-center">{{ store_rating_with_subject.value }}</div>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+			<div id="sc-shop-reviews_{{ module }}" class="row gy-4">
+				{% for review in reviews %}
+				<div class="col-12 col-lg-6 col-xl-4">
+					<div class="sc-shop-reviews-item content-block p-3 h-100">
+						<div class="d-flex align-items-start justify-content-between">
+							<div class="sc-product-content-reviews-item-info">
+								<div class="sc-last-reviews-author d-flex align-items-center">
+									<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--review-author-icon" alt="{{ review.author }}" width="50" height="50">
+									<div class="sc-last-reviews-author-info ps-3">
+										<div class="sc-last-reviews-author-name fw-600 dark-text">{{ review.author }}</div>
+										<div class="sc-last-reviews-date fsz-12">{{ review.date_added }}</div>
+									</div>
+								</div>
+							</div>
+							<div class="d-flex flex-column align-items-end">
+								<div class="sc-product-content-reviews-rating-stars d-inline-flex align-items-center mb-2">
+									{% for i in 1..5 %}
+										{% if review.avg_rating_stars < i %}
+											<span class="sc-module-rating-star"></span>
+										{% else %}
+											<span class="sc-module-rating-star sc-module-rating-star-is"></span>
+										{% endif %}
+									{% endfor %}
+								</div>
+								<div class="d-flex flex-column align-items-end position-relative">
+									<span class="blue-link fsz-14 sc-shop-reviews-item-details-link">{{ review.avg_rating }}</span>
+									<div class="sc-shop-reviews-item-details fsz-14 dark-text content-block no-hover-shadow p-2 position-absolute">
+										{% for rev in review.review_subject_array %}
+											<div class="sc-shop-reviews-item-details-item ">
+												<span class="fw-600">{{ rev.name }}</span>
+												-
+												{{ rev.rating }}</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="sc-shop-reviews-item-text pt-3 dark-text fsz-14">{{ review.text }}</div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	{% endif %}
+{% endif %}

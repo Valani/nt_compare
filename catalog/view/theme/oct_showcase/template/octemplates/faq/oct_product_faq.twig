@@ -1,0 +1,156 @@
+{% if page == 1 %}
+<div id="{{ oct_id_div }}" class="sc-product-content-faq pb-4 mb-md-4 pt-4 pt-md-0 px-3 px-lg-4">
+    {% if poup_is_not %}
+        <div class="sc-product-content-title d-flex align-items-center mb-4">
+            <div class="sc-product-content-title-icon d-flex align-items-center justify-content-center br-4">
+                <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--product-content-faq-icon" alt="" width="16" height="16">
+            </div>
+            <span class="fsz-24 fw-600 dark-text">{{ text_faq_title }}</span>
+        </div>
+        <button type="button" class="sc-btn sc-btn-outline sc-btn-outline-primary br-4" data-bs-toggle="modal" data-bs-target="#faqModal">{{ text_faq_button }}</button>
+        <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header p-4">
+                        <h5 class="modal-title fsz-20 d-flex align-items-center justify-content-between" id="faqModalLabel">{{ text_faq }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="sc-product-content-reviews-rating-text light-text fsz-14 mb-3 text-sm-start">{{ text_faq_text }}</div>
+                        <form id="form-faq" enctype="multipart/form-data" method="post">
+                            <div class="form-group pb-3">
+                                <label for="faqInputName" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ entry_name }}</label>
+                                <input type="text" name="name" {% if firstname %}value="{{ firstname }}"{% endif %} class="form-control" id="faqInputName" placeholder="{{ entry_name }}" inputmode="text">
+                            </div>
+                            <div class="form-group pb-3">
+                                <label for="faqInputEmail" class="fsz-14 dark-text fw-500 pb-1">{{ text_faq_email }}</label>
+                                <span class="small">{{ text_faq_email_detail }}</span>
+                                <input type="text" name="email" {% if email_user %}value="{{ email_user }}"{% endif %} class="form-control" id="faqInputEmail" placeholder="{{ text_faq_email }}" inputmode="email">
+                            </div>
+                            <div class="form-group pb-3">
+                                <label for="faqText" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ text_faq_textarea }}</label>
+                                <textarea id="faqText" name="text" class="form-control" placeholder="{{ text_faq_textarea }}"></textarea>
+                            </div>
+                            <div class="form-group">
+                                {{ captcha }}
+                            </div>
+                            <button type="button" id="button-oct_faq" class="sc-btn sc-btn-primary br-2">{{ button_continue }}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div id="{{ oct_faqs_id }}" class="dark-text fsz-14 mt-4">
+        {% if oct_faqs %}
+            {% for oct_faq in oct_faqs %}
+                <div class="sc-product-content-reviews-item p-3">
+                    <div class="sc-product-content-reviews-item-info">
+                        <div class="sc-last-reviews-author d-flex align-items-center">
+                            <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--review-author-icon" alt="" width="50" height="50">
+                        <div class="sc-last-reviews-author-info ps-3">
+                                <div class="sc-last-reviews-author-name fw-600 dark-text">{{ oct_faq.author }}</div>
+                                <div class="sc-last-reviews-date fsz-12 light-text">{{ oct_faq.date_added }}</div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="sc-product-content-reviews-item-text pt-3">
+                        <p>{{ oct_faq.text }}</p>
+                    </div>
+                    {% if oct_faq.answer is defined and oct_faq.answer %}
+                    <div class="sc-product-content-reviews-item-answer p-3 br-4 mt-3">
+                        <div class="sc-product-content-reviews-item-answer-title text-uppercase fw-600 mb-3">{{ text_faq_answer }}</div>
+                        <p>{{ oct_faq.answer }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="text-right">{{ pagination }}</div>
+        {% endif %}
+        {% if oct_faqs is empty %}
+            <div class="d-flex flex-column justify-content-center sc-empty-reviews mb-3 mb-md-0 text-center p-4 br-4">
+                <p class="fw-500 fsz-16 mb-3">{{ text_faq_empty }}</p>
+                <img src="catalog/view/theme/oct_showcase/img/answers-empty.svg" alt="" class="img-fluid d-block my-5 mx-auto" width="85" height="85">
+            </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+$("#faqInputName, faqInputEmail, #faqText").on("change paste keyup", function() {
+  $(this).removeClass('error_style');
+});
+$('body').on('click', '#{{ oct_faqs_id }} .pagination a', function(e){
+    e.preventDefault();
+
+    $('#{{ oct_faqs_id }}').html();
+
+    $('#{{ oct_faqs_id }}').load(this.href);
+
+    scrollToElement('#product_questions');
+});
+
+$('#button-oct_faq').on('click', function() {
+	$.ajax({
+		url: 'index.php?route=octemplates/faq/oct_product_faq/write&faqp_id={{ product_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: $("#form-faq").serialize(),
+		beforeSend: function() {
+			$('#button-oct_faq').button('loading');
+            $('#faqModal input, #faqModal textarea').removeClass('error_style');
+		},
+		complete: function() {
+			$('#button-oct_faq').button('reset');
+		},
+		success: function(json) {
+            $('.alert-dismissible').remove();
+
+            if (json['error']) {
+                let errorOption = '';
+
+                $.each(json['error'], function(i, val) {
+                    $('#faqModal [name="' + i + '"]').addClass('error_style');
+                    errorOption += '<div class="alert-text-item">' + val + '</div>';
+                });
+
+                scNotify('danger', errorOption);
+            }
+
+			if (json['success']) {
+                scNotify('success', json['success']);
+
+                $('#faqModal').modal('hide');
+                $('#form-faq input[name=\'name\']').val('');
+                $('#form-faq textarea[name=\'text\']').val('');
+			}
+		}
+	});
+});
+</script>
+{% else %}
+{% if oct_faqs %}
+    {% for oct_faq in oct_faqs %}
+        <div class="sc-product-content-reviews-item p-3">
+            <div class="sc-product-content-reviews-item-info">
+                <div class="sc-last-reviews-author d-flex align-items-center">
+                    <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--review-author-icon" alt="" width="50" height="50">
+                    <div class="sc-last-reviews-author-info ps-3">
+                        <div class="sc-last-reviews-author-name fw-600 dark-text">{{ text_faq_autor }}{{ oct_faq.author }}</div>
+                        <div class="sc-last-reviews-date fsz-12">{{ oct_faq.date_added }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sc-product-content-reviews-item-text pt-3">
+                <p>{{ oct_faq.text }}</p>
+            </div>
+            {% if oct_faq.answer is defined and oct_faq.answer %}
+            <div class="sc-product-content-reviews-item-answer p-3 br-4 mt-3">
+                <div class="sc-product-content-reviews-item-answer-title text-uppercase fw-600 mb-3">{{ text_faq_answer }}</div>
+                <p>{{ oct_faq.answer }}</p>
+            </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <div class="text-right">{{ pagination }}</div>
+{% endif %}
+{% endif %}

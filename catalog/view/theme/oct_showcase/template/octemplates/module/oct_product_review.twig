@@ -1,0 +1,92 @@
+{% if reviews %}
+{% if position == 'column_left' or position == 'column_right' %}
+<div  class="content-block p-0 overflow-hidden with-border position-relative">
+	<div class="sc-column-title fsz-20 fw-700 dark-text">{{ heading_title }}</div>
+	<div id="sc-column-last-reviews-{{ module }}" class="sc-column-last-reviews">
+		{% for review in reviews %}
+			<div class="sc-last-reviews-item">
+				<div class="p-3 h-100 d-flex flex-column">
+					<div class="d-flex justify-content-between">
+						<div class="sc-last-reviews-info d-flex">
+							<a href="{{ review.href }}">
+								<img src="{{ review.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ review.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="oct-lazy"{% endif %} alt="{{ review.name }}" width="{{ review.width }}" height="{{ review.height }}" />
+							</a>
+							<div class="sc-last-reviews-info-text ps-3">
+								<div class="sc-last-reviews-author-name fw-600 dark-text mb-1">{{ review.author }}</div>
+								<div class="sc-last-reviews-date fsz-12">{{ review.date }}</div>
+							</div>
+						</div>
+						<div class="sc-module-rating d-flex align-items-center br-4">
+							<div class="sc-module-rating-stars d-flex align-items-center">
+								{% if review.rating %}
+								{% for i in 1..5 %}
+								{% if review.rating < i %}
+								<span class="sc-module-rating-star"></span>
+								{% else %}
+								<span class="sc-module-rating-star sc-module-rating-star-is"></span>
+								{% endif %}
+								{% endfor %}
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<a href="{{ review.href }}" class="sc-last-reviews-title fw-700 fsz-14 dark-text mt-3 mb-2">{{ review.name }}</a>	
+					<div class="sc-last-reviews-text fsz-12">
+						{{ review.text }}
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+	<script>
+		$('#sc-column-last-reviews-{{ module }}').slick({
+			dots: false,
+			infinite: true,
+			prevArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-prev sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center" aria-label="Previous"><span class="sc-btn-icon"></span></button>',
+			nextArrow: '<button type="button" class="slick-slider-btn slick-slider-btn-next sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center" aria-label="Next"><span class="sc-btn-icon"></span></button>',
+			slidesToShow: 1
+		});
+	</script>
+</div>
+{% else %}
+	<div id="rm-product-reviews_{{ module }}" class="row mt-3 mt-md-0 p-3 p-md-0 pt-xl-3 g-3 g-xl-4 sc-module">
+		<div class="sc-module-header fsz-22 dark-text fw-700 text-center text-md-start mt-0 mt-md-2 mb-2">
+			{{ heading_title }}
+		</div>
+		{% for review in reviews %}
+			<div class="sc-last-reviews-item">
+				<div class="content-block h-100 d-flex flex-column">
+					<div class="d-flex justify-content-between">
+						<div class="sc-last-reviews-info d-flex">
+							<a href="{{ review.href }}">
+								<img src="{{ review.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ review.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="oct-lazy"{% endif %} alt="{{ review.name }}" width="{{ review.width }}" height="{{ review.height }}" />
+							</a>
+							<div class="sc-last-reviews-info-text ps-3">
+								<div class="sc-last-reviews-author-name fw-600 dark-text mb-1">{{ review.author }}</div>
+								<div class="sc-last-reviews-date fsz-12">{{ review.date }}</div>
+							</div>
+						</div>
+						<div class="sc-module-rating d-flex align-items-center br-4">
+							<div class="sc-module-rating-stars d-flex align-items-center">
+								{% if review.rating %}
+								{% for i in 1..5 %}
+								{% if review.rating < i %}
+								<span class="sc-module-rating-star"></span>
+								{% else %}
+								<span class="sc-module-rating-star sc-module-rating-star-is"></span>
+								{% endif %}
+								{% endfor %}
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<a href="{{ review.href }}" class="sc-last-reviews-title fw-700 fsz-14 dark-text mt-3 mb-2">{{ review.name }}</a>	
+					<div class="sc-last-reviews-text fsz-12">
+						{{ review.text }}
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% endif %}
+{% endif %}

@@ -1,0 +1,36 @@
+{% if oct_benefits %}
+<div id="rm-shop-advantages-{{ module }}" class="row pt-3 pt-xl-4 g-3 g-xl-4 sc-advantages">
+	{% set key = 0 %}
+	{% for oct_benefit in oct_benefits %}
+	{% set key = key + 1 %}
+		{% if oct_benefit.title[language_id] is defined and oct_benefit.title[language_id] %}
+		<div class="sc-advantages-item">
+			<div id="block{{ module }}-{{ key }}" class="content-block d-flex flex-column align-items-center text-center h-100">
+				<img src="{{ oct_benefit.icon }}" alt="{{ oct_benefit.title[language_id] }}" width="50" height="50">
+				{% if oct_benefit.link[language_id] is defined and oct_benefit.link[language_id] %}
+				<a href="{{ oct_benefit.link[language_id] }}" class="sc-advantages-item-title mt-3 mb-1 fsz-14 fw-600 dark-text">{{ oct_benefit.title[language_id] }}</a>
+				{% else %}
+				<span class="sc-advantages-item-title mt-3 mb-1 fsz-14 fw-600 dark-text">{{ oct_benefit.title[language_id] }}</span>
+				{% endif %}
+				{% if oct_benefit.text[language_id] is defined and oct_benefit.text[language_id] %}
+				<div class="sc-advantages-item-text fsz-12">{{ oct_benefit.text[language_id] }}</div>
+				{% endif %}
+			</div>
+		</div>
+		<style>
+			{% if oct_benefit.color_title %}
+			#block{{ module }}-{{ key }} .sc-advantages-item-title {color: {{ oct_benefit.color_title }};}
+			{% endif %}
+
+			{% if oct_benefit.color_text %}
+			#block{{ module }}-{{ key }} .sc-advantages-item-text {color: {{ oct_benefit.color_text }};}
+			{% endif %}
+
+			{% if oct_benefit.color_fon_hover %}
+			#block{{ module }}-{{ key }}:hover .sc-advantages-item-title {color: {{ oct_benefit.color_fon_hover }};}
+			{% endif %}
+		</style>
+		{% endif %}
+	{% endfor %}
+</div>
+{% endif %}

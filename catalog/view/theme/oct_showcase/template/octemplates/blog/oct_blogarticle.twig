@@ -1,0 +1,226 @@
+{{ header }}
+<div class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+    {% if oct_showcase_data.micro is defined and oct_showcase_data.micro %}
+    <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement":
+        [
+            {% for breadcrumb in breadcrumbs %}
+                {% if loop.first %}
+                {% else %}
+                {
+                    "@type": "ListItem",
+                    "position": {{ loop.index -1 }},
+                    "item":
+                    {
+                        "@id": "{{ breadcrumb.href }}",
+                        "name": "{{ breadcrumb.text }}"
+                    }
+                }{% if not loop.last %},{% endif %}
+                {% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    {% endif %}
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		<div class="row sc-account-row">
+			{{ column_left }}
+			{% if column_left and column_right %}
+				{% set class = 'col-xl-6' %}
+			{% elseif column_left or column_right %}
+				{% set class = 'col-xl-9' %}
+			{% else %}
+				{% set class = 'col-xl-12' %}
+			{% endif %}
+			<div id="content" class="{{ class }}">
+				<div class="content-block content-block-text p-3 p-md-4 mobile-no-radius sc-blog-post">
+					{% if thumb %}
+					<div class="sc-blog-post-photo br-4 overflow-hidden mb-3">
+						<img src="{{ thumb }}" alt="{{ heading_title }}" class="img-fluid" width="{{ thumb_width }}" height="{{ thumb_height }}" />
+					</div>
+					{% endif %}
+					<div class="sc-blog-post-text">
+						{{ description }}
+						{% if tags %}
+						<p class="sc-product-tags">{{ text_tags }}
+							{% for i in 0..tags | length - 1 %}
+								<a href="{{ tags[i].href }}">{{ tags[i].tag }}</a>{% if i < (tags|length - 1) %},{% endif %}
+							{% endfor %}
+						</p>
+						{% endif %}
+					</div>
+					{% if images %}
+					<div class="sc-blog-post-gallery">
+						<div class="h4">{{ entry_dop_photo }}</div>
+						<div class="row">
+							{% for image in images %}
+							<div class="col-4 col-md-3 col-lg-2">
+								<a href="{{ image.popup }}" data-fancybox="images" class="sc-blog-post-gallery-item br-4 overflow-hidden">
+									<img class="img-fluid" src="{{ image.thumb }}" alt="" width="{{ image.thumb_width }}" height="{{ image.thumb_height }}" />
+									<span class="d-none d-xl-flex align-items-center justify-content-center"></span>
+								</a>
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+					{% endif %}
+					<div class="sc-blog-post-info d-flex flex-column flex-md-row mt-3 py-3 py-xl-4 fsz-14 dark-text">
+						<div class="sc-blog-post-info-item sc-blog-post-info-item-date d-flex align-items-center">
+							<span class="fw-700">{{ date_added }}</span>
+						</div>
+						{% if review_status %}
+						<div class="sc-blog-post-info-item sc-blog-post-info-item-comments d-flex align-items-center">
+							<span class="fw-700">{{ comments_total }}</span>
+						</div>
+						{% endif %}
+						<div class="sc-blog-post-info-item sc-blog-post-info-item-views d-flex align-items-center">
+							<span class="fw-700">{{ comments_viewed }}</span>
+						</div>
+					</div>
+					{% if review_status %}
+					<div class="sc-blog-post-comments mt-4">
+						<button type="button" class="sc-btn sc-btn-outline sc-btn-outline-primary br-4" data-bs-toggle="modal" data-bs-target="#blogCommentModal">{{ text_add_comment }}</button>
+						<div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
+							<div class="modal fade" id="blogCommentModal" tabindex="-1" aria-labelledby="blogCommentModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered">
+									<div class="modal-content">
+										<div class="modal-header p-4">
+											<h5 class="modal-title fsz-20 fw-700 d-flex align-items-center justify-content-between my-0" id="blogCommentModalLabel">{{ text_write }}</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-4">
+											<form method="post" enctype="multipart/form-data" id="form-comment">
+													<div class="form-group pb-3">
+														<label for="inputNameComment" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ entry_name }}</label>
+														<input type="text" name="name" class="form-control" id="inputNameComment" placeholder="{{ entry_name }}">
+													</div>
+													<div class="form-group pb-3">
+														<label for="inputReviewComment" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ oct_article_your_comment }}</label>
+														<textarea id="inputReviewComment" name="text" class="form-control" placeholder="{{ oct_article_your_comment }}"></textarea>
+													</div>
+													<div class="sc-modal-comment fsz-12 dark-text mb-3">{{ text_note }}</div>
+													{% if captcha %}
+													<div class="form-group">
+														{{ captcha }}
+													</div>
+													{% endif %}
+													<button type="button" id="button-comment" class="sc-btn sc-btn-primary br-2">{{ button_continue }}</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="article-comments" class="dark-text fsz-14 mt-4"></div>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+			{{ column_right }}
+		</div>
+	</main>
+	{% if products %}
+		{{ products }}
+	{% endif %}
+	{% if articles %}
+	<div id="rm-related-article" class="row mt-3 mt-md-0 p-3 p-md-0 pt-xl-3 g-3 g-xl-4 sc-module">
+		<div class="sc-module-header fsz-22 dark-text fw-700 text-center text-md-start mt-0 mt-md-2 mb-2">{{ text_related_articles }}</div>
+		{% for article in articles %}
+			<div class="sc-last-news-item">
+				<div class="content-block h-100 d-flex flex-column p-0 pb-3 overflow-hidden">
+						<a href="{{ article.href }}" title="{{ article.name }}">
+							<img src="{{ article.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ article.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="img-fluid oct-lazy"{% else %} class="img-fluid w-md-100"{% endif %} alt="{{ article.name }}" width="{{ article.width }}" height="{{ article.height }}" />
+						</a>
+					<div class="sc-last-news-caption d-flex flex-column justify-content-between w-100">
+						<div class="sc-last-news-info d-flex align-items-center justify-content-between p-3">
+							<div class="d-flex align-items-center">
+								{% for blog_category_name in article.blog_categories %}
+									<span class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-green me-1">{{ blog_category_name }}</span>
+								{% endfor %}
+							</div>
+							<span class="sc-last-news-item-date fsz-12">{{ article.date_added }}</span>
+						</div>
+						<a href="{{ article.href }}" class="sc-last-news-title fw-700 fsz-14 dark-text px-3">{{ article.name }}</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+	{{ content_bottom }}
+</div>
+<script>
+	$("#inputNameComment, #inputReviewComment").on("change paste keyup", function() {
+		$(this).removeClass('error_style');
+	});
+
+	$('#article-comments').delegate('.pagination a', 'click', function(e) {
+	    e.preventDefault();
+	    $('#article-comments').load(this.href);
+        scrollToElement('.sc-blog-post-comments', false, -90);
+	});
+
+	$('#article-comments').load('index.php?route=octemplates/blog/oct_blogarticle/comment&blogarticle_id={{ blogarticle_id }}');
+
+	$('#button-comment').on('click', function() {
+		$.ajax({
+			url: 'index.php?route=octemplates/blog/oct_blogarticle/write&blogarticle_id={{ blogarticle_id }}',
+			type: 'post',
+			dataType: 'json',
+			cache: false,
+			data: $('#form-comment').serialize(),
+			beforeSend: function() {
+				$('#button-comment').button('loading');
+			},
+			complete: function() {
+				$('#button-comment').button('reset');
+			},
+			success: function(json) {
+				$('.alert-dismissible').remove();
+
+				if (json['error']) {
+					let errors = '';
+
+					$.each(json['error'], function(i, val) {
+						if (val) {
+							$('#form-comment [name="' + i + '"]').addClass('error_style');
+							errors += '<div class="alert-text-item">' + val + '</div>';
+						}
+					});
+
+					scNotify('danger', errors);
+				}
+
+				if (json['success']) {
+					scNotify('success', json['success']);
+					$('#blogCommentModal').modal('hide');
+					$('input[name=\'name\']').val('');
+					$('textarea[name=\'text\']').val('');
+					$('input[name=\'rating\']:checked').prop('checked', false);
+					$('.sc-module-rating-star-is').removeClass('sc-module-rating-star-is');
+				}
+			}
+		});
+	});
+</script>
+{{ footer }}

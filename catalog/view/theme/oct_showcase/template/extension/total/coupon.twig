@@ -1,0 +1,43 @@
+<div class="sc-cart-actions-block">
+    <div class="sc-cart-actions-block-title d-flex align-items-center fw-500 dark-text">{{ heading_title }}</div>
+    <div id="collapse-coupon" class="form-group sc-cart-actions-block-group">
+		<label for="input-coupon" class="sc-control-label fsz-14 fw-300 dark-text mb-2">{{ entry_coupon }}</label>
+		<div class="input-group flex-column flex-md-row align-items-md-stretch">
+			<input type="text" name="coupon" value="{{ coupon }}" placeholder="{{ entry_coupon }}" id="input-coupon" class="form-control" />
+			<span class="input-group-btn">
+				<button type="button" id="button-coupon" data-loading-text="{{ text_loading }}"  class="sc-btn sc-btn-secondary sc-input-with-btn h-100" />{{ button_coupon }}</button>
+			</span>
+		</div>
+		<script>
+		$('#button-coupon').on('click', function() {
+			$.ajax({
+				url: 'index.php?route=extension/total/coupon/coupon',
+				type: 'post',
+				data: 'coupon=' + encodeURIComponent($('input[name=\'coupon\']').val()),
+				dataType: 'json',
+				cache: false,
+				beforeSend: function() {
+					$('#button-coupon').button('loading');
+				},
+				complete: function() {
+					$('#button-coupon').button('reset');
+				},
+				success: function(json) {
+					$('.alert-dismissible').remove();
+
+					if (json['error']) {
+						scNotify('danger', json['error']);
+					}
+
+					if (json['redirect']) {
+						location = json['redirect'];
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		});
+		</script>
+	</div>
+</div>

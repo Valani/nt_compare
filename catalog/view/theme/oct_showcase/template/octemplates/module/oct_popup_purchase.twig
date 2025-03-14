@@ -1,0 +1,451 @@
+<div class="modal fade" id="quickOrderModal" tabindex="-1" aria-labelledby="quickOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header p-4">
+                <h5 class="modal-title fsz-20 d-flex align-items-center justify-content-between" id="quickOrderModalLabel">{{ heading_title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="one-click-main-block" class="modal-body p-4">
+                <form action="javascript:;" id="oct_purchase_form" method="post">
+                    <div class="content-block d-flex modal-body-product br-8">
+                        {% if thumb is defined %}
+                            <div class="modal-body-product-img p-2 br-8">
+                                <img src="{{ thumb }}"  width="64" height="64" alt="{{ heading_title_product }}">
+                            </div>
+                        {% endif %}
+                        <div class="modal-body-product-info ps-3 dark-text">
+                            <div class="modal-body-product-title fw-700 fsz-12">{{ product_name }}</div>
+                            {% if price %}
+                                {% if not special %}
+                                    <div class="sc-module-price mt-1 fw-800 fsz-14">{{ price }}</div>
+                                {% else %}
+                                    <div class="sc-module-price-old mt-1 light-text fsz-14">{{ price }}</div>
+                                    <div class="sc-module-price mt-1 fw-800 fsz-14">{{ special }}</div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="sc-product-options modal-body-options mt-3" id="sc-purchase-options-box">
+                        {% if price %}
+                            {% if options %}
+                                {% for option in options %}
+                                    {% if option.type == 'select' %}
+                                        <div class="form-group">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14 mb-2" for="input-option{{ option.product_option_id }}">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>
+                                                {% endif %}
+                                            </label>
+                                            <select name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}" class="sc-select form-control">
+                                                <option value="">{{ text_select }}</option>
+                                                {% for option_value in option.product_option_value %}
+                                                    <option value="{{ option_value.product_option_value_id }}">{{ option_value.name }}
+                                                        {% if option_value.price %}
+                                                            ({{ option_value.price_prefix }}{{ option_value.price }})
+                                                        {% endif %}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'radio' %}
+                                        <div class="form-group d-flex flex-column flex-md-row align-items-md-center mb-3">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>{% endif %}
+                                            </label>
+                                            <div id="input-option{{ option.product_option_id }}" class="options-box d-flex mt-3 mt-sm-0">
+                                                {% for option_value in option.product_option_value %}
+                                                    <div class="radio">
+                                                        <label
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            class="option optid-{{ option.product_option_id }} not-selected {% if option_value.image %} radio-img{% else %}sc-radio{% endif %}"
+                                                            title="{{ option_value.name }} {% if option_value.price %}{{ option_value.price_prefix }}{{ option_value.price }}{% endif %}">
+                                                            <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" class="input-radio"/>
+                                                            {% if option_value.image %}
+                                                                <img src="{{ option_value.image }}" alt="{{ option_value.name }} {% if option_value.price %} {{ option_value.price_prefix }} {{ option_value.price }} {% endif %}" width="50" height="50" />
+                                                            {% else %}
+                                                                {{ option_value.name }}
+                                                            {% endif %}
+                                                        </label>
+                                                        <script>
+                                                            $(document).ready(function() {
+                                                                $(document).on('touchstart click', 'label.optid-{{ option.product_option_id }}', function(event) {
+                                                                    $('label.optid-{{ option.product_option_id }}').removeClass('selected').addClass('not-selected');
+                                                                    $(this).removeClass('not-selected').addClass('selected');
+                                                                });
+                                                            });
+                                                        </script>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'checkbox' %}
+                                        <div class="form-checkbox-group mb-3">
+                                            <div class="sc-control-label fw-600 dark-text fsz-14 mb-2">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>{% endif %}
+                                            </div>
+                                            <div id="input-option{{ option.product_option_id }}">
+                                                {% for option_value in option.product_option_value %}
+                                                    <div class="form-check d-flex align-items-center mb-0">
+                                                        <label class="form-check-label">
+                                                            {% if option_value.image %}<img src="{{ option_value.image }}" alt="{{ option_value.name }} {% if option_value.price %} {{ option_value.price_prefix }} {{ option_value.price }} {% endif %}" class="img-thumbnail" width="50" height="50" />{% endif %}
+                                                            <input type="checkbox" id="option[{{ option.product_option_id }}][{{ option_value.product_option_value_id }}]" name="option[{{ option.product_option_id }}][]" value="{{ option_value.product_option_value_id }}" class="form-check-input"/>
+                                                            {{ option_value.name }}
+                                                            {% if option_value.price %}
+                                                                ({{ option_value.price_prefix }}{{ option_value.price }})
+                                                            {% endif %}
+                                                        </label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'text' %}
+                                        <div class="form-group">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14" for="input-option{{ option.product_option_id }}">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>
+                                                {% endif %}
+                                            </label>
+                                            <input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" placeholder="{{ option.name }}" id="input-option{{ option.product_option_id }}" class="form-control"/>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'textarea' %}
+                                        <div class="form-group">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14" for="input-option{{ option.product_option_id }}">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>{% endif %}
+                                            </label>
+                                            <textarea name="option[{{ option.product_option_id }}]" rows="5" placeholder="{{ option.name }}" id="input-option{{ option.product_option_id }}" class="form-control">{{ option.value }}</textarea>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'file' %}
+                                        <div class="form-group">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>{% endif %}
+                                            </label>
+                                            <button type="button" id="button-upload{{ option.product_option_id }}" data-loading-text="{{ text_loading }}" class="sc-btn sc-btn-primary br-4">
+                                                <i class="fa fa-upload me-2"></i>
+                                                {{ button_upload }}</button>
+                                            <input type="hidden" name="option[{{ option.product_option_id }}]" value="" id="input-option{{ option.product_option_id }}"/>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'date' %}
+                                        <div class="form-group">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14" for="input-option{{ option.product_option_id }}">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>{% endif %}
+                                            </label>
+                                            <div class="input-group date">
+                                                <input type="date" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" id="input-option{{ option.product_option_id }}" class="form-control"/>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'datetime' %}
+                                        <div class="form-group">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14" for="input-option{{ option.product_option_id }}">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>{% endif %}
+                                            </label>
+                                            <div class="input-group datetime">
+                                                <input type="datetime-local" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" id="input-option{{ option.product_option_id }}" class="form-control"/>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if option.type == 'time' %}
+                                        <div class="form-group">
+                                            <label class="sc-control-label fw-600 dark-text fsz-14" for="input-option{{ option.product_option_id }}">{{ option.name }}
+                                                {% if option.required %}
+                                                    <span class="required"> *</span>{% endif %}
+                                            </label>
+                                            <div class="input-group time">
+                                                <input type="time" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" id="input-option{{ option.product_option_id }}" class="form-control"/>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if oct_popup_purchase_data.quantity is defined %}
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="sc-control-label fw-600 dark-text fsz-14">{{ oct_cat_quantity }}</label>
+                                    <div class="sc-module-quantity d-flex align-items-center justify-content-center py-1 br-12 ms-4 ms-md-0">
+                                        <button type="button" class="sc-module-quantity-btn d-flex align-items-center justify-content-center" onclick="updatePurchaseValue(true, false, false);">
+                                            <span class="minus"></span>
+                                        </button>
+                                        <input type="text" id="popup-input-quantity" class="form-control" name="quantity" value="{{ minimum }}" inputmode="numeric">
+                                        <button type="button" class="sc-module-quantity-btn d-flex align-items-center justify-content-center" onclick="updatePurchaseValue(false, true, false);">
+                                            <span class="plus"></span>
+                                        </button>
+                                        <input type="hidden" id="min_quantity" value="{{ minimum }}" name="min_quantity">
+                                        <input type="hidden" id="max-purchase-quantity" value="{{ max_quantity }}" name="max_quantity">
+                                    </div>
+                                </div>
+                            {% else %}
+                                <input type="hidden" id="popup-input-quantity" name="quantity" value="{{ minimum }}" />
+                            {% endif %}
+                        {% endif %}
+                        {% if oct_popup_purchase_data.firstname %}
+                            <div class="form-group">
+                                <label for="inputPurchaseName" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_purchase_data.firstname == 2 %}<span class="required">* </span>{% endif %}{{ enter_firstname }}</label>
+                                <input type="text" name="name" value="{{ user_name }}" class="form-control" id="inputPurchaseName" placeholder="{{ enter_firstname }}" inputmode="text">
+                            </div>
+                        {% endif %}
+                        {% if oct_popup_purchase_data.telephone %}
+                            <div class="form-group">
+                                <label for="inputPurchasePhone" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_purchase_data.telephone == 2 %}<span class="required">* </span>{% endif %}{{ enter_telephone }}</label>
+                                <input type="tel" name="telephone" value="{{ user_telephone }}" class="form-control" id="inputPurchasePhone" placeholder="{{ enter_telephone }}" inputmode="tel">
+                            </div>
+                        {% endif %}
+                        {% if oct_popup_purchase_data.email %}
+                            <div class="form-group">
+                                <label for="inputPurchaseMail" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_purchase_data.email == 2 %}<span class="required">* </span>{% endif %}{{ enter_email }}</label>
+                                <input type="email" name="email" value="{{ user_email }}" class="form-control" id="inputPurchaseMail" placeholder="{{ enter_email }}" inputmode="email">
+                            </div>
+                        {% endif %}
+                        {% if oct_popup_purchase_data.comment %}
+                            <div class="form-group pb-3">
+                                <label for="inputPurchaseComment" class="fsz-14 dark-text fw-500 pb-1">{{ enter_comment }}</label>
+                                <textarea name="comment" class="form-control" id="inputPurchaseComment" placeholder="{{ enter_comment }}"></textarea>
+                            </div>
+                        {% endif %}
+                        <input type="hidden" name="product_id" value="{{ product_id }}"/>
+                        {% if text_agree %}
+                            <div class="form-check d-flex pb-3">
+                                <input id="agreePurchaseCheck" type="checkbox" class="form-check-input" name="agree">
+                                <label class="form-check-label" for="agreePurchaseCheck">
+                                    {{ text_agree }}
+                                </label>
+                            </div>
+                        {% endif %}
+                        {{ captcha }}
+                        <button id="button_checkout" type="submit" class="sc-btn sc-btn-primary br-2">{{ button_checkout }}</button>
+                    </div>
+                </form>
+                <div class="sc-popup-success d-none flex-column align-items-center text-center">
+                    <div class="d-flex align-items-center justify-content-center my-4">
+                        <img src="catalog/view/theme/oct_showcase/img/quick-order-success.svg" alt="" width="150" height="150">
+                    </div>
+                    <div id="sc-popup-success-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% if oct_popup_purchase_data.mask is defined and oct_popup_purchase_data.mask is not empty %}
+    <script>
+        scInputMask('#inputPurchasePhone', '{{ oct_popup_purchase_data.mask }}');
+    </script>
+{% endif %}
+<script>
+
+$("#inputPurchaseName, #inputPurchasePhone, #inputPurchaseMail, #inputPurchaseComment, #agreePurchaseCheck").on("change paste keyup", function() {
+    $(this).removeClass('error_style');
+});
+
+{% if error_stock_check is not defined %}
+    $('#button_checkout').on('click', function() {
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            url: 'index.php?route=octemplates/module/oct_popup_purchase/makeOrder',
+            data: $('#oct_purchase_form').serialize(),
+            beforeSend: function() {
+                masked('body', true);
+            },
+            complete: function() {
+                masked('body', false);
+            },
+            success: function(json) {
+                masked('body', false);
+                if (json['error']) {
+                    $('#quickOrderModal .text-danger').remove();
+                    let errorOption = '';
+
+                    $.each(json['error']['options'], function(i, val) {
+                        if (val) {
+                            var element = $('#oct_purchase_form #input-option' + i.replace('_', '-'));
+
+                            if (element.parent().hasClass('input-group')) {
+                                element.parent().after('<div class="text-danger">' + val + '</div>');
+                            } else {
+                                element.parent().after('<div class="text-danger mb-3">' + val + '</div>');
+                            }
+
+                            errorOption += '<div class="alert-text-item">' + val + '</div>';
+                        }
+                    });
+
+                    delete json['error']['options'];
+
+                    $.each(json['error'], function(i, val) {
+                        if (val) {
+                            $('#quickOrderModal [name="' + i + '"]').addClass('error_style');
+                            errorOption += '<div class="alert-text-item">' + val + '</div>';
+                        }
+                    });
+
+                    scNotify('danger', errorOption);
+                } else {
+                    if (json['success']) {
+                        {% if oct_analytics_google_ecommerce is defined and oct_analytics_google_ecommerce is not empty %}
+                            if (typeof gtag != 'undefined' && json['ecommerce']) {
+                                gtag('event', 'purchase', json['ecommerce']);
+                            }
+                        {% endif %}
+
+                        $("#sc-popup-success-text").html(json['success']);
+                        $("#one-click-main-block").html($(".sc-popup-success"));
+                        $(".sc-popup-success").removeClass("d-none");
+                    }
+                }
+            }
+        });
+    });
+{% endif %}
+
+$('#popup-input-quantity').on('input', function(e) {
+    updatePurchaseValue(false, false, true);
+});
+
+function updatePurchaseValue(minus, plus, manual) {
+    let min = parseInt($('#popup-input-quantity').val());
+    let currentMinimum = parseInt($('#min_quantity').val());
+    let max = parseInt($('#max-purchase-quantity').val());
+
+    if (max === 0)
+        return;
+
+    if (minus && min > 1) {
+        if (min <= currentMinimum) {
+            $('#popup-input-quantity').val(currentMinimum);
+            updatePurchasePrice();
+            return;
+        } else if (min > max) {
+            $('#popup-input-quantity').val(max);
+            updatePurchasePrice();
+            return;
+        }
+
+        $('#popup-input-quantity').val(~~ $('#popup-input-quantity').val() - 1);
+    }
+
+    if (plus) {
+        if (max && min > max - 1) {
+            $('#popup-input-quantity').val(max);
+            updatePurchasePrice();
+            return;
+        } else if (min < currentMinimum) {
+            $('#popup-input-quantity').val(currentMinimum);
+            updatePurchasePrice();
+            return;
+        }
+
+        $('#popup-input-quantity').val(~~ $('#popup-input-quantity').val() + 1);
+    }
+
+    if (manual) {
+        if (min <= currentMinimum) {
+            $('#popup-input-quantity').val(currentMinimum);
+            updatePurchasePrice();
+            return;
+        } else if (min > max) {
+            $('#popup-input-quantity').val(max);
+            updatePurchasePrice();
+            return;
+        }
+
+    }
+
+    updatePurchasePrice();
+}
+
+$("#sc-purchase-options-box input:not(.form-control), #sc-purchase-options-box select ").on('change', function() {
+    updatePurchasePrice();
+});
+
+function updatePurchasePrice() {
+    masked('body', true);
+    $.ajax({
+        type: 'post',
+        url: 'index.php?route=octemplates/main/oct_functions/updatePrices',
+        data: $('#quickOrderModal input[type=\'text\'], #quickOrderModal input[type=\'hidden\'], #quickOrderModal input[type=\'radio\']:checked, #quickOrderModal input[type=\'checkbox\']:checked, #quickOrderModal select'),
+        dataType: 'json',
+        cache: false,
+        success: function(json) {
+            {% if special %}
+                $('#quickOrderModal .sc-module-price-old').html(json['price']);
+                $('#quickOrderModal .sc-module-price').html(json['special']);
+            {% else %}
+                $('#quickOrderModal .sc-module-price').html(json['price']);
+            {% endif %}
+
+            {% if oct_sticker_you_save and you_save %}
+                $('#popup-quickorder-product-you-save').html(json['you_save']);
+            {% endif %}
+
+            {% if tax %}
+                $('.rm-product-center-price-tax > span').html(json['tax']);
+            {% endif %}
+            masked('body', false);
+        }
+    });
+}
+
+$('button[id^=\'popup-button-upload\']').on('click', function() {
+    var node = this;
+
+    $('#form-upload').remove();
+
+    $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+    $('#form-upload input[name=\'file\']').trigger('click');
+
+    if (typeof timer != 'undefined') {
+        clearInterval(timer);
+    }
+
+    timer = setInterval(function() {
+        if ($('#form-upload input[name=\'file\']').val() != '') {
+            clearInterval(timer);
+
+            $.ajax({
+                url: 'index.php?route=tool/upload',
+                type: 'post',
+                dataType: 'json',
+                data: new FormData($('#form-upload')[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    $(node).button('loading');
+                },
+                complete: function() {
+                    $(node).button('reset');
+                },
+                success: function(json) {
+                    $('.text-danger').remove();
+
+                    if (json['error']) {
+                        $(node).parent().find('input').after('<div class="text-danger">' + json['error'] + '</div>');
+                    }
+
+                    if (json['success']) {
+                        alert(json['success']);
+
+                        $(node).parent().find('input').val(json['code']);
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+            });
+        }
+    }, 500);
+});
+</script>

@@ -1,0 +1,76 @@
+{{ header }}
+<div id="account-newsletter" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		<div class="row sc-account-row">
+			{{ column_left }}
+		    {% if column_left and column_right %}
+		    	{% set class = 'col-xl-6' %}
+		    {% elseif column_left or column_right %}
+		    	{% set class = 'col-xl-9' %}
+		    {% else %}
+		    	{% set class = 'col-xl-12' %}
+		    {% endif %}
+		    <div id="content" class="{{ class }}">
+				<div class="content-block p-3 p-md-4 mobile-no-radius">
+					<form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+						<fieldset class="sc-account-form p-0">
+							<legend class="h3 mt-0">{{ entry_newsletter }}</legend>
+							<div class="d-flex">
+								{% if newsletter %}
+									<div class="form-check d-flex align-items-center mb-0">
+										<label class="form-check-label">
+											<input type="radio" class="form-check-input" name="newsletter" id="CheckYes" value="1" checked="checked" />
+											{{ text_yes }}
+										</label>
+									</div>
+									<div class="form-check d-flex align-items-center mb-0 ms-2">
+										<label class="form-check-label">
+											<input type="radio" class="form-check-input" name="newsletter" id="CheckNo" value="0" />
+											{{ text_no }}
+										</label>
+									</div>
+								{% else %}
+									<div class="form-check d-flex align-items-center mb-0">
+										<label class="form-check-label">
+											<input type="radio" class="form-check-input" name="newsletter" id="CheckYes" value="1" />
+											{{ text_yes }}
+										</label>
+									</div>
+									<div class="form-check d-flex align-items-center mb-0 ms-2">
+										<label class="form-check-label">
+											<input type="radio" class="form-check-input" name="newsletter" id="CheckNo" value="0" checked="checked" />
+											{{ text_no }}
+										</label>
+									</div>
+								{% endif %}
+							</div>
+						</fieldset>
+						<div class="mt-4">
+							<input type="submit" value="{{ button_continue }}" class="sc-btn sc-btn-primary br-4 sc-account-login-button" />
+						</div>
+					</form>
+				</div>
+			</div>
+			{{ column_right }}
+		</div>
+		{{ content_bottom }}
+	</main>
+</div>
+{{ footer }}

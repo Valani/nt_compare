@@ -1,0 +1,25 @@
+{% if comments %}
+	{% for comment in comments %}
+		<div class="sc-product-content-reviews-item p-3">
+			<div class="sc-product-content-reviews-item-info">
+				<div class="sc-last-reviews-author d-flex align-items-center">
+					<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--review-author-icon" alt="user-icon" width="50" height="50" />
+					<div class="sc-last-reviews-author-info ps-3">
+						<div class="sc-last-reviews-author-name fw-600 dark-text">{{ comment.author }}</div>
+						<div class="sc-last-reviews-date fsz-12 light-text">{{ comment.date_added }}</div>
+					</div>
+				</div>
+			</div>
+			<div class="sc-product-content-reviews-item-text pt-3">{{ comment.text }}</div>
+			{% if comment.admin_text %}
+				<div class="sc-product-content-reviews-item-answer p-3 br-4 mt-3">
+					<div class="sc-product-content-reviews-item-answer-title text-uppercase fw-600 mb-3">{{ text_admin_title }}</div>
+					<p>{{ comment.admin_text }}</p>
+				</div>
+			{% endif %}
+		</div>
+	{% endfor %}
+	<div class="pt-3">{{ pagination }}</div>
+{% else  %}
+	<div class="dark-text fw-500">{{ entry_empty_comments }}</div>
+{% endif %}

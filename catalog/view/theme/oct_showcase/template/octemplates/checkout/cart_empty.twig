@@ -1,0 +1,20 @@
+{{ header }}
+<div id="error-not-found" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<main class="main mt-3">
+		<div class="row">
+            <div class="col-12 sc-page-title pb-3">
+                <h1>{{ heading_title }}</h1>
+            </div>
+        </div>
+		<div class="content-top-box">{{ content_top }}</div>
+		<div class="content-block p-3 p-md-4 mobile-no-radius">
+			<img class="img-fluid mb-3 mx-auto d-block" src="catalog/view/theme/oct_showcase/img/empty-cart.svg" width="300" height="300" />
+			<div class="text-center">
+				<p class="fw-500 fsz-18 mb-4">{{ text_error }}</p>
+				<a href="{{ continue }}" class="sc-btn sc-btn-primary mt-3 br-4 d-inline-flex">{{ button_continue }}</a>
+			</div>
+		</div>
+		{{ content_bottom }}
+	</div>
+</div>
+{{ footer }}

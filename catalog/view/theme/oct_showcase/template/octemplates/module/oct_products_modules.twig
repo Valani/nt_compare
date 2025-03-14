@@ -1,0 +1,272 @@
+{% if products %}
+    {% if position == 'column_left' or position == 'column_right' %}
+        <div class="content-block p-0 overflow-hidden with-border position-relative">
+            <div class="sc-column-title fsz-20 fw-700 dark-text">
+                {% if link is defined and link %}
+                    <a href="{{ link }}">
+                {% endif %}
+                {{ heading_title }}
+                {% if link is defined and link %}
+                    </a>
+                {% endif %}
+            </div>
+            <div id="sc-column-{{ module_name }}_{{ module }}" class="sc-column-products">
+                {% for product in products %}
+                    <div class="sc-column-item">
+                        <div class="sc-module-item h-100 d-flex flex-column p-3{% if product.oct_grayscale %} rm-no-stock{% endif %}">
+                            <div class="sc-module-img position-relative">
+                                <a href="{{ product.href }}">
+                                    <img
+                                        src="{{ product.thumb }}"
+                                        {% if oct_lazyload is defined and oct_lazyload %}
+                                        data-srcset="{{ product.thumb }} 100w"
+                                        srcset="{{ oct_lazy_image }} 100w"
+                                        sizes="100vw"
+                                        class="img-fluid oct-lazy"
+                                        {% else %}
+                                        class="img-fluid"
+                                        {% endif %}
+                                        alt="{{ product.name }}"
+                                        title="{{ product.name }}"
+                                        width="{{ product.width }}"
+                                        height="{{ product.height }}"/>
+                                </a>
+                                <div class="sc-module-stickers d-flex align-items-center mt-3">
+                                    {% if oct_sticker_you_save and product.you_save %}
+                                        <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-red sc-module-sticker-infinity">{{ product.you_save }}</div>
+                                    {% endif %}
+                                    {% if not product.quantity %}
+                                        <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-green sc-module-sticker-infinity">{{ oct_product_stock }}</div>
+                                    {% endif %}
+                                    {% if product.oct_stickers is not empty %}
+                                        {% for key, oct_sticker in product.oct_stickers %}
+                                            {% if oct_sticker is not empty and oct_sticker is iterable %}
+                                                <div class="sc-module-sticker sc-module-sticker-image pe-0 py-0 order-1">
+                                                    <img src="{{ oct_sticker.image }}" alt="{{ oct_sticker.title }}" data-bs-html="true" data-bs-placement="top" data-bs-toggle="popover" data-bs-trigger="hover" title="{{ oct_sticker.title }}" data-bs-content="{{ oct_sticker.description }}" width="24" height="24" />
+                                                </div>
+                                            {% elseif oct_sticker is not empty %}
+                                                <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-{{ key }}">
+                                                    {{ oct_sticker }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="sc-module-btns d-flex flex-column position-absolute">
+                                    {% if oct_popup_view_status %}
+                                        <button type="button" aria-label="Quick view" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4" title="{{ oct_popup_view }}" onclick="octPopUpView('{{ product.product_id }}')">
+                                            <span class="sc-btn-icon sc-btn-icon-viewed"></span>
+                                        </button>
+                                    {% endif %}
+                                    <button type="button" aria-label="Wishlist" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 sc-wishlist-btn" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');">
+                                        <span class="sc-btn-icon sc-btn-icon-wishlist"></span>
+                                    </button>
+                                    <button type="button" aria-label="Compare" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 sc-compare-btn" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}');">
+                                        <span class="sc-btn-icon sc-btn-icon-compare"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="sc-module-caption d-flex flex-column justify-content-between pt-md-2 h-100">
+                                <div class="sc-module-info">
+                                    <a href="{{ product.href }}" class="sc-module-title dark-text fw-700">{{ product.name }}</a>
+                                    {% if product.oct_model is defined and product.oct_model %}
+                                    <div class="sc-module-model light-text fsz-10 mt-2"><span>{{ oct_view_model_cat }}</span>{{ product.oct_model }}</div>
+                                    {% endif %}
+                                    {% if product.rating is not same as(false) %}
+                                    <div class="sc-module-rating d-flex align-items-center mt-2 mb-1 br-4">
+                                        <div class="sc-module-rating-stars d-flex align-items-center">
+                                            {% for i in 1..5 %}
+                                                {% if product.rating < i %}
+                                                    <span class="sc-module-rating-star"></span>
+                                                {% else %}
+                                                    <span class="sc-module-rating-star sc-module-rating-star-is"></span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <div class="sc-module-reviews d-flex align-items-center">
+                                            <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--module-comments-icon" alt="" width="12" height="12" />
+                                            <span class="dark-text fsz-12 ps-1">{{ product.reviews }}</span>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if product.price %}
+                                        <div class="sc-module-price-box py-2 mt-auto">
+                                            {% if product.tax %}
+                                                <div class="price-tax fw-300 fsz-12 light-text">
+                                                    {{ text_tax }} {{ product.tax }}
+                                                </div>
+                                            {% endif %}
+                                            {% if not product.special %}
+                                                <span class="sc-module-price fw-800 dark-text mt-1">{{ product.price }}</span>
+                                            {% else %}
+                                                <span class="sc-module-price-old light-text fsz-14">{{ product.price }}</span>
+                                                <span class="sc-module-price fw-800 dark-text mt-1">{{ product.special }}</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" aria-label="Previous" id="sc-{{ module_name }}_{{ module }}-button-prev" class="slick-slider-btn slick-slider-btn-prev sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center">
+                <span class="sc-btn-icon"></span>
+            </button>
+            <button type="button" aria-label="Next" id="sc-{{ module_name }}_{{ module }}-button-next" class="slick-slider-btn slick-slider-btn-next sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 overflow-hidden d-flex align-items-center justify-content-center">
+                <span class="sc-btn-icon"></span>
+            </button>
+            <script>
+                octColumnProducts("sc-{{ module_name }}_{{ module }}-button-prev", "sc-{{ module_name }}_{{ module }}-button-next", "sc-column-{{ module_name }}_{{ module }}");
+            </script>
+        </div>
+    {% else %}
+        <div id="sc-{{ module_name }}_{{ module }}" class="row mt-3 mt-md-0 p-3 p-md-0 pt-xl-3 g-2 g-md-3 sc-module"{% if show_type == '' %} data-type="split"{% endif %}{% if show_type == 'width-100' %} data-type="width100"{% endif %}{% if show_type == 'width-50' %} data-type="width50"{% endif %}{% if show_type == 'width-infinity' %} data-type="slider"{% endif %}{% if show_type == 'width-minimal' %} data-type="minimal"{% endif %}>
+            <div class="sc-module-header fsz-22 dark-text fw-700 text-center text-md-start mt-0 mt-md-2 mb-2">
+                {% if link is defined and link %}<a href="{{ link }}">{% endif %}
+                {{ heading_title }}
+                {% if link is defined and link %}</a>{% endif %}
+            </div>
+            {% if show_type == 'width-infinity' %}<div class="sc-module-infinity col-12"><div class="row p-0 g-2 g-md-3">{% endif %}
+                {% for product in products %}
+                <div class="sc-module-item sc-module-col">
+                    <div class="content-block h-100 d-flex flex-column{% if product.oct_grayscale %} sc-no-stock{% endif %}">
+                        <div class="sc-module-img position-relative">
+                            <a href="{{ product.href }}">
+                                <img
+                                    src="{{ product.thumb }}"
+                                    {% if oct_lazyload is defined and oct_lazyload %}
+                                    data-srcset="{{ product.thumb }} 100w"
+                                    srcset="{{ oct_lazy_image }} 100w"
+                                    sizes="100vw"
+                                    class="img-fluid oct-lazy"
+                                    {% else %}
+                                    class="img-fluid"
+                                    {% endif %}
+                                    alt="{{ product.name }}"
+                                    title="{{ product.name }}"
+                                    width="{{ product.width }}"
+                                    height="{{ product.height }}"/>
+                            </a>
+                            <div class="sc-module-stickers d-flex align-items-center mt-3">
+                                {% if oct_sticker_you_save and product.you_save %}
+                                    <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-red sc-module-sticker-infinity">{{ product.you_save }}</div>
+                                {% endif %}
+                                {% if not product.quantity %}
+                                    <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-green sc-module-sticker-infinity">{{ oct_product_stock }}</div>
+                                {% endif %}
+                                {% if product.oct_stickers is not empty %}
+                                    {% for key, oct_sticker in product.oct_stickers %}
+                                        {% if oct_sticker is not empty and oct_sticker is iterable %}
+                                            <div class="sc-module-sticker sc-module-sticker-image pe-0 py-0 order-1">
+                                                <img src="{{ oct_sticker.image }}" alt="{{ oct_sticker.title }}" data-bs-html="true" data-bs-placement="top" data-bs-toggle="popover" data-bs-trigger="hover" title="{{ oct_sticker.title }}" data-bs-content="{{ oct_sticker.description }}" width="24" height="24" />
+                                            </div>
+                                        {% elseif oct_sticker is not empty %}
+                                            <div class="sc-module-sticker br-4 fsz-10 fw-500 sc-module-sticker-{{ key }}">
+                                                {{ oct_sticker }}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="sc-module-btns d-flex flex-column position-absolute">
+                                {% if oct_popup_view_status %}
+                                <button type="button" aria-label="Quick view" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4" title="{{ oct_popup_view }}" onclick="octPopUpView('{{ product.product_id }}')">
+                                    <span class="sc-btn-icon sc-btn-icon-viewed"></span>
+                                </button>
+                                {% endif %}
+                                <button type="button" aria-label="Wishlist" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 sc-wishlist-btn" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');">
+                                    <span class="sc-btn-icon sc-btn-icon-wishlist"></span>
+                                </button>
+                                <button type="button" aria-label="Compare" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon br-4 sc-compare-btn" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}');">
+                                    <span class="sc-btn-icon sc-btn-icon-compare"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="sc-module-caption d-flex flex-column justify-content-between py-md-2 h-100">
+                            <div class="sc-module-info">
+                                <a href="{{ product.href }}" class="sc-module-title dark-text fw-700">{{ product.name }}</a>
+                                {% if product.oct_model is defined and product.oct_model %}
+                                <div class="sc-module-model light-text fsz-10 mt-2"><span>{{ oct_view_model_cat }}</span>{{ product.oct_model }}</div>
+                                {% endif %}
+                                {% if product.rating is not same as(false) %}
+                                <div class="sc-module-rating d-flex align-items-center mt-2 mb-1 br-4">
+                                    <div class="sc-module-rating-stars d-flex align-items-center">
+                                        {% for i in 1..5 %}
+                                            {% if product.rating < i %}
+                                                <span class="sc-module-rating-star"></span>
+                                            {% else %}
+                                                <span class="sc-module-rating-star sc-module-rating-star-is"></span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="sc-module-reviews d-flex align-items-center">
+                                        <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--module-comments-icon" alt="" width="12" height="12" />
+                                        <span class="dark-text fsz-12 ps-1">{{ product.reviews }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% if product.price %}
+                            <div class="sc-module-price-box py-2 mt-auto">
+                                {% if product.tax %}
+                                <div class="price-tax fw-300 fsz-12 light-text">
+                                    {{ text_tax }} {{ product.tax }}
+                                </div>
+                                {% endif %}
+                                {% if not product.special %}
+                                <span class="sc-module-price fw-800 dark-text mt-1">{{ product.price }}</span>
+                                {% else %}
+                                <span class="sc-module-price-old light-text fsz-14">{{ product.price }}</span>
+                                <span class="sc-module-price fw-800 dark-text mt-1">{{ product.special }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="sc-module-cart d-flex align-items-stretch justify-content-between">
+                            {% if product.can_buy is not empty and product.can_buy %}
+                                {% if product.can_buy or not product.quantity %}
+                                <div class="sc-module-quantity{% if quantity_show or product.quantity_show is defined and product.quantity_show %} d-flex{% else %} d-none{% endif %} align-items-center justify-content-center py-1 br-12">
+                                    <button type="button" aria-label="Minus" class="sc-module-quantity-btn d-flex align-items-center justify-content-center sc-minus">
+                                        <span class="minus"></span>
+                                    </button>
+                                    <input type="text" class="form-control" name="quantity" value="1" aria-label="Quantity" inputmode="numeric">
+                                    <button type="button" aria-label="Plus" class="sc-module-quantity-btn d-flex align-items-center justify-content-center sc-plus">
+                                        <span class="plus"></span>
+                                    </button>
+                                </div>
+                                {% endif %}
+                                <button type="button" aria-label="To cart" class="sc-btn sc-btn-primary sc-btn-with-icon br-4 sc-module-cart-btn">
+                                    <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--btn-cart-icon" alt="" width="20" height="20" class="sc-btn-icon sc-btn-icon-cart-img">
+                                    <span class="sc-btn-text">{{ button_cart }}</span>
+                                </button>
+                            {% endif %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}" />
+                        </div>
+                        {% if product.oct_atributes is defined and product.oct_atributes %}
+                        <div class="sc-module-item-attr p-3 fsz-10 dark-text d-none d-md-block">
+                            {% for attribute in product.oct_atributes %}
+                            <div class="sc-module-item-attr-item">
+                                <span class="fw-500">{{ attribute.name }}:</span> {{ attribute.text }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% if show_type == 'width-infinity' %}</div></div>{% endif %}
+        </div>
+        {% if show_more is defined and show_more and show_type != 'width-infinity' %}
+        <div class="sc-module-showmore d-flex justify-content-center pb-md-3 pt-3">
+            <div class="oct-load-more-button-wrapper w-100 d-flex align-items-center justify-content-center">
+                <input type="hidden" id="more_{{ module_name }}_{{ module }}" name="more_{{ module_name }}_{{ module }}" value="{{ page }}">
+                <button id="btn_{{ module_name }}_{{ module }}" class="sc-btn sc-btn-primary br-4" onclick="octShowMoreModule('{{ module_id }}', '{% if oct_lazyload is defined and oct_lazyload %}1{% else %}0{% endif %}', 'btn_{{ module_name }}_{{ module }}', 'sc-{{ module_name }}_{{ module }}', 'more_{{ module_name }}_{{ module }}', '{{ oct_path }}');">
+                    <span class="sc-btn-icon sc-btn-icon-showmore"></span>
+                    <span class="sc-btn-text">{{ oct_show_more }}</span>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+{% endif %}

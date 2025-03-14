@@ -1,0 +1,375 @@
+<div class="sidebar-main-menu h-100">
+    <div class="sidebar-main-menu-item sidebar-main-menu-item-catalog py-3 px-4 d-flex align-items-center" data-menu="open">
+        <div class="sidebar-main-menu-item-icon br-4 p-2 d-flex align-items-center justify-content-center"></div>
+        <div class="sidebar-main-menu-item-text ps-3 fsz-16 fw-600">{{ oct_menu_title }}</div>
+        <div class="sidebar-main-menu-item-chevron ms-auto">
+            <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--menu-chevron" alt="" width="5" height="10">
+        </div>
+    </div>
+    <div class="sidebar-main-menu-item sidebar-main-menu-item-account sidebar-menu-toggle py-3 px-4 d-flex align-items-center">
+        <div class="sidebar-main-menu-item-icon br-4 p-2 d-flex align-items-center justify-content-center"></div>
+        <div class="sidebar-main-menu-item-text ps-3 fsz-14 fw-600">{{ oct_account }}</div>
+        <div class="sidebar-main-menu-item-chevron ms-auto">
+            <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--menu-chevron" alt="" width="5" height="10">
+        </div>
+        <div class="position-absolute sidebar-menu-catalog">
+            <button type="button" class="sc-btn sc-btn-with-icon no-btn br-4 ms-auto sc-btn-close" data-sidebar="close">
+                <span class="sc-btn-icon sc-btn-icon-close"></span>
+            </button>
+            <div class="sidebar-header sidebar-header-menu d-flex align-items-center w-100 p-3 fw-700 dark-text">
+                <button type="button" class="sc-btn sc-btn-secondary sc-btn-with-icon br-4 me-3 p-0 d-flex align-items-center justify-content-center">
+                    <span class="sc-btn-icon sc-btn-icon-chevron"></span>
+                </button>
+                <span class="sidebar-header-text">{{ text_heading }}</span>
+            </div>
+            <div class="sidebar-menu-catalog-inner">
+                {% if isLogged %}
+                    <div class="content-block sc-account-module p-0 overflow-hidden">
+                        <ul class="list-unstyled sc-column-categories fsz-14 p-0">
+                            <li class="sc-column-categories-item">
+                                <a class="d-flex align-items-center" href="{{ account }}">
+                                    <span class="sc-account-module-icon br-8 me-3">
+                                        <img src="catalog/view/theme/oct_showcase/img/account/account.svg" alt="" width="20" height="20">
+                                    </span>
+                                    <span>{{ text_account }}</span>
+                                </a>
+                            </li>
+                            <li class="sc-column-categories-item">
+                                <a class="d-flex align-items-center" href="{{ edit }}">
+                                    <span class="sc-account-module-icon br-8 me-3">
+                                        <img src="catalog/view/theme/oct_showcase/img/account/edit.svg" alt="" width="20" height="20">
+                                    </span>
+                                    <span>{{ text_edit }}</span>
+                                </a>
+                            </li>
+                            <li class="sc-column-categories-item">
+                                <a class="d-flex align-items-center" href="{{ password }}">
+                                    <span class="sc-account-module-icon br-8 me-3">
+                                        <img src="catalog/view/theme/oct_showcase/img/account/password.svg" alt="" width="20" height="20">
+                                    </span>
+                                    <span>{{ text_password }}</span>
+                                </a>
+                            </li>
+                            <li class="sc-column-categories-item">
+                                <a class="d-flex align-items-center" href="{{ address }}">
+                                    <span class="sc-account-module-icon br-8 me-3">
+                                        <img src="catalog/view/theme/oct_showcase/img/account/delivery.svg" alt="" width="20" height="20">
+                                    </span>
+                                    <span>{{ text_address }}</span>
+                                </a>
+                            </li>
+                            <li class="sc-column-categories-item">
+                                <a class="d-flex align-items-center" href="{{ wishlist }}">
+                                    <span class="sc-account-module-icon br-8 me-3">
+                                        <img src="catalog/view/theme/oct_showcase/img/account/wishlist.svg" alt="" width="20" height="20">
+                                    </span>
+                                    <span>{{ text_wishlist }}</span>
+                                </a>
+                            </li>
+                            <li class="sc-column-categories-item">
+                                <a class="d-flex align-items-center" href="{{ order }}">
+                                    <span class="sc-account-module-icon br-8 me-3">
+                                        <img src="catalog/view/theme/oct_showcase/img/account/orders.svg" alt="" width="20" height="20">
+                                    </span>
+                                    <span>{{ text_order }}</span>
+                                </a>
+                            </li>
+                            {% if oct_stock_notifier_status is defined and oct_stock_notifier_status %}
+                                <li class="sc-column-categories-item">
+                                    <a class="d-flex align-items-center" href="{{ oct_stock_notifier }}">
+                                        <span class="sc-account-module-icon br-8 me-3">
+                                            <img src="catalog/view/theme/oct_showcase/img/account/mail.svg" alt="" width="20" height="20">
+                                        </span>
+                                        <span>{{ oct_stock_notifier_text }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if download_view is defined and download_view %}
+                                <li class="sc-column-categories-item">
+                                    <a class="d-flex align-items-center" href="{{ download }}">
+                                        <span class="sc-account-module-icon br-8 me-3">
+                                            <img src="catalog/view/theme/oct_showcase/img/account/files.svg" alt="" width="20" height="20">
+                                        </span>
+                                        <span>{{ text_download }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if recurring_view is defined and recurring_view %}
+                                <li class="sc-column-categories-item">
+                                    <a class="d-flex align-items-center" href="{{ recurring }}">
+                                        <span class="sc-account-module-icon br-8 me-3">
+                                            <img src="catalog/view/theme/oct_showcase/img/account/regular-payments.svg" alt="" width="20" height="20">
+                                        </span>
+                                        <span>{{ text_recurring }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if reward_view is defined and reward_view %}
+                                <li class="sc-column-categories-item">
+                                    <a class="d-flex align-items-center" href="{{ reward }}">
+                                        <span class="sc-account-module-icon br-8 me-3">
+                                            <img src="catalog/view/theme/oct_showcase/img/account/bonus.svg" alt="" width="20" height="20">
+                                        </span>
+                                        <span>{{ text_reward }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if return_view is defined and return_view %}
+                                <li class="sc-column-categories-item">
+                                    <a class="d-flex align-items-center" href="{{ return }}">
+                                        <span class="sc-account-module-icon br-8 me-3">
+                                            <img src="catalog/view/theme/oct_showcase/img/account/return.svg" alt="" width="20" height="20">
+                                        </span>
+                                        <span>{{ text_return }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if transaction_view is defined and transaction_view %}
+                                <li class="sc-column-categories-item">
+                                    <a class="d-flex align-items-center" href="{{ transaction }}">
+                                        <span class="sc-account-module-icon br-8 me-3">
+                                            <img src="catalog/view/theme/oct_showcase/img/account/payments.svg" alt="" width="20" height="20">
+                                        </span>
+                                        <span>{{ text_transaction }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if newsletter_view is defined and newsletter_view %}
+                                <li class="sc-column-categories-item">
+                                    <a class="d-flex align-items-center" href="{{ newsletter }}">
+                                        <span class="sc-account-module-icon br-8 me-3">
+                                            <img src="catalog/view/theme/oct_showcase/img/account/mail.svg" alt="" width="20" height="20">
+                                        </span>
+                                        <span>{{ text_newsletter }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if affiliate_view is defined and affiliate_view %}
+                                {% if not tracking %}
+                                    <li class="sc-column-categories-item">
+                                        <a class="d-flex align-items-center" href="{{ affiliate }}">
+                                            <span class="sc-account-module-icon br-8 me-3">
+                                                <img src="catalog/view/theme/oct_showcase/img/account/affiliate.svg" alt="" width="20" height="20">
+                                            </span>
+                                            <span>{{ text_oct_affiliate }}</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="sc-column-categories-item">
+                                        <a class="d-flex align-items-center" href="{{ affiliate }}">
+                                            <span class="sc-account-module-icon br-8 me-3">
+                                                <img src="catalog/view/theme/oct_showcase/img/account/affiliate.svg" alt="" width="20" height="20">
+                                            </span>
+                                            <span>{{ text_oct_affiliate }}</span>
+                                        </a>
+                                    </li>
+                                    <li class="sc-column-categories-item">
+                                        <a class="d-flex align-items-center" href="{{ tracking }}">
+                                            <span class="sc-account-module-icon br-8 me-3">
+                                                <i class="fas fa-code"></i>
+                                            </span>
+                                            <span>{{ text_oct_tracking }}</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                            <li class="sc-column-categories-item">
+                                <a class="d-flex align-items-center" href="{{ logout }}">
+                                    <span class="sc-account-module-icon br-8 me-3">
+                                        <img src="catalog/view/theme/oct_showcase/img/account/exit.svg" alt="" width="20" height="20">
+                                    </span>
+                                    <span>{{ text_logout }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <div class="sidebar-account p-3">
+                        <div class="content-block fsz-14">
+                            <div class="sidebar-account-title fw-600 fsz-20 dark-text mb-3">{{ text_login_is }}</div>
+                            <div class="sidebar-account-text mb-3">{{ oct_sidebar_enter }}</div>
+                            <form action="javascript:;" id="rm-mobile-login" class="d-flex flex-column">
+                                <div class="form-group mb-3">
+                                    <label for="input-email" class="sc-control-label mb-1 dark-text fw-500">
+                                        <span class="required">*</span> {{ entry_email }}
+                                    </label>
+                                    <input type="email" name="email" value="" placeholder="{{ entry_email }}" id="sidebar-input-email" class="form-control">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="input-password" class="sc-control-label mb-1 dark-text fw-500">
+                                        <span class="required">*</span> {{ entry_password }}
+                                    </label>
+                                    <input type="password" name="password" value="" placeholder="{{ entry_password }}" id="sidebar-input-password" class="form-control">
+                                    <input type="hidden" name="redirect" value="#">
+                                </div>
+                                <div class="d-flex flex-column align-items-center">
+                                    <input type="submit" id="mobile-login-button" value="{{ button_login }}" class="sc-btn sc-btn-primary br-4 w-100 mb-3">
+                                    <a href="{{ forgotten_url }}" class="blue-link fsz-12">{{ button_forgotten }}</a>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="content-block fsz-14 mt-3">
+                            <div class="sidebar-account-title fw-600 fsz-20 dark-text mb-3">{{ button_register }}</div>
+                            <div class="sidebar-account-text mb-3">
+                                {{ text_register }}
+                            </div>
+                            <button onclick="location = '{{ register_url }}';" type="button" class="sc-btn sc-btn-secondary br-4 w-100">{{ button_register }}</button>
+                        </div>
+                        <script>
+                        $('#mobile-login-button').on('click', function() {
+                            $.ajax({
+                                type: 'post',
+                                url:  'index.php?route=octemplates/module/oct_popup_login/login',
+                                dataType: 'json',
+                                cache: false,
+                                data: $('#rm-mobile-login').serialize(),
+                                beforeSend: function() {
+                                    masked('body', true);
+                                },
+                                complete: function() {
+                                    masked('body', false);
+                                },
+                                success: function(json) {
+                                    if (json['warning']) {
+                                        scNotify('danger', json['warning']);
+                                    } else {
+        
+                                        if (json['redirect']) {
+                                            location = json['redirect'];
+                                        } else {
+                                            location = '{{ account_url }}';
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                        </script>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if product_views_count %}
+        <div id="oct_sidebar_viewed_toggle" class="sidebar-main-menu-item sidebar-main-menu-item-viewed sidebar-menu-toggle py-3 px-4 d-flex align-items-center">
+            <div class="sidebar-main-menu-item-icon br-4 p-2 d-flex align-items-center justify-content-center"></div>
+            <div class="sidebar-main-menu-item-text ps-3 fsz-14 fw-600">{{ oct_product_views }}</div>
+            <div class="sidebar-main-menu-item-chevron ms-auto">
+                <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--menu-chevron" alt="" width="5" height="10">
+            </div>
+            <div class="position-absolute sidebar-menu-catalog">
+                <button type="button" class="sc-btn sc-btn-with-icon no-btn br-4 ms-auto sc-btn-close" data-sidebar="close">
+                    <span class="sc-btn-icon sc-btn-icon-close"></span>
+                </button>
+                <div class="sidebar-header sidebar-header-menu d-flex align-items-center w-100 p-3 fw-700 dark-text">
+                    <button type="button" class="sc-btn sc-btn-secondary sc-btn-with-icon br-4 me-3 p-0 d-flex align-items-center justify-content-center">
+                        <span class="sc-btn-icon sc-btn-icon-chevron"></span>
+                    </button>
+                    <span class="sidebar-header-text">{{ oct_product_views }}</span>
+                </div>
+                <div id="oct_sidebar_viewed" class="sidebar-menu-catalog-inner"></div>
+            </div>
+        </div>
+    {% endif %}
+    {% if mobile_informations is defined and mobile_informations %}
+        <div class="sidebar-main-menu-item pt-3 px-4">
+            <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-3">{{ oct_information }}</div>
+            <ul class="list-unstyled fsz-14">
+                {% for info in mobile_informations %}
+                    <li class="mb-3"><a href="{{ info.href }}" class="blue-link">{{ info.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if (language is defined and language) or (currency is defined and currency) %}
+        <div class="sidebar-main-menu-item py-3 px-4 d-flex d-md-none align-items-center justify-content-between">
+            {% if language is defined and language %}
+               <div>
+                    <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-3">{{ oct_sidebar_language }}</div>
+                    <div id="oct_mobile_language"></div>
+               </div>
+            {% endif %}
+            {% if currency is defined and currency %}
+                <div>
+                    <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-3">{{ oct_sidebar_currency }}</div>
+                    <div id="oct_mobile_currency"></div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+    {% if oct_contact_telephones is defined and oct_contact_telephones %}
+        <div class="sidebar-main-menu-item sidebar-main-menu-item-phones pt-3 px-4">
+            <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-3">{{ oct_telephones }}</div>
+            <ul class="list-unstyled fsz-14">
+                {% for telephone in oct_contact_telephones %}
+                    <li class="mb-3">
+                        <img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--sidebar-phone-icon" alt="" width="6" height="14" class="me-2">
+                        <a href="tel:{{ telephone|replace({" " : "", "-" : "", "(" : "", ")" : ""}) }}" class="blue-link">{{ telephone }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if oct_contact_opens is defined and oct_contact_opens %}
+        <div class="sidebar-main-menu-item py-3 px-4">
+            <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-3">{{ oct_menu_time }}</div>
+            <ul class="list-unstyled light-text fsz-14">
+                {% for oct_contact_open in oct_contact_opens %}
+                    <li>{{ oct_contact_open }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if (oct_showcase_data.mobile_menu.messenger is defined and oct_showcase_data.mobile_menu.messenger) or (oct_showcase_data.mobile_menu.viber is defined and oct_showcase_data.mobile_menu.viber) or (oct_showcase_data.mobile_menu.telegram is defined and oct_showcase_data.mobile_menu.telegram) or (oct_showcase_data.mobile_menu.skype is defined and oct_showcase_data.mobile_menu.skype) or (oct_showcase_data.mobile_menu.whatsapp is defined and oct_showcase_data.mobile_menu.whatsapp) %}
+        <div class="sidebar-main-menu-item py-3 px-4">
+            <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-3">{{ oct_footer_messengers_text }}:</div>
+            <div class="sidebar-messengers d-flex align-items-center">
+                {% if oct_showcase_data.contact_messenger is defined and oct_showcase_data.contact_messenger and oct_showcase_data.mobile_menu.messenger is defined and oct_showcase_data.mobile_menu.messenger %}
+                    <a class="me-2" rel="noopener noreferrer" href="https://m.me/{{ oct_showcase_data.contact_messenger }}" target="_blank">
+                        <span class="sidebar-messengers-item sidebar-messengers-item-messenger d-flex align-items-center justify-content-center"></span>
+                    </a>
+                {% endif %}
+                {% if oct_showcase_data.contact_viber is defined and oct_showcase_data.contact_viber and oct_showcase_data.mobile_menu.viber is defined and oct_showcase_data.mobile_menu.viber %}
+                    <a class="me-2" rel="noopener noreferrer" href="viber://add?number={{ oct_showcase_data.contact_viber }}" target="_blank">
+                        <span class="sidebar-messengers-item sidebar-messengers-item-viber d-flex align-items-center justify-content-center"></span>
+                    </a>
+                {% endif %}
+                {% if oct_showcase_data.contact_telegram is defined and oct_showcase_data.contact_telegram and oct_showcase_data.mobile_menu.telegram is defined and oct_showcase_data.mobile_menu.telegram %}
+                    <a class="me-2" rel="noopener noreferrer" href="https://t.me/{{ oct_showcase_data.contact_telegram }}" target="_blank">
+                        <span class="sidebar-messengers-item sidebar-messengers-item-telegram d-flex align-items-center justify-content-center"></span>
+                    </a>
+                {% endif %}
+                {% if oct_showcase_data.contact_skype is defined and oct_showcase_data.contact_skype and oct_showcase_data.mobile_menu.skype is defined and oct_showcase_data.mobile_menu.skype %}
+                    <a class="me-2" rel="noopener noreferrer" href="skype:{{ oct_showcase_data.contact_skype }}?chat">
+                        <span class="sidebar-messengers-item sidebar-messengers-item-skype d-flex align-items-center justify-content-center"></span>
+                    </a>
+                {% endif %}
+                {% if oct_showcase_data.contact_whatsapp is defined and oct_showcase_data.contact_whatsapp and oct_showcase_data.mobile_menu.whatsapp is defined and oct_showcase_data.mobile_menu.whatsapp %}
+                    <a class="me-2" rel="noopener noreferrer" href="https://api.whatsapp.com/send?phone={{ oct_showcase_data.contact_whatsapp }}" target="_blank">
+                        <span class="sidebar-messengers-item sidebar-messengers-item-whatsapp d-flex align-items-center justify-content-center"></span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% if socials is defined and socials is not empty %}
+        <div class="sidebar-main-menu-item py-3 px-4">
+            <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-3">{{ oct_join_socials }}</div>
+            <div class="sidebar-socials d-flex align-items-center">
+                {% for social in socials %}
+                    <a rel="noopener noreferrer" href="{{ (social.link == "#" or social.link is empty) ? 'javascript:;' : social.link }}" class="sidebar-socials-item sidebar-socials-item-{{ social.icone|replace({'fa ': "", "fab " : "", "far " : "", "fas " : ""}) }} d-flex align-items-center justify-content-center" target="_blank">
+                        <i class="{{ social.icone }}"></i>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    {% if (oct_showcase_data.mobile_menu.email is defined and oct_showcase_data.mobile_menu.email) and (oct_showcase_data.contact_email is defined and oct_showcase_data.contact_email is not empty) %}
+        <div class="sidebar-main-menu-item py-3 px-4">
+            <div class="sidebar-main-menu-item-title fsz-14 fw-600 mb-2">E-mail</div>
+            <a href="mailto:{{ oct_showcase_data.contact_email }}" class="blue-link fsz-14">{{ oct_showcase_data.contact_email }}</a>
+        </div>
+    {% endif %}
+    <div class="sidebar-main-menu-item py-3 px-4">
+        <a href="{{ contact }}" class="sc-btn sc-btn-primary br-4 w-100">{{ oct_go_contact_text }}</a>
+    </div>
+</div>

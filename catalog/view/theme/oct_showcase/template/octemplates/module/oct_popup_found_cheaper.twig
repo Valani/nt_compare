@@ -1,0 +1,129 @@
+<div class="modal fade" id="foundCheaperModal" tabindex="-1"  aria-labelledby="foundCheaperModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content">
+	        <div class="modal-header p-4">
+	            <h5 class="modal-title fsz-20 d-flex align-items-center justify-content-between" id="foundCheaperModalLabel">{{ heading_title }}</h5>
+	            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	        </div>
+	        <div id="cheaper-main-block" class="modal-body p-4">
+				<div class="dark-text fw-600 mb-3">{{ enter_text_title }}</div>
+				<div class="modal-body-text fsz-14 light-text mb-4">{{ enter_text }}</div>
+				<div class="content-block d-flex modal-body-product br-8 mb-4">
+					{% if thumb is defined %}
+						<div class="modal-body-product-img p-2 br-8">
+							<img src="{{ thumb }}" alt="{{ heading_title_product }}" width="64" height="64">
+						</div>
+					{% endif %}
+					<div class="modal-body-product-info ps-3 dark-text">
+						<div class="modal-body-product-title fw-700 fsz-12">{{ heading_title_product }}</div>
+						{% if price %}
+							{% if not special %}
+								<div class="sc-module-price mt-1 fw-800 fsz-14">{{ price }}</div>
+							{% else %}
+								<div class="sc-module-price-old mt-1 light-text fsz-14">{{ price }}</div>
+								<div class="sc-module-price mt-1 fw-800 fsz-14">{{ special }}</div>
+							{% endif %}
+						{% endif %}
+					</div>
+				</div>
+				<form method="post" enctype="multipart/form-data" id="found-cheaper-form">
+					{% if oct_popup_found_cheaper_data.name %}
+					<div class="form-group pb-3">
+						<label for="inputCheaperName" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_found_cheaper_data.name == 2 %}<span class="required">* </span>{% endif %}{{ enter_name }}</label>
+						<input type="text" name="name" value="{{ name }}" class="form-control" id="inputCheaperName" placeholder="{{ enter_name }}" inputmode="text">
+					</div>
+					{% endif %}
+					{% if oct_popup_found_cheaper_data.telephone %}
+					<div class="form-group pb-3">
+						<label for="inputCheaperPhone" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_found_cheaper_data.telephone == 2 %}<span class="required">* </span>{% endif %}{{ enter_telephone }}</label>
+						<input type="tel" name="telephone" value="{{ telephone }}" class="form-control" id="inputCheaperPhone" placeholder="{{ enter_telephone }}" inputmode="tel">
+					</div>
+					{% endif %}
+					{% if oct_popup_found_cheaper_data.email is defined and oct_popup_found_cheaper_data.email %}
+					<div class="form-group pb-3">
+						<label for="inputCheaperEmail" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_found_cheaper_data.email == 2 %}<span class="required">* </span>{% endif %}{{ enter_email }}</label>
+						<input type="tel" name="email" value="{{ email }}" class="form-control" id="inputCheaperEmail" placeholder="{{ enter_email }}" inputmode="email">
+					</div>
+					{% endif %}
+					{% if oct_popup_found_cheaper_data.link %}
+					<div class="form-group pb-3">
+						<label for="inputCheaperLink" class="fsz-14 dark-text fw-500 pb-1">{% if oct_popup_found_cheaper_data.link == 2 %}<span class="required">* </span>{% endif %}{{ enter_link }}</label>
+						<input type="text" name="link" value="{{ link }}" class="form-control" id="inputCheaperLink" placeholder="{{ enter_link }}" inputmode="url">
+					</div>
+					{% endif %}
+					{% if oct_popup_found_cheaper_data.comment %}
+					<div class="form-group pb-3">
+						<label for="inputCheaperComment" class="fsz-14 dark-text fw-500 pb-1">{{ enter_comment }}</label>
+						<textarea name="comment" class="form-control" id="inputCheaperComment" placeholder="{{ enter_comment }}">{{ comment }}</textarea>
+					</div>
+					{% endif %}
+					{% if text_terms %}
+					<div class="form-check d-flex pb-3">
+						<input id="agreeCheaperCheck" type="checkbox" class="form-check-input" name="agree">
+						<label class="form-check-label" for="agreeCheaperCheck">
+							{{ text_terms }}
+						</label>
+					</div>
+					{% endif %}
+					<button type="submit" class="sc-btn sc-btn-primary br-2">{{ button_send }}</button>
+					<input type="hidden" name="pid" value="{{ href }}">
+					<input type="hidden" name="mid" value="{{ model }}">
+				</form>
+				
+				<div class="sc-popup-success d-none flex-column align-items-center text-center w-100">
+                    <div id="sc-popup-success-cheaper-text" class="dark-text fw-600 text-center"></div>
+					<div class="d-flex align-items-center justify-content-center my-4">
+						<img src="catalog/view/theme/oct_showcase/img/success.svg" alt="" width="150" height="150">
+					</div>
+                    <button type="button" class="sc-btn sc-btn-primary br-2" data-bs-dismiss="modal" aria-label="Close">{{ oct_info_bar_close }}</button>
+                </div>
+		    </div>
+	    </div>
+	</div>
+<script>
+$("#inputCheaperName, #inputCheaperPhone, #inputCheaperEmail, #inputCheaperLink, #inputCheaperComment, #agreeCheaperCheck").on("change paste keyup", function() {
+	$(this).removeClass('error_style');
+});
+
+$('#found-cheaper-form').on('submit', function (event) {
+	event.preventDefault();
+	$.ajax({
+		type: 'post',
+		url: 'index.php?route=octemplates/module/oct_popup_found_cheaper/send',
+		dataType: 'json',
+		data: $('#found-cheaper-form').serialize(),
+		cache: false,
+		beforeSend: function() {
+			masked('body', true);
+		},
+		complete: function() {
+			masked('body', false);
+		},
+		success: function (json) {
+			if (json['error']) {
+				$('#foundCheaperModal .text-danger').remove();
+				let errorOption = '';
+
+				$.each(json['error'], function (i, val) {
+					$('#foundCheaperModal [name="' + i + '"]').addClass('error_style');
+					errorOption += '<div class="alert-text-item">' + val + '</div>';
+				});
+
+				scNotify('danger', errorOption);
+			} else {
+				if (json['output']) {
+					$("#sc-popup-success-cheaper-text").html(json['output']);
+					$("#cheaper-main-block").html($(".sc-popup-success"));
+					$(".sc-popup-success").removeClass("d-none");
+				}
+			}
+		}
+	});
+});
+</script>
+{% if oct_popup_found_cheaper_data.mask is defined and oct_popup_found_cheaper_data.mask is not empty %}
+<script>
+scInputMask('#inputCheaperPhone','{{ oct_popup_found_cheaper_data.mask }}');
+</script>
+{% endif %}
+</div>

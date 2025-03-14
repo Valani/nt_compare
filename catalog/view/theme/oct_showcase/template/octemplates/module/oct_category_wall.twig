@@ -1,0 +1,49 @@
+{% if categories is not empty %}
+	<div class="row pt-3 pt-xl-4 g-3 g-xl-4 sc-category-wall">
+		<div class="sc-module-header fsz-22 dark-text fw-700 text-center text-md-start mt-3 mt-md-4">
+			{{ heading_title }}
+		</div>
+		{% for category in categories %}
+	  	<div class="sc-category-wall-item">
+			{% if category.children %}
+				<div class="content-block sc-category-wall-item-block d-flex flex-column align-items-center text-center h-100">
+					{% if (category.thumb) %}
+					<img src="{{ category.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ category.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="oct-lazy"{% endif %} alt="{{ category.name }}" title="{{ category.name }}" width="{{ category.width }}" height="{{ category.height }}" />
+					{% endif %}
+					<span class="sc-category-wall-title dark-text fw-600 fsz-14 mt-3">{{ category.name }}</span>
+					<div class="sc-category-wall-item-list d-none flex-column text-start">
+						{% set countstop = 1 %}
+						{% for child in category.children %}
+							{% set countstop = countstop + 1 %}
+							<a href="{{ child.href }}" class="blue-link fsz-12">{{ child.name }}</a>
+						{% endfor %}
+						<div class="pt-3 mt-auto">
+							<a href="{{ category.href }}" class="sc-btn sc-btn-primary small br-4 text-center">{{ text_see_more }}</a>
+						</div>
+					</div>
+				</div>
+			{% else %}
+				<a href="{{ category.href }}" class="content-block d-flex flex-column align-items-center text-center h-100">
+					{% if (category.thumb) %}
+					<img src="{{ category.thumb }}"{% if oct_lazyload is defined and oct_lazyload %} data-srcset="{{ category.thumb }} 100w" srcset="{{ oct_lazy_image }} 100w" sizes="100vw" class="oct-lazy"{% endif %} alt="{{ category.name }}" title="{{ category.name }}" width="{{ category.width }}" height="{{ category.height }}" />
+					{% endif %}
+					<span class="sc-category-wall-title dark-text fw-600 fsz-14 mt-3">{{ category.name }}</span>
+				</a>
+			{% endif %}
+		</div>
+		{% endfor %}
+	</div>
+	<div class="row mt-3 d-md-none">
+		<div class="col-12 text-center">
+			<button type="button" class="sc-btn sc-btn-primary br-4 w-100 mb-0" data-menu="open">
+				<span class="sc-btn-icon sc-btn-icon-catalog"></span>
+				<span class="sc-btn-text">{{ oct_menu_catalog }}</span>
+			</button>
+		</div>
+	</div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+		categoryWall();
+	});
+</script>
+{% endif %}

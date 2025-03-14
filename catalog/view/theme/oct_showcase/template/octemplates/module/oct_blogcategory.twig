@@ -1,0 +1,41 @@
+{% if blog_categories %}
+<div class="content-block p-0 overflow-hidden">
+	<div class="sc-column-title fsz-20 fw-700 dark-text">{{ heading_title }}</div>
+	<ul class="list-unstyled sc-column-categories fw-500 fsz-14 p-0">
+		{% for blog_category in blog_categories %}
+			<li class="sc-column-categories-item">
+				<span class="d-flex justify-content-between">
+					<a href="{{ blog_category.href }}">{{ blog_category.name }}</a>
+					{% if blog_category.children %}
+						<button type="button" class="sc-column-categories-toggle sc-btn sc-btn-secondary sc-btn-with-icon br-4 p-0 d-flex align-items-center justify-content-center" aria-label="Expand">
+							<span class="sc-btn-icon sc-btn-icon-chevron"></span>
+						</button>
+					{% endif %}
+				</span>
+				{% if blog_category.children %}
+				<ul class="sc-column-categories-children sc-categories-2 list-unstyled ps-0">
+					{% for child in blog_category.children %}
+						<li class="sc-column-categories-item">
+							<span class="d-flex justify-content-between">
+								<a href="{{ child.href }}">{{ child.name }}</a>
+							</span>
+						</li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endif %}
+{% if search_block %}
+<div class="content-block p-0 overflow-hidden mt-2">
+	<div class="sc-column-title fsz-20 fw-700 dark-text">{{ search_title }}</div>
+	<div id="blog_search" class="sc-blog-search p-3 position-relative">
+		<input type="text" name="blog_search" value="" placeholder="{{ search_placeholder }}" class="form-control w-100 br-2">
+		<button type="button" id="oct-blog-search-button" class="sc-btn sc-btn-outline sc-btn-outline-secondary sc-btn-with-icon" aria-label="Search">
+			<span class="sc-btn-icon sc-btn-icon-search"></span>
+		</button>
+	</div>
+</div>
+{% endif %}

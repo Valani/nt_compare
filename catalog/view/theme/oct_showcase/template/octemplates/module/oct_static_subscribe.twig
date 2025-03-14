@@ -1,0 +1,50 @@
+<div class="sc-footer-subscribe d-flex flex-column align-items-center justify-content-center">
+	<div class="sc-footer-title fw-500 text-uppercase d-flex align-items-center mb-3">
+		<img src="catalog/view/theme/oct_showcase/img/sprite.svg#include--footer-subscribe-title-icon" alt="" width="24" height="24" class="me-2">
+		{{ oct_text_subscribe_title }}
+	</div>
+	<form action="javascript:;" id="footer-subscribe" class="sc-footer-subscribe-form">
+		<div class="input-group">
+	    	<input type="email" id="InputSubscribeEmail" class="form-control sc-input-with-btn fw-400" name="email" placeholder="{{ enter_email_static_subscribe }}">
+		    <button type="submit" id="footer-make-subscribe" class="sc-btn sc-btn-primary">{{ oct_text_subscribe_button }}</button>
+		</div>
+	    {% if text_terms %}
+	    <div class="d-flex align-items-center justify-content-center mt-2 text-center">
+	        <input type="checkbox" class="form-check-input" name="agree" id="oct-scales-static">
+			<label class="form-check-label fsz-10" for="oct-scales-static">{{ text_terms }}</label>
+	    </div>
+	    {% endif %}
+	</form>
+</div>
+<script>
+$("#InputSubscribeEmail, #oct-scales-static").on("change paste keyup", function() {
+	$(this).removeClass('error_style');
+});
+$('#footer-make-subscribe').on('click', function() {
+	$.ajax({
+		type: 'post',
+		url:  'index.php?route=octemplates/module/oct_subscribe/makeSubscribe',
+		dataType: 'json',
+		cache: false,
+		data: $('#footer-subscribe').serialize(),
+		success: function(json) {
+			if (json['error']) {
+				$('#us-subscribe-modal .text-danger').remove();
+				let errorOption = '';
+
+				$.each(json['error'], function(i, val) {
+					$('#footer-subscribe [name="' + i + '"]').addClass('error_style');
+					errorOption += '<div class="alert-text-item">' + val + '</div>';
+				});
+
+				scNotify('danger', errorOption);
+			} else {
+				if (json['output']) {
+					$('#footer-subscribe [name="email"]').val('');
+					scNotify('success', '<div class="alert-text-item">' + json['output'] + '</div>');
+				}
+			}
+		}
+	});
+});
+</script>

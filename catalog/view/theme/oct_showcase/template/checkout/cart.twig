@@ -1,0 +1,134 @@
+{{ header }}
+<div id="checkout-cart" class="container-fluid container-lg flex-grow-1 mobile-no-gutters">
+	<nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+        {% for breadcrumb in breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+            {% else %}
+                <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+	<main class="main">
+		<div class="row">
+			<div class="col-12 sc-page-title pb-3">
+				<h1>{{ heading_title }}{% if weight %} ({{ weight }}){% endif %}</h1>
+			</div>
+		</div>
+		<div class="content-top-box">{{ content_top }}</div>
+		{% if attention %}
+			<script>
+				scNotify('warning', '{{ attention }}');
+			</script>
+		{% endif %}
+		{% if success %}
+			<script>
+				scNotify('success', '{{ success }}');
+			</script>
+		{% endif %}
+			<div class="row sc-cart">
+				<div class="col-lg-8">
+					<div class="content-block p-3 p-md-4 mobile-no-radius">
+						<form action="{{ action }}" method="post" enctype="multipart/form-data" id="content">
+							<div class="sc-cart-items">
+								{% for product in products %}
+									<div class="sc-cart-item content-block p-2 p-md-3">
+										<div class="sc-cart-item-top d-flex">
+											{% if product.thumb %}
+												<a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" /></a>
+											{% endif %}
+											<div class="sidebar-cart-info ps-5">
+												<a href="{{ product.href }}" class="sc-cart-item-title fw-700 dark-text mb-2 d-inline-block">{{ product.name }}</a>{% if not product.stock %}<span class="required"> ***</span>{% endif %}
+												{% if product.option %}
+													{% for option in product.option %}
+														<div class="sc-cart-item-option fsz-12"><span class="dark-text">{{ option.name }}: </span>{{ option.value }}</div>
+													{% endfor %}
+												{% endif %}
+												<div class="sc-cart-item-option fsz-12"><span class="dark-text">{{ column_model }}: </span>{{ product.model }}</div>
+												{% if product.reward %}
+													<div class="sc-cart-item-option fsz-12"><span class="dark-text">{{ product.reward }}</span></div>
+												{% endif %}
+												{% if product.recurring %}
+													<div class="sc-cart-item-option fsz-12"><span class="dark-text">{{ text_recurring_item }} </span>{{ product.recurring }}</div>
+												{% endif %}
+											</div>
+										</div>
+										<div class="sidebar-cart-item-bottom d-flex flex-column flex-sm-row justify-content-sm-between mt-4">
+											<div class="sidebar-cart-item-buttons d-flex align-items-center">
+												<div class="sc-module-quantity d-flex align-items-center justify-content-center py-1 me-3 br-12">
+													<button type="button" aria-label="Minus" class="sc-module-quantity-btn d-flex align-items-center justify-content-center" onclick="$('#input-quantity-{{ product.cart_id }}').val(~~$('#input-quantity-{{ product.cart_id }}').val()-1);">
+														<span class="minus"></span>
+													</button>
+													<input type="text" id="input-quantity-{{ product.cart_id }}" class="form-control" name="quantity[{{ product.cart_id }}]" value="{{ product.quantity }}" aria-label="Quantity" inputmode="numeric">
+													<button type="button" aria-label="Plus" class="sc-module-quantity-btn d-flex align-items-center justify-content-center" onclick="$('#input-quantity-{{ product.cart_id }}').val(~~$('#input-quantity-{{ product.cart_id }}').val()+1);">
+														<span class="plus"></span>
+													</button>
+												</div>
+												<button type="submit" class="sc-btn sc-btn-secondary sc-btn-with-icon br-4 ms-auto me-2" title="{{ button_update }}">
+													<span class="sc-btn-icon sc-btn-icon-showmore"></span>
+												</button>
+												<button type="button" class="sc-btn sc-btn-danger sc-btn-with-icon br-4" onclick="cart.remove('{{ product.cart_id }}');">
+													<span class="sc-btn-icon sc-btn-icon-del"></span>
+												</button>
+											</div>
+											<div class="sidebar-cart-item-price fsz-14 text-sm-end mt-3 mt-sm-0">
+												<div class="dark-text fw-600">{{ column_total }}: {{ product.total }}</div>
+												<div class="light-text">{{ column_price }}: {{ product.price }}</div>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+								{% for voucher in vouchers %}
+									<div class="sc-cart-item content-block p-2 p-md-3">
+										<div class="d-flex align-items-center">
+											<button type="button" class="sc-btn sc-btn-danger sc-btn-with-icon br-4" onclick="voucher.remove('{{ voucher.key }}');"><span class="sc-btn-icon sc-btn-icon-del"></span></button>	
+											<div class="dark-text fw-500 ms-2 ms-md-3">{{ voucher.description }}</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						</form>
+						{% if oct_byoneclick is defined and oct_byoneclick %}
+							{{ oct_byoneclick }}
+						{% endif %}
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="sc-cart-actions oct-checkout-actions content-block p-3 p-md-4 mt-3 mt-lg-0 mobile-no-radius">
+						{% if modules %}
+							<div class="sc-cart-actions-block pt-0">
+								<div class="sc-cart-actions-title fw-700 dark-text mb-3">{{ text_next }}</div>
+								<div class="sc-cart-actions-text fsz-14 light-text">{{ text_next_choice }}</div>
+							</div>
+							{% for module in modules %}
+								{{ module }}
+							{% endfor %}
+							<script>
+								window.addEventListener('DOMContentLoaded', () => {
+									$('.sc-cart-actions-block-title').on('click', function (e) {
+										$(this).toggleClass('clicked');
+										$(this).next().toggleClass('opened');
+									});
+								});
+							</script>
+						{% endif %}
+						<div class="d-flex flex-column align-items-end mt-4">
+							{% for total in totals %}
+								<div class="fw-700 fsz-14 dark-text mb-1">
+									{{ total.title }}: <span>{{ total.text }}</span>
+								</div>
+							{% endfor %}
+							<a href="{{ checkout }}" class="sc-btn sc-btn-primary br-4 mt-3 w-100">{{ button_checkout }}</a>
+						</div>
+						{% if error_warning %}
+							<div class="required">{{ error_warning }}</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		{{ content_bottom }}
+	</main>
+</div>
+{{ footer }}
