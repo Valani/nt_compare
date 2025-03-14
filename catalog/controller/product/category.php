@@ -57,6 +57,10 @@ class ControllerProductCategory extends Controller {
 		} else {
 			$page = 1;
 		}
+        $pre_title = '';
+        if($page > 1){
+            $pre_title = 'Сторінка '.$page.' - ';
+        }
 
 		if (isset($this->request->get['limit'])) {
 			$limit = (int)$this->request->get['limit'];
@@ -116,13 +120,16 @@ class ControllerProductCategory extends Controller {
 		}
 
 		$category_info = $this->model_catalog_category->getCategory($category_id);
+        if($category_id == 13 || $category_id == 15){
+            $data['hide_plus'] = 1;
+        }else $data['hide_plus'] = 0;
 
 		if ($category_info) {
 
 			if ($category_info['meta_title']) {
-				$this->document->setTitle($category_info['meta_title']);
+				$this->document->setTitle($pre_title.$category_info['meta_title']);
 			} else {
-				$this->document->setTitle($category_info['name']);
+				$this->document->setTitle($pre_title.$category_info['name']);
 			}
 
 			if ($category_info['noindex'] <= 0 && $this->config->get('config_noindex_status')) {
@@ -130,12 +137,12 @@ class ControllerProductCategory extends Controller {
 			}
 
 			if ($category_info['meta_h1']) {
-				$data['heading_title'] = $category_info['meta_h1'];
+				$data['heading_title'] = $pre_title.$category_info['meta_h1'];
 			} else {
-				$data['heading_title'] = $category_info['name'];
+				$data['heading_title'] = $pre_title.$category_info['name'];
 			}
 
-			$this->document->setDescription($category_info['meta_description']);
+			$this->document->setDescription($pre_title.$category_info['meta_description']);
 			$this->document->setKeywords($category_info['meta_keyword']);
 
 			$data['text_compare'] = sprintf($this->language->get('text_compare'), (isset($this->session->data['compare']) ? count($this->session->data['compare']) : 0));
@@ -201,7 +208,9 @@ class ControllerProductCategory extends Controller {
 			);
 
 			$product_total = $this->model_catalog_product->getTotalProducts($filter_data);
-
+            if($page > ceil($product_total/$limit)){
+                $this->response->redirect($this->url->link('product/category', 'path=' . $category_info['category_id']));
+            }
 			$results = $this->model_catalog_product->getProducts($filter_data);
 
 			foreach ($results as $result) {
@@ -211,14 +220,38 @@ class ControllerProductCategory extends Controller {
 					$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
 				}
 
+                $is_rent = 0;
+                $is_remont = 0;
+                $cats = $this->model_catalog_product->getCategories($result['product_id']);
+                if(!empty($cats)){
+                    foreach($cats as $cat){
+                        if($cat['category_id'] == 15){
+                            $is_rent = 1;
+                        }
+                        if($cat['category_id'] == 13){
+                            $is_remont = 1;
+                        }
+                    }
+                }
+
 				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    if($is_rent == 1){
+                        $price = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $data['price'] = 'За домовленістю';
+                    }else $price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 				} else {
 					$price = false;
 				}
 
 				if (!is_null($result['special']) && (float)$result['special'] >= 0) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    if($is_rent == 1){
+                        $special = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $special = false;
+                    }else{
+                        $special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    }
 					$tax_price = (float)$result['special'];
 				} else {
 					$special = false;
@@ -371,9 +404,11 @@ class ControllerProductCategory extends Controller {
 			$pagination->limit = $limit;
 			$pagination->url = $this->url->link('product/category', 'path=' . $this->request->get['path'] . $url . '&page={page}');
 
-			$data['pagination'] = $pagination->render();
+            //$data['pagination'] = str_replace('&amp;page=1','',$pagination->render());
+            $data['pagination'] = $pagination->render();
 
 			$data['results'] = sprintf($this->language->get('text_pagination'), ($product_total) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($product_total - $limit)) ? $product_total : ((($page - 1) * $limit) + $limit), $product_total, ceil($product_total / $limit));
+
 
             if (!$this->config->get('config_canonical_method')) {
                 // http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html
@@ -399,9 +434,23 @@ class ControllerProductCategory extends Controller {
                 $request_url = rtrim($server, '/') . $this->request->server['REQUEST_URI'];
                 $canonical_url = $this->url->link('product/category', 'path=' . $category_info['category_id']);
 
-                if (($request_url != $canonical_url) || $this->config->get('config_canonical_self')) {
-                    $this->document->addLink($canonical_url, 'canonical');
+                //if ($this->config->get('config_canonical_self')) {
+                $can_u = explode("?",'https://'.$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+                $can_u_final = $can_u[0];
+                if(isset($can_u[1])){
+                    $mas_part_u = explode('&', $can_u[1]);
+                    if(!empty($mas_part_u)){
+                        foreach($mas_part_u as $mpu){
+                            if(strpos($mpu, 'page') !== false){
+                                $can_u_final .= '?'.$mpu;
+                                break;
+                            }
+                        }
+                    }
                 }
+                    //$this->document->addLink('https://'.$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], 'canonical');
+                    $this->document->addLink($can_u_final, 'canonical');
+                //}
 
                 if ($this->config->get('config_add_prevnext')) {
 

@@ -1,0 +1,966 @@
+<!-- Handy Filter . Begin -->
+<div class="well" style="background-color: #ececec;">
+  <div class="row">
+    <div class="col-sm-4">
+
+      <a href="{{ filter_reset_link }}" class="btn btn-sm btn-danger"><i class="fa fa-close"></i> {{ filter_reset_text }}</a>
+{#      <p class="alert alert-info" style="margin-top: 10px; ">{{ handy_filter_info }}</p>#}
+
+      <div class="filter-categories-wrapper" style="background: #f2f2f2; padding: 10px; border: 1px solid #ccc; margin-top: 15px;">
+        <p class=""><b>{{ handy_filter_categories }}</b></p>
+        
+        <div class="filter-categories-container" style="background: #fff; padding: 10px; border-bottom: #999; margin-bottom: 10px;">
+          
+          <!-- Filter Main Category -->
+          {% if (has_main_category_column and getProductMainCategoryIdExist) %}
+          <div class="row">
+            <div class="col-sm-12">
+            <label class="" for="input-handy-filter--main-category-id">{{ handy_entry_main_category }}</label>
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-folder"></i></div>
+                <select name="handy_filter[main_category_id]" class="form-control input-sm filter-field" id="input-handy-filter--main-category-id" style="width: 100%;">
+                <option value="">{{ text_none }}</option>
+                <option value="notset" {% if ('notset' == handy_filter.main_category_id) %}selected="selected"{% endif %}>{{ handy_filter_text_notset }}</option>
+                {% for category in all_categories %} 
+                  <option value="{{ category['category_id'] }}" {% if (category['category_id'] == handy_filter.main_category_id) %}selected="selected"{% endif %}>{{ category['name'] }}</option>
+                {% endfor %} 
+              </select>
+            </div>
+          </div>
+          </div>
+          <hr style="border-color: #c3c3c3; margin-bottom: 10px;" />
+          {% endif %} 
+
+          <!-- Filter Category -->
+          <label class="control-label"><i class="fa fa-folder-open-o"></i> {{ handy_entry_category }}</label>
+
+          <!-- Filter Category NotSet -->
+          <div class="checkbox">
+            <label><input type="checkbox" name="handy_filter[category]" value="notset" id="input-handy-filter--categories-notset" {% if ('notset' == handy_filter.category) %}checked{% endif %}/> {{ handy_filter_text_notset_category }}</label>
+          </div>
+
+          <div id="handy-filter--categories-selector-container" class="categories-selector-container well well-sm" style="background: #fff; padding-top: 15px; margin-bottom: 0;">
+            <div class="categories-selector">
+              {{ handy_filter_category_tree }}
+            </div>
+          </div>
+            
+        </div><!-- /filter-categories-container -->
+
+        <!-- Filter Category Flag -->
+        <div class="le-row">
+          <label class="control-label" for="input-handy-filter--category-flag">{{ handy_entry_category_flag }}</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon"><i class="fa fa-folder"></i></div>
+            <select name="handy_filter[category_flag]" id="input-handy-filter--category-flag" class="form-control input-sm filter-field">
+                <option value="OR" {% if ('OR' == handy_filter.category_flag or handy_filter.category_flag is null) %}selected="selected"{% endif %}>{{ text_flag_or_category }}</option>
+                <option value="AND" {% if ('AND' == handy_filter.category_flag) %}selected="selected"{% endif %}>{{ text_flag_and_category }}</option>
+              </select>
+          </div>
+        </div>
+              
+      </div><!-- /filter-categories-wrapper -->
+
+      <!-- Filter Manufacturer -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label" for="input-handy-filter--manufacturer">{{ handy_entry_manufacturer }}</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon"><i class="fa fa-trademark"></i></div>
+          <input type="text" name="handy_filter_manufacturer_input" value="" placeholder="{{ handy_entry_manufacturer }}" id="input-handy-filter--manufacturer" class="form-control input-sm filter-field" />
+        </div>
+        <div id="handy-filter--manufacturers" class="well well-sm" style="height: 120px; overflow: auto; resize: vertical;">
+          {% if handy_filter.manufacturer %}
+          {% for manufacturer_id in handy_filter.manufacturer %}
+					<div id="handy-filter--manufacturers{{ manufacturer_id }}"><i class="fa fa-minus-circle"></i> {{ manufacturers.manufacturer_id }}<input type="hidden" name="handy_filter[manufacturer][]" value="{{ manufacturer_id }}" /></div>
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+    <div class="col-sm-2">		
+
+      <!-- Filter Name -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label">{{ handy_filter_entry_name }}</label>        
+        {% for language in languages %} 
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon">
+            <img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" />
+          </div>
+          <input type="text" name="handy_filter[name][{{ language.language_id }}]" value="{{ handy_filter.name[language.language_id] is defined ? handy_filter.name[language.language_id] : '' }}" placeholder="{{ handy_filter_entry_name }}" id="input-handy-filter--name-{{ language.language_id }}" class="form-control input-sm filter-field" data-key="{{ language.language_id }}" />
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default remove-filter" data-target="name-{{ language.language_id }}"><i class="fa fa-close"></i></button>
+          </div>
+        </div> 
+        {% endfor %}
+      </div>
+          
+      <div class="form-group" style="padding-bottom: 0; padding-top: 5px;">
+        <label class="control-label">{{ handy_filter_entry_flag_andor }} {{ handy_filter_entry_name }}</label>
+        <div style="margin-top: -5px;">
+          <label class="radio-inline"><input type="radio" name="handy_filter[name_flag]" value="AND" {{ ('AND' == handy_filter.name_flag or not handy_filter.name_flag) ? 'checked' : '' }}> {{ handy_filter_flag_and }}</label>
+          &nbsp;
+          <label class="radio-inline"><input type="radio" name="handy_filter[name_flag]" value="OR" {{ ('OR' == handy_filter.name_flag) ? 'checked' : '' }}> {{ handy_filter_flag_or }}</label>
+        </div>
+      </div>
+
+      
+      {% if ('product_list' == filter_flag) %}   
+      <!-- Filter Product Id -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label" for="input-handy-filter--product-id">{{ handy_filter_entry_product_id }}</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon"><i class="fa fa-square"></i></div>
+          <input type="text" name="handy_filter[product_id]" value="{{ handy_filter.product_id }}" placeholder="{{ handy_filter_entry_product_id }}" id="input-handy-filter--product-id" class="form-control filter-field" />
+
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default remove-filter" data-target="product-id"><i class="fa fa-close"></i></button>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if ('product_list' == filter_flag) %}
+      <!-- Filter SEO URL -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label" for="input-handy-filter--keyword">{{ handy_filter_entry_keyword }}</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon"><i class="fa fa-link"></i></div>
+          <input type="text" name="handy_filter[keyword]" value="{{ handy_filter.keyword }}" placeholder="{{ handy_filter_entry_keyword }}" id="input-handy-filter--keyword" class="form-control filter-field" />
+
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default remove-filter" data-target="keyword"><i class="fa fa-close"></i></button>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+          
+      <!-- Filter Model -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label" for="input-handy-filter--model">{{ entry_model }}</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon"><i class="fa fa-hand-pointer-o"></i></div>
+          <input type="text" name="handy_filter[model]" value="{{ handy_filter['model'] }}" placeholder="{{ entry_model }}" id="input-handy-filter--model" class="form-control input-sm filter-field" />
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default remove-filter" data-target="model"><i class="fa fa-close"></i></button>
+          </div>
+        </div>
+      </div>
+      <!-- Filter SKU -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label" for="input-handy-filter--sku">{{ entry_sku }}</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon"><i class="fa fa-tag"></i></div>
+          <input type="text" name="handy_filter[sku]" value="{{ handy_filter['sku'] }}" placeholder="{{ entry_sku }}" id="input-handy-filter--sku" class="form-control input-sm filter-field" />
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default remove-filter" data-target="sku"><i class="fa fa-close"></i></button>
+          </div>
+        </div>
+      </div>
+      <!-- Filter UPC -->
+
+      {% if 'upc' in a_product_list_field %}
+        <div class="form-group" style="padding-bottom: 0;">
+          <label class="control-label" for="input-handy-filter--upc">{{ entry_upc }}</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon"><i class="fa fa-barcode"></i></div>
+            <input type="text" name="handy_filter[upc]" value="{{ handy_filter['upc'] }}" placeholder="{{ entry_upc }}" id="input-handy-filter--upc" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="upc"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      <!-- Filter EAN -->
+      {% if 'ean' in a_product_list_field %}
+        <div class="form-group" style="padding-bottom: 0;">
+          <label class="control-label" for="input-handy-filter--ean">{{ entry_ean }}</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon"><i class="fa fa-barcode"></i></div>
+            <input type="text" name="handy_filter[ean]" value="{{ handy_filter['ean'] }}" placeholder="{{ entry_ean }}" id="input-handy-filter--ean" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="ean"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      <!-- Filter JAN -->
+      {% if 'jan' in a_product_list_field %}
+        <div class="form-group" style="padding-bottom: 0;">
+          <label class="control-label" for="input-handy-filter--jan">{{ entry_jan }}</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon"><i class="fa fa-barcode"></i></div>
+            <input type="text" name="handy_filter[jan]" value="{{ handy_filter['jan'] }}" placeholder="{{ entry_jan }}" id="input-handy-filter--jan" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="jan"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Filter ISBN -->
+      {% if 'isbn' in a_product_list_field %}
+        <div class="form-group" style="padding-bottom: 0;">
+          <label class="control-label" for="input-handy-filter--isbn">{{ entry_isbn }}</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon"><i class="fa fa-barcode"></i></div>
+            <input type="text" name="handy_filter[isbn]" value="{{ handy_filter['isbn'] }}" placeholder="{{ entry_isbn }}" id="input-handy-filter--isbn" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="isbn"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      <!-- Filter MPN -->
+      {% if 'mpn' in a_product_list_field %}
+        <div class="form-group" style="padding-bottom: 0;">
+          <label class="control-label" for="input-handy-filter--mpn">{{ entry_mpn }}</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon"><i class="fa fa-linode"></i></div>
+            <input type="text" name="handy_filter[mpn]" value="{{ handy_filter['mpn'] }}" placeholder="{{ entry_mpn }}" id="input-handy-filter--mpn" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="mpn"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Filter Status -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label" for="input-handy-filter--status">{{ entry_status }}</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon"><i class="fa fa-toggle-on"></i></div>
+          <select name="handy_filter[status]" id="input-handy-filter--status" class="form-control input-sm filter-field">
+            <option value="">{{ handy_text_none }}</option>
+            <option value="1"{% if '1' == handy_filter['status'] %} selected="selected"{% endif %}>{{ text_enabled }}</option>
+            <option value="0"{% if '0' == handy_filter['status'] %} selected="selected"{% endif %}>{{ text_disabled }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filter Image -->
+      <div class="form-group" style="">
+        <label class="control-label" for="input-handy-filter--image">{{ entry_image }}</label>
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon"><i class="fa fa-image"></i></div>
+          <select name="handy_filter[image]" id="input-handy-filter--image" class="form-control input-sm filter-field">
+            <option value="">{{ handy_text_none }}</option>
+            <option value="1"{% if '1' == handy_filter['image'] %} selected="selected"{% endif %}>{{ handy_text_filled }}</option>
+            <option value="0"{% if '0' == handy_filter['image'] %} selected="selected"{% endif %}>{{ handy_text_empty }}</option>
+          </select>
+        </div>
+      </div>
+          
+      <!-- Filter Doubles -->
+      {% if 'product_list' == filter_flag %}
+        <div class="form-group" style="padding: 8px; border: 1px solid #ccc;">
+          <label class="control-label">{{ handy_filter_entry_doubles }}</label>
+          <div class="checkbox">
+            <label><input type="checkbox" name="handy_filter[doubles][]" value="model" {{ handy_filter['doubles'] and 'model' in handy_filter['doubles'] ? 'checked' }}>{{ entry_model }}</label>
+            {% if 'sku' in a_product_list_field %}
+            <label><input type="checkbox" name="handy_filter[doubles][]" value="sku" {{ handy_filter['doubles'] and 'sku' in handy_filter['doubles'] ? 'checked' }}>{{ entry_sku }}</label>
+            {% endif %}
+            {% if 'upc' in a_product_list_field %}
+            <label><input type="checkbox" name="handy_filter[doubles][]" value="upc" {{ handy_filter['doubles'] and 'upc' in handy_filter['doubles'] ? 'checked' }}>{{ entry_upc }}</label>
+            {% endif %}
+            {% if 'ean' in a_product_list_field %}
+            <label><input type="checkbox" name="handy_filter[doubles][]" value="ean" {{ handy_filter['doubles'] and 'ean' in handy_filter['doubles'] ? 'checked' }}>{{ entry_ean }}</label>
+            {% endif %}
+            {% if 'jan' in a_product_list_field %}
+            <label><input type="checkbox" name="handy_filter[doubles][]" value="jan" {{ handy_filter['doubles'] and 'jan' in handy_filter['doubles'] ? 'checked' }}>{{ entry_jan }}</label>
+            {% endif %}
+            {% if 'isbn' in a_product_list_field %}
+            <label><input type="checkbox" name="handy_filter[doubles][]" value="isbn" {{ handy_filter['doubles'] and 'isbn' in handy_filter['doubles'] ? 'checked' }}>{{ entry_isbn }}</label>
+            {% endif %}
+            {% if 'mpn' in a_product_list_field %}
+            <label><input type="checkbox" name="handy_filter[doubles][]" value="mpn" {{ handy_filter['doubles'] and 'mpn' in handy_filter['doubles'] ? 'checked' }}>{{ entry_mpn }}</label>
+              {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+
+    
+
+    <div class="col-sm-3">
+      {% if ('date_added' in a_product_list_field) %} 
+      <!-- Filter Date Added -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label>{{ handy_text_date_added }}</label>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm date">
+              <span class="input-group-btn"><button class="btn btn-default btn-calendar" type="button"><i class="fa fa-calendar"></i></button></span>
+              <input type="text" name="handy_filter[date_added_from]" value="{{ handy_filter.date_added_from ?? '' }}" placeholder="{{ handy_entry_date_from }}" data-date-format="YYYY-MM-DD" id="input-handy-filter--date-added-from" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="date-from"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm date">
+              <span class="input-group-btn"><button class="btn btn-default btn-calendar" type="button"><i class="fa fa-calendar"></i></button></span>
+              <input type="text" name="handy_filter[date_added_before]" value="{{ handy_filter.date_added_before ?? '' }}" placeholder="{{ handy_entry_date_before }}" data-date-format="YYYY-MM-DD" id="input-handy-filter--date-added-before" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="date-before"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %} 
+      
+      {% if ('date_available' in a_product_list_field) %} 
+      <!-- Filter Date Modified -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label>{{ handy_text_date_modified }}</label>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm date">
+              <span class="input-group-btn"><button class="btn btn-default btn-calendar" type="button"><i class="fa fa-calendar"></i></button></span>
+              <input type="text" name="handy_filter[date_modified_from]" value="{{ handy_filter['date_modified_from'] ?? '' }}" placeholder="{{ handy_entry_date_from }}" data-date-format="YYYY-MM-DD" id="input-handy-filter--date-modified-from" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="date-from"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm date">
+              <span class="input-group-btn"><button class="btn btn-default btn-calendar" type="button"><i class="fa fa-calendar"></i></button></span>
+              <input type="text" name="handy_filter[date_modified_before]" value="{{ handy_filter['date_modified_before'] ?? '' }}" placeholder="{{ handy_entry_date_before }}" data-date-format="YYYY-MM-DD" id="input-handy-filter--date-modified-before" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="date-before"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %} 
+      
+      {% if ('date_modified' in a_product_list_field) %} 
+      <!-- Filter Date Available -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label>{{ handy_text_date_available }}</label>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm date">
+              <span class="input-group-btn"><button class="btn btn-default btn-calendar" type="button"><i class="fa fa-calendar"></i></button></span>
+              <input type="text" name="handy_filter[date_available_from]" value="{{ handy_filter.date_available_from ?? '' }}" placeholder="{{ handy_entry_date_from }}" data-date-format="YYYY-MM-DD" id="input-handy-filter--date-available-from" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="date-from"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm date">
+              <span class="input-group-btn"><button class="btn btn-default btn-calendar" type="button"><i class="fa fa-calendar"></i></button></span>
+              <input type="text" name="handy_filter[date_available_before]" value="{{ handy_filter.date_available_before ?? '' }}" placeholder="{{ handy_entry_date_before }}" data-date-format="YYYY-MM-DD" id="input-handy-filter--date-available-before" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="date-before"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %} 
+
+      <!-- Filter Price -->
+      <div class="form-group" style="border-top: none; padding-bottom: 0;">
+        <label class="control-label">{{ entry_price }}</label>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-dollar"></i></div>
+              <input type="text" name="handy_filter[price_min]" value="{{ handy_filter.price_min ? handy_filter.price_min : '' }}" placeholder="{{ handy_filter_text_min }}" id="input-handy-filter--price-min" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="price-min"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-dollar"></i></div>
+              <input type="text" name="handy_filter[price_max]" value="{{ handy_filter.price_max ? handy_filter.price_max : '' }}" placeholder="{{ handy_filter_text_max }}" id="input-handy-filter--price-max" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="price-max"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Quantity -->
+      <div class="form-group" style="border-top: none; padding-bottom: 0;">
+        <label class="control-label">{{ entry_quantity }}</label>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-clone"></i></div>
+              <input type="text" name="handy_filter[quantity_min]" value="{{ handy_filter.quantity_min ? handy_filter.quantity_min : '' }}" placeholder="{{ handy_filter_text_min }}" id="input-handy-filter--quantity-min" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="quantity-min"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-clone"></i></div>
+              <input type="text" name="handy_filter[quantity_max]" value="{{ handy_filter.quantity_max ? handy_filter.quantity_max : '' }}" placeholder="{{ handy_filter_text_max }}" id="input-handy-filter--quantity-max" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="quantity-max"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+              
+      {% if ('weight' in a_product_list_field) %} 
+       <!-- Filter Weight -->
+      <div class="form-group" style="border-top: none; padding-bottom: 0;">
+        <label class="control-label">{{ entry_weight }}</label>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-balance-scale"></i></div>
+              <input type="text" name="handy_filter[weight_min]" value="{{ handy_filter.weight_min ? handy_filter.weight_min : '' }}" placeholder="{{ handy_filter_text_min }}" id="input-handy-filter--weight-min" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="weight-min"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-balance-scale"></i></div>
+              <input type="text" name="handy_filter[weight_max]" value="{{ handy_filter.weight_max ? handy_filter.weight_max : '' }}" placeholder="{{ handy_filter_text_max }}" id="input-handy-filter--weight-max" class="form-control input-sm filter-field" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default remove-filter" data-target="weight-max"><i class="fa fa-close"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+              
+      <!-- Weight Class -->
+      <div class="form-group" style="padding-bottom: 0; padding-top: 0;">
+        <label class="control-label" for="input-handy-filter--weight-class-id">{{ entry_weight_class }}</label>
+        <select name="handy_filter[weight_class_id]" id="input-handy-filter--weight-class-id" class="form-control input-sm filter-field">
+          <option value="">{{ handy_text_none }}</option>
+          {% for weight_class in weight_classes %} 
+            <option value="{{ weight_class['weight_class_id'] }}">{{ weight_class['title'] }}</option>
+          {% endfor %} 
+          <option value="{{ weight_class.weight_class_id }}" {% if weight_class.weight_class_id == handy_filter.weight_class_id %}selected="selected"{% endif %}>{{ weight_class.title }}</option>
+        </select>
+      </div>
+      {% endif %}
+              
+      {% if ('dimension' in a_product_list_field) %} 
+      <!-- Filter Dimensions Min -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <div class="col-sm-12" style="padding: 0;">
+          <label class="control-label">{{ entry_dimension }} MIN</label>
+        </div>
+        <div class="col-sm-4" style="padding: 0 4px 0 0;">
+          <div class="input-group input-group-sm">
+            <input type="text" name="handy_filter[length_min]" value="{{ handy_filter.length_min ? handy_filter.length_min : '' }}" placeholder="{{ entry_length }}" id="input-handy-filter--length-min" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="length-min"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4" style="padding: 0 4px 0 0;">
+          <div class="input-group input-group-sm">
+            <input type="text" name="handy_filter[width_min]" value="{{ handy_filter.width_min ? handy_filter.width_min : '' }}" placeholder="{{ entry_width }}" id="input-handy-filter--width-min" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="width-min"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4" style="padding: 0;">
+          <div class="input-group input-group-sm">
+            <input type="text" name="handy_filter[height_min]" value="{{ handy_filter.height_min ? handy_filter.height_min : '' }}" placeholder="{{ entry_height }}" id="input-handy-filter--height-min" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="height-min"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>            
+      </div>
+            
+      <!-- Filter Dimensions Max -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <div class="col-sm-12" style="padding: 0;">
+          <label class="control-label">{{ entry_dimension }} MAX</label>
+        </div>
+        <div class="col-sm-4" style="padding: 0 4px 0 0;">
+          <div class="input-group input-group-sm">
+            <input type="text" name="handy_filter[length_max]" value="{{ handy_filter.length_max ? handy_filter.length_max : '' }}" placeholder="{{ entry_length }}" id="input-handy-filter--length-max" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="length-max"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4" style="padding: 0 4px 0 0;">
+          <div class="input-group input-group-sm">
+            <input type="text" name="handy_filter[width_max]" value="{{ handy_filter.width_max ? handy_filter.width_max : '' }}" placeholder="{{ entry_width }}" id="input-handy-filter--width-max" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="width-max"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4" style="padding: 0;">
+          <div class="input-group input-group-sm">
+            <input type="text" name="handy_filter[height_max]" value="{{ handy_filter.height_max ? handy_filter.height_max : '' }}" placeholder="{{ entry_height }}" id="input-handy-filter--height-max" class="form-control input-sm filter-field" />
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default remove-filter" data-target="height-max"><i class="fa fa-close"></i></button>
+            </div>
+          </div>
+        </div>            
+      </div>      
+
+      <!-- Length Class -->
+      <div class="form-group" style="padding-bottom: 0;">
+        <label class="control-label" for="input-handy-filter--length-class-id">{{ entry_length_class }}</label>
+        <select name="handy_filter[length_class_id]" id="input-handy-filter--length-class-id" class="form-control input-sm filter-field">
+          <option value="">{{ handy_text_none }}</option>
+          {% for length_class in length_classes %} 
+            <option value="{{ length_class.length_class_id }}" {% if length_class.length_class_id == handy_filter.length_class_id %}selected="selected"{% endif %}>{{ weight_class.title }}</option>
+          {% endfor %} 
+        </select>
+      </div>
+      {% endif %}  
+    </div>
+        
+    <div class="col-sm-3">
+      <!-- Filter Attribute -->
+      <div id="handy-filter--attributes">
+        {% set row = 0 %}
+
+        {% if handy_filter['attribute'] %}
+        {% for attribute_id in handy_filter['attribute'] %}
+          <div class="row" id="handy-filter--attribute-row-{{ row }}" style="padding-top: 15px;">
+            <div class="col-sm-5">
+              <label class="control-label" for="input-handy-filter--attribute-{{ row }}">{{ handy_entry_attribute }}</label>
+              <div class="input-group input-group-sm">
+                <div class="input-group-addon"><i class="fa fa-tags"></i></div>
+                <select name="handy_filter[attribute][{{ row }}]" id="input-handy-filter--attribute-{{ row }}" class="form-control input-sm filter-field handy-filter__attribute-select" data-row="{{ row }}" style="width: 90%;">
+                  <option value="*">{{ handy_text_none }}</option>
+                  {% for attribute in attributes %}
+                    <option value="{{ attribute['attribute_id'] }}" {% if attribute['attribute_id'] == attribute_id %}selected="selected"{% endif %}>{{ attribute['attribute_group'] }} -- {{ attribute['name'] }}</option>
+                  {% endfor %} 
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-5">
+              <label class="control-label" for="input-handy-filter--attribute-value-{{ row }}">{{ handy_entry_attribute_value }}</label>
+              <select name="handy_filter[attribute_value][]" id="input-handy-filter--attribute-value-{{ row }}" class="form-control input-sm filter-field" style="width: 90%;">
+                <option value="*">{{ handy_text_none }}</option>
+              </select>
+            </div>
+            <div class="col-sm-2">
+              <a type="button" class="handy-filter--btn--remove-attribute-row" data-parent-row="{{ row }}" data-toggle="tooltip" title="{{ button_remove }}"><i class="fa fa-close"></i></a>
+            </div>
+          </div>
+          {% set row = row + 1 %}
+        {% endfor %}
+        {% else %}
+          <div class="row" id="handy-filter--attribute-row-{{row}}" style="padding-top: 15px;">
+            <div class="col-sm-5">
+              <label class="control-label" for="input-handy-filter--attribute-{{row}}">{{ handy_entry_attribute }}</label>
+              <div class="input-group input-group-sm">
+                <div class="input-group-addon"><i class="fa fa-tags"></i></div>
+                <select name="handy_filter[attribute][{{row}}]" id="input-handy-filter--attribute-{{row}}" class="form-control input-sm filter-field handy-filter__attribute-select" data-row="0">
+                  <option value="*">{{ handy_text_none }}</option>
+                  {% for attribute in attributes %}
+                    <option value="{{ attribute['attribute_id'] }}">{{ attribute['attribute_group'] }} -- {{ attribute['name'] }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-5">
+              <label class="control-label" for="input-handy-filter--attribute-value-{{row}}">{{ handy_entry_attribute_value }}</label>
+              <select name="handy_filter[attribute_value][]" id="input-handy-filter--attribute-value-{{row}}" class="form-control input-sm filter-field">
+                <option value="*">{{ handy_text_none }}</option>
+              </select>
+            </div>
+            <div class="col-sm-2">
+              <a type="button" class="handy-filter--btn--remove-attribute-row" data-parent-row="{{row}}" data-toggle="tooltip" title="{{ button_remove }}"><i class="fa fa-close"></i></a>
+            </div>
+          </div>
+          {% set row = row + 1 %}
+        {% endif %}
+      </div>
+      <button type="button" class="btn btn-sm btn-success handy-filter--btn--add-attribute-row" data-toggle="tooltip" title="{{ button_add }}" data-target-row="{{ row }}" style="margin-top: 10px;"><i class="fa fa-plus"></i></button>
+      
+      <hr style="border-color: #c3c3c3; margin-bottom: 10px;">
+      
+      <!-- Filter Option -->
+      {% set row = 0 %}
+      <div id="handy-filter--options">
+      {% if handy_filter['option'] %}
+        {% for option_id in handy_filter['option'] %}
+          <div class="row" id="handy-filter--option-row-{{ row }}" style="padding-top: 15px;">
+            <div class="col-sm-10">
+              <label class="control-label" for="input-handy-filter--option-{{ row }}">{{ handy_entry_option }}</label>
+              <div class="input-group input-group-sm">
+                <div class="input-group-addon"><i class="fa fa-list-ul"></i></div>
+                <select name="handy_filter[option][{{ row }}]" id="input-handy-filter--option-{{ row }}" class="form-control input-sm filter-field handy-filter--option-select" data-row="{{ row }}">
+                  <option value="*">{{ handy_text_none }}</option>
+                  {% for option in options %}
+                    <option value="{{ option['option_id'] }}" {% if option['option_id'] == option_id %}selected="selected"{% endif %}>{{ option['name'] }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <a type="button" class="handy-filter--btn--remove-option-row" data-parent-row="{{ row }}" data-toggle="tooltip" title="{{ button_remove }}"><i class="fa fa-close"></i></a>
+            </div>
+          </div>
+          {% set row = row + 1 %}
+        {% endfor %}
+      {% else %}
+        <div class="row" id="handy-filter--option-row-{{ row }}" style="padding-top: 15px;">
+          <div class="col-sm-10">
+            <label class="control-label" for="input-handy-filter--option-{{ row }}">{{ handy_entry_option }}</label>
+            <div class="input-group input-group-sm">
+              <div class="input-group-addon"><i class="fa fa-list-ul"></i></div>
+              <select name="handy_filter[option][{{ row }}]" id="input-handy-filter--option-{{ row }}" class="form-control input-sm filter-field handy-filter--option-select" data-row="{{ row }}">
+                <option value="*">{{ handy_text_none }}</option>
+                {% for option in options %}
+                  <option value="{{ option['option_id'] }}">{{ option['name'] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <a type="button" class="handy-filter--btn--remove-option-row" data-parent-row="{{ row }}" data-toggle="tooltip" title="{{ button_remove }}"><i class="fa fa-close"></i></a>
+          </div>
+        </div>
+        {% set row = row + 1 %}
+        {% endif %}
+      </div>
+      <button type="button" class="btn btn-sm btn-success handy-filter--btn--add-option-row" data-toggle="tooltip" title="{{ button_add }}" data-target-row="{{ row }}" style="margin-top: 10px;"><i class="fa fa-plus"></i></button>
+      
+      {% if ('product_list' == filter_flag) %}
+      <hr style="border-color: #c3c3c3; margin-top: 32px;">
+      <div class="row">
+        <div class="col-sm-12">
+          <!-- sort -->
+          <div style="padding: 4px 0 0 0; margin-bottom: 15px;">
+            <label class="control-label" for="input-handy-filter--sort"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+ {{ handy_filter_sort }}</label>
+            <select name="handy_filter[sort]" id="input-handy-filter--sort" class="form-control input-sm filter-field handy-filter--sort">
+              <option value="p.product_id/DESC" {% if ('p.product_id/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_default }}</option>
+              <option value="p.sort_order/ASC" {% if ('p.sort_order/ASC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_sort_order_asc }}</option>
+              <option value="p.sort_order/DESC" {% if ('p.sort_order/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_sort_order_desc }}</option>
+              <option value="p.product_id/ASC" {% if ('p.product_id/ASC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_product_id_asc }}</option>
+              <option value="p.product_id/DESC" {% if ('p.product_id/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_product_id_desc }}</option>
+              <option value="pd.name/ASC" {% if ('pd.name/ASC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_name_asc }}</option>
+              <option value="pd.name/DESC" {% if ('pd.name/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_name_desc }}</option>
+              <option value="p.model/ASC" {% if ('p.model/ASC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_model_asc }}</option>
+              <option value="p.model/DESC" {% if ('p.model/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_model_desc }}</option>
+              <option value="p.sku/ASC" {% if ('p.sku/ASC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_sku_asc }}</option>
+              <option value="p.sku/DESC" {% if ('p.sku/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_sku_desc }}</option>
+              <option value="p.price/ASC" {% if ('p.price/ASC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_price_asc }}</option>
+              <option value="p.price/DESC" {% if ('p.price/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_price_desc }}</option>
+              <option value="p.quantity/ASC" {% if ('p.quantity/ASC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_quantity_asc }}</option>
+              <option value="p.quantity/DESC" {% if ('p.quantity/DESC' == handy_filter.sort) %}selected{% endif %}>{{ handy_filter_sort_by_quantity_desc }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if ('product_list' == filter_flag) %}
+      <div class="row">
+        <div class="col-sm-12">
+          <button type="button" id="button-filter" class="btn btn-primary pull-right"><i class="fa fa-filter"></i> {{ button_filter }}</button>
+        </div>
+      </div>
+      {% endif %}
+      
+    </div>
+
+  </div>
+  
+  
+</div>
+<!-- Handy Filter . End -->
+
+<br><br>
+
+
+<script>
+  
+  
+//////////////////////////////////////////////////////////////////////////////
+// FILTER
+//////////////////////////////////////////////////////////////////////////////
+
+// Categories -- lock category tree if notset selected
+
+$(document).ready(function() {
+  categoriesTreeCorrelation($('#input-handy-filter--categories-notset'));
+});
+
+$('body').on('click', '#input-handy-filter--categories-notset', function() {
+  categoriesTreeCorrelation($(this));
+});
+
+function categoriesTreeCorrelation(el) {
+  if (el.prop('checked')) {
+    $('#handy-filter--categories-selector-container input, #handy-filter--categories-selector-container select').prop('disabled', true);
+    $('#handy-filter--categories-selector-container, #handy-filter--categories-selector-container select').css('color', '#ccc');
+    $('#handy-filter--categories-selector-container input').prop('checked', false);
+  } else {
+    $('#handy-filter--categories-selector-container input, #handy-filter--categories-selector-container select').prop('disabled',false);
+    $('#handy-filter--categories-selector-container, #handy-filter--categories-selector-container select').css('color', 'initial');
+  }
+}
+
+// Filter Manufacturer
+$('input[name=\'handy_filter_manufacturer_input\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=extension/module/handy/autocompleteManufacturer&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['manufacturer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'handy_filter_manufacturer_input\']').val('');
+		$('#handy-filter--manufacturers' + item['value']).remove();
+		$('#handy-filter--manufacturers').append('<div id="handy-filter--manufacturers' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="handy_filter[manufacturer][]" value="' + item['value'] + '" /></div>');
+	}
+});
+
+$('#handy-filter--manufacturers').delegate('.fa-minus-circle', 'click', function() {
+	$(this).parent().remove();
+});
+
+
+// Filter Attribute
+$('body').on('change', '.handy-filter__attribute-select', function() {
+	massGetAttributeValues(this.value, this.dataset.row);
+});
+
+function massGetAttributeValues(attributeId, row) {
+	var target = '#input-handy-filter--attribute-value-' + row;
+	var html = '';
+
+	$.ajax({
+		url: 'index.php?route=extension/module/handy/getAttributeValues&user_token={{ user_token }}&attribute_id=' + attributeId,
+		type: 'GET',
+		dataType: 'json',
+		success: function(json) {
+			if ('success' === json['status']) {
+				var data = json['data'];
+
+				if (debug) {
+					console.debug(data);
+				}
+
+				var i = 0;
+				for (var key in data) {
+					// КАВЫЧКИ - Фильтр - подготовить значения для POST запроса, а то теряются
+					let attribute_value_prepared = data[key]['text'].replace("\"", '&#34;');
+					attribute_value_prepared = attribute_value_prepared.replace("'", '&#039');
+					
+					html += '<option value="' + attribute_value_prepared + '">' + data[key]['text'] + '</option>';
+					i++;
+				}
+				if(0 === i) {
+					html += '<option value="*">{{ handy_text_attribute_values_empty }}</option>';
+				} else {
+					html = '<option value="*">{{ handy_text_attribute_values_select }}</option>' + html;
+				}
+
+				$(target).html(html);
+
+			} else {
+				if (debug) {
+					console.log('error on attribute selector get attribute values: ' + target );
+				}
+			}
+		},
+		error: function( jqXHR, textStatus, errorThrown ){
+			// Error ajax query
+			console.log('AJAX query Error on ' + target + ': ' + textStatus );
+		},
+	});
+}
+
+$('body').on('click', '.handy-filter--btn--add-attribute-row', function() {
+	var row = $(this).attr('data-target-row');
+	var html = '';
+	html +='<div class="row" id="handy-filter--attribute-row-' + row + '" style="padding-top: 15px;">';
+
+	html +='<div class="col-sm-5">';
+	html +='<label class="control-label" for="handy-filter__attribute-' + row + '">{{ handy_entry_attribute }}</label>';
+	html +='<div class="input-group input-group-sm"><div class="input-group-addon"><i class="fa fa-tags"></i></div>';
+	html +='<select name="handy_filter[attribute][' + row + ']" id="handy-filter__attribute-' + row + '" class="form-control input-sm filter-field handy-filter__attribute-select" data-row="' + row + '" style="width: 90%;">';
+	html +='<option value="*">{{ handy_text_none }}</option>';
+	{% for attribute in attributes %}
+	{#html +='<option value="{{ attribute['attribute_id'] }}"><?php echo htmlspecialchars($attribute['attribute_group'] . ' -- ' . $attribute['name'], ENT_QUOTES, 'UTF-8') }}</option>';#}
+	html +='<option value="{{ attribute['attribute_id'] }}">{{ attribute['attribute_group'] }}  -- {{ attribute['name'] }}</option>';
+	{% endfor %} 
+	html +='</select>';
+	html +='</div>';
+	html +='</div>';
+
+	html +='<div class="col-sm-5">';
+	html +='<label class="control-label" for="input-handy-filter--attribute-value-' + row + '">{{ handy_entry_attribute_value }}</label>';
+	html +='<select name="handy_filter[attribute_value][]" id="input-handy-filter--attribute-value-' + row + '" class="form-control input-sm filter-field" style="width: 90%;">';
+	html +='<option value="*">{{ handy_text_none }}</option>';
+	html +='</select>';
+	html +='</div>';
+
+	html +='<div class="col-sm-2">';
+	html +='<a type="button" class="handy-filter--btn--remove-attribute-row" data-parent-row="' + row + '" data-toggle="tooltip" title="{{ button_remove }}"><i class="fa fa-close"></i></a>';
+	html +='</div>';
+
+	html +='</div>';
+
+	// append
+	$('#handy-filter--attributes').append(html);
+
+	$(".filter-field[name*='attribute']").select2(); // New added attribute & attribute value for filter
+
+	$(this).attr('data-target-row', Number(row) + 1);
+
+});
+
+$('body').on('click', '.handy-filter--btn--remove-attribute-row', function() {
+	$('#handy-filter--attribute-row-' + $(this).data('parent-row')).remove();
+});
+
+// Get attribute data from URL
+function filterAttributeValuesChangeByGet() {
+console.log('filterAttributeValuesChangeByGet() called');
+{% if (handy_filter['attribute_value']) %}
+{% for row, value in handy_filter.attribute_value %}
+  $('#input-handy-filter--attribute-value-{{ row }}').val('{{ value }}').change();
+{% endfor %}
+{% endif %}
+console.log('filterAttributeValuesChangeByGet() executed');
+}
+
+let renderAttributesValuesByAttributeId = new Promise(function(resolve, reject) {
+	$(".handy-filter__attribute-select").each(function() {
+		massGetAttributeValues(this.value, this.dataset.row);
+	});
+
+	console.log('Promise executed');
+	resolve(1); // return result required
+	reject('Filter Attributes Values were not rendered! You need to select them again!');
+});
+
+$(function() {
+	renderAttributesValuesByAttributeId.then(
+		function(result) {
+			console.log(result);
+			console.log('calling filterAttributeValuesChangeByGet()');
+			filterAttributeValuesChangeByGet();
+		},
+		function(error) {
+			alert(error);
+		}
+	);
+});
+
+
+// Filter Option
+// Данный массив всегда актуален, пока мы не добавляем новые опции прямо во время редактирования товара.
+// При реализации редактирования товара можно просто пополнять данный массив значениями.
+
+var optionsExist = JSON.parse('{{ optionsExist }}');
+var optionValuesExist = [];
+
+$.ajax({
+  url: 'index.php?route=extension/module/handy/getAllOptionValues&user_token={{ user_token }}',
+  type: 'GET',
+  dataType: 'json',
+  async: false,
+  success: function(json) {
+    if ('success' === json['status']) {
+      optionValuesExist = json['data'];
+    } else {
+      alert('error on extension/module/handy/getAllOptionValues');
+    }
+  },
+  error: function( jqXHR, textStatus, errorThrown ) {
+    // Error ajax query
+    console.log('AJAX query Error: ' + textStatus );
+  },
+});
+
+
+$('body').on('click', '.handy-filter--btn--add-option-row', function() {
+	var row = $(this).attr('data-target-row');
+	var html = '';
+
+	html +='<div class="row" id="handy-filter--option-row-' + row + '" style="padding-top: 15px;">';
+
+	html +='<div class="col-sm-10">';
+	html +='<label class="control-label" for="handy-filter__input-option-' + row + '">{{ handy_entry_option }}</label>';
+	html +='<div class="input-group input-group-sm"><div class="input-group-addon"><i class="fa fa-list-ul"></i></div>';
+	html +='<select name="handy_filter[option][' + row + ']" id="handy-filter__input-option-' + row + '" class="form-control input-sm filter-field handy-filter--option-select" data-row="' + row + '">';
+	html +='<option value="*">{{ handy_text_none }}</option>';
+	{% for option in options %}
+	html +='<option value="{{ option['option_id'] }}">{{ option['name'] }}</option>';
+	{% endfor %}
+	html +='</select>';
+	html +='</div>';
+	html +='</div>';
+	html +='<div class="col-sm-2">';
+	html +='<a type="button" class="handy-filter--btn--remove-option-row" data-parent-row="' + row + '" data-toggle="tooltip" title="{{ button_remove }}"><i class="fa fa-close"></i></a>';
+	html +='</div>';
+
+	html +='</div>';
+
+	// append
+	$('#handy-filter--options').append(html);
+
+	$(this).attr('data-target-row', Number(row) + 1);
+});
+
+$('body').on('click', '.handy-filter--btn--remove-option-row', function() {
+	$('#handy-filter--option-row-' + $(this).data('parent-row')).remove();
+});  
+
+// Get option data from URL
+{% if handy_filter.option is defined %}
+$(function() {
+{% for row, value in handy_filter.option %}
+$('#input-handy-filter--option-{{row}}').val('{{value}}').change();
+{% endfor %}
+});
+{% endif %}
+  
+  
+// Btn Remove Filter Value
+$('body').on('click', '.remove-filter', function(e) {
+  if ('' != $('#input-handy-filter--' + $(this).data('target')).val()) {
+    $('#input-handy-filter--' + $(this).data('target')).val('');
+
+    //filtering();
+  }
+});
+
+// Select2 -- for filters
+$(document).ready(function() {
+	$(".filter-field[name*='attribute']").select2(); // Attribute & attribute value for filter
+	$('#input-handy-filter--main-category-id').select2(); // Main category for filter
+});
+
+</script>

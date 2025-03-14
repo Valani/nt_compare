@@ -877,7 +877,7 @@ class ControllerBlogArticle extends Controller {
 	public function autocomplete() {
 		$json = array();
 
-		if (isset($this->request->get['filter_name'])) {
+		//if (isset($this->request->get['filter_name'])) {
 			$this->load->model('blog/article');
 
 			if (isset($this->request->get['filter_name'])) {
@@ -907,7 +907,7 @@ class ControllerBlogArticle extends Controller {
 					'name'       => strip_tags(html_entity_decode($result['name'], ENT_QUOTES, 'UTF-8'))
 				);
 			}
-		}
+		//}
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));

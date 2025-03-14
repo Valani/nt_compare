@@ -34,12 +34,12 @@
 					{% endif %}
 					{% if oct_stock_notifier_data.phone %}
 					<div class="form-group pb-3">
-						<label for="inputNotifierPhone" class="fsz-14 dark-text fw-500 pb-1">{% if oct_stock_notifier_data.phone == 2 %}<span class="required">* </span>{% endif %}{{ enter_phone }}</label>
+						<label for="inputNotifierPhone" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ enter_phone }}</label>
 						<input type="tel" name="phone" value="{{ phone }}" class="form-control" id="inputNotifierPhone" placeholder="{{ enter_phone }}" inputmode="tel">
 					</div>
 					{% endif %}
 					<div class="form-group pb-3">
-						<label for="inputNotifierEmail" class="fsz-14 dark-text fw-500 pb-1"><span class="required">* </span>{{ enter_email }}</label>
+						<label for="inputNotifierEmail" class="fsz-14 dark-text fw-500 pb-1">{{ enter_email }}</label>
 						<input type="email" name="email" value="{{ email }}" class="form-control" id="inputNotifierEmail" placeholder="{{ enter_email }}" inputmode="email">
 					</div>
 					{% if text_terms %}

@@ -1,0 +1,129 @@
+{{ header }}
+<div id="product-category" class="container-fluid container-lg flex-grow-1">
+    <nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+            {% for breadcrumb in breadcrumbs %}
+                {% if loop.last %}
+                    <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+                {% else %}
+                    <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+    {% if oct_showcase_data.micro is defined and oct_showcase_data.micro %}
+    <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement":
+        [
+            {% for breadcrumb in breadcrumbs %}
+                {% if loop.first %}
+                {% else %}
+                {
+                    "@type": "ListItem",
+                    "position": {{ loop.index -1 }},
+                    "item":
+                    {
+                        "@id": "{{ breadcrumb.href }}",
+                        "name": "{{ breadcrumb.text }}"
+                    }
+                }{% if not loop.last %},{% endif %}
+                {% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    {% endif %}
+    <main class="main">
+        <div class="row">
+            <div class="col-12 sc-page-title pb-3">
+                <h1>{{ heading_title }}</h1>
+            </div>
+        </div>
+        <div class="content-top-box">{{ content_top }}</div>
+        <div class="row">
+            <div id="content" class="col-xl-12 no-col sc-category">
+                {% if products %}
+                    <div class="row gy-2 g-sm-2 sc-module sc-category-products" data-type="minimal">
+                        {% for product in products %}
+                            <div class="product-layout sc-module-col product-grid col-sm-6 col-md-4 col-lg-3" data-pid="{{ product.product_id }}">
+                                <div class="content-block content-block-p24 h-100 d-flex flex-column">
+                                    <div class="sc-module-stickers d-flex align-items-center">
+                                        <div class="sc-module-sticker br-4 fsz-10 fw-500 mb-2 sc-module-sticker-stickers_sold">Оригінал</div>
+                                    </div>
+
+                                    <div class="sc-module-caption flex-grow-1 d-flex flex-column">
+                                        <div class="sc-module-info mb-2">
+                                            <a href="{{ product.href }}" class="sc-module-title dark-text fw-700 d-block mb-2">{{ product.name }}</a>
+                                            <div class="sc-module-product-info">
+                                                <div class="sc-module-model light-text fsz-12">
+                                                    Артикул: {{ product.sku }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="sc-module-model light-text fsz-12 mb-2">Доступно під замовлення</p>
+                                        {% if product.price %}
+                                        <div class="sc-module-price-box mt-auto mb-3">
+                                            {% if not product.special %}
+                                            <span class="sc-module-price fw-800 dark-text">{{ product.price }}</span>
+                                            {% else %}
+                                            <span class="sc-module-price-old light-text fsz-14">{{ product.price }}</span>
+                                            <span class="sc-module-price fw-800 dark-text">{{ product.special }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        <button type="button" class="sc-btn sc-btn-primary br-4 w-100"
+                                            onclick="octStockNotifier('{{ product.product_id }}');">
+                                            <span class="sc-btn-text">Замовити</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ pagination }}
+                {% else %}
+                    <div class="content-block-p24">
+                        <p>{{ text_empty }}</p>
+                        <a href="{{ continue }}" class="sc-btn sc-btn-primary mt-3 br-4 d-inline-flex">{{ button_continue }}</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {{ content_bottom }}
+    </main>
+</div>
+
+<style>
+.sc-module-col .content-block {
+    background: white;
+    border: 1px solid #EDEDED;
+    transition: box-shadow 0.2s ease;
+}
+.sc-module-col .content-block:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+</style>
+<script>
+function octStockNotifier(product_id) {
+    masked('body', true);
+    $(".modal-backdrop").remove();
+    
+    $.ajax({
+        type: 'post',
+        dataType: 'html',
+        url: 'index.php?route=octemplates/module/oct_stock_notifier',
+        data: 'product_id=' + product_id,
+        cache: false,
+        success: function(data) {
+            masked('body', false);
+            $(".modal-holder").html(data);
+            $("#octStockNotifier").modal("show");
+            popupClose();
+        }
+    });
+}
+</script>
+{{ footer }}

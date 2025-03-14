@@ -1,0 +1,17 @@
+<style type="text/css">
+{{ css }} 
+</style>
+
+{% if (element is defined and element) %} 
+<script type="text/javascript">
+  var search_element = "{{element}}";
+</script>
+{% endif %}
+
+<script type="text/javascript">
+  function ss_cart_add(product_id, minimum) {
+    window.ss_btn_clicked = true;
+    cart.add(product_id, minimum);
+    return false;
+  }
+</script>

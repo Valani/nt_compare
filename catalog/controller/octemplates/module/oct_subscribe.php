@@ -13,7 +13,7 @@ class ControllerOCTemplatesModuleOctSubscribe extends Controller {
 			$this->load->model('tool/image');
 			$this->load->model('octemplates/module/oct_subscribe');
 	        $this->load->language('octemplates/module/oct_subscribe');
-
+            $data['privacy_link'] = $this->url->link('information/information/agree', 'information_id=3');
 			$oct_subscribe_text_data = $this->config->get('oct_subscribe_text_data');
 			$data['oct_subscribe_form_data'] = $oct_subscribe_form_data = $this->config->get('oct_subscribe_form_data');
 
@@ -41,7 +41,7 @@ class ControllerOCTemplatesModuleOctSubscribe extends Controller {
 	            $information_info = $this->model_catalog_information->getInformation($this->config->get('config_account_id'));
 
 	            if ($information_info) {
-	                $data['text_terms'] = sprintf($this->language->get('text_oct_terms'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $information_info['title'], $information_info['title']);
+	                $data['text_terms'] = sprintf($this->language->get('text_oct_terms'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $this->language->get('error_oct_terms_politika'), $this->language->get('error_oct_terms_politika'));
 	            } else {
 	                $data['text_terms'] = '';
 	            }
@@ -59,7 +59,7 @@ class ControllerOCTemplatesModuleOctSubscribe extends Controller {
 	            $information_info = $this->model_catalog_information->getInformation($this->config->get('config_account_id'));
 
 	            if ($information_info) {
-	                $data['text_terms'] = sprintf($this->language->get('text_oct_terms'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $information_info['title']);
+	                $data['text_terms'] = sprintf($this->language->get('text_oct_terms'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $this->language->get('error_oct_terms_politika'));
 	            } else {
 	                $data['text_terms'] = '';
 	            }

@@ -1,0 +1,340 @@
+{{ header }}{{ column_left }} 
+<div id="content" class="handy-product-manager">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right"><a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+        <button type="submit" id="btn-copy" form="form-product" formaction="{{ copy }}" data-toggle="tooltip" title="{{ button_copy }}" class="btn btn-default" onclick="$('#form-product').attr('action', this.getAttribute('formaction')).submit()"><i class="fa fa-copy"></i></button>
+        <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" id="btn-delete-products" onclick="confirm('{{ text_confirm }}') ? $('#form-product').submit() : false;"><i class="fa fa-trash-o"></i></button>
+      </div>
+      <h1>{{ text_part_productlist }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+        <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+        {% endfor %} 
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    
+    <div class="module-navigation">
+      <a class="btn btn-sm btn-default navbar-btn" href="{{ link_part_settings }}">{{ text_part_settings }}</a>
+      {% if (valid_licence) %} 
+      <a class="btn btn-sm btn-warning navbar-btn active" href="{{ link_part_productlist }}">{{ text_part_productlist }}</a>
+      <a class="btn btn-sm btn-default navbar-btn" href="{{ link_part_massedit }}">{{ text_part_massedit }}</a>
+      {% endif %} 
+    </div>
+    
+    {% if (error_warning) %} 
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %} 
+    {% if (success) %} 
+    <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }} 
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %} 
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_part_productlist }}</h3>
+      </div>
+      <div class="panel-body">
+        <div class="load-bar-container">
+          <div class="load-bar">
+            <div class="load-bar-icon">
+            <img src="{{ constant('HTTPS_SERVER') }}view/image/handy-loading.gif" alt="loading icon" />
+            </div>
+            <div id="load-bar-progress"></div>
+          </div>
+        </div>
+				{% if (not valid_licence) %} 
+				<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i>
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					{{ text_input_licence_list }} 
+				</div>
+				{% else %}
+          
+        <script>
+          // config data on load
+          var debug = {{ debug }};
+          var config_language_id = {{ config_language_id }};
+          var largest_product_id = false;
+					var scrollCurrentProductId;
+          var trRow = 0;
+        </script>
+
+        {{ include_filter }}
+
+        <!-- Upload Form Hidden -->
+				{% if (not output) %} 
+        <form enctype="multipart/form-data" id="form-upload" class="hidden">
+          <input type="file" name="photo_main" id="photo-main" />
+          <input type="file" name="photo_additional[]" id="photo-additional" multiple="multiple" />
+        </form>
+				{% endif %} 
+
+        <!-- Report Modal -->
+        <div id="handy-report" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-danger"></h4>
+              </div>
+              <div class="modal-body">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form action="" id="form-add-products-row" class="row">
+          <div class="form-group">
+            <label class="control-label col-sm-1" for="add-products-row-number">{{ handy_entry_products_row_number }}</label>
+            <div class="col-sm-1">
+              <input type="text" name="number" value="1" id="add-products-row-number" class="form-control input-sm" maxlength="2" />
+            </div>
+            <label class="control-label col-sm-1 depends-on-clone" for="add-products-row-clone-images" style="padding-top: 0;"><span data-toggle="tooltip" title="{{ handy_help_clone_images }}">{{ handy_entry_clone_images }}</span></label>
+            <div class="col-sm-1">
+              <input type="checkbox" name="clone_images" value="1" id="add-products-row-clone-images" class="form-control depends-on-clone" />
+            </div>
+
+            <button type="button" id="btn-add-products-row" class="btn btn-sm btn-success col-sm-2"><i class="fa fa-plus"></i> {{ handy_text_add_new_products_row }}</button>
+          </div>
+        </form>
+
+        <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-product"></form>
+
+				<div id="dynamic-content">
+          {# include DIR_APPLICATION . 'view/template/extension/module/module_handy_product_list_response_by_ajax.tpl'; #}
+        </div>
+				<!--
+        <div class="dynamic-content-container">
+          <div class="dynamic-content-load-bar text-center _active">
+            <img src="{{ constant('HTTPS_SERVER') }}view/image/handy-loading.gif" alt="loading icon" />
+          </div>
+
+
+        </div>
+				-->
+
+				{% endif %} 
+      </div>
+    </div>
+		<div class="copywrite" style="padding: 10px 10px 0 10px; border: 1px dashed #ccc;">
+      <p>{{ text_version }}</p>
+    	<p>
+    		&copy; {{ text_author }}: <a href="https://bit.ly/mod-handy" target="_blank">Serge Tkach</a>
+    		<br/>
+				{{ text_author_support }}: <a href="mailto:sergetkach.help@gmail.com">sergetkach.help@gmail.com</a>
+    	</p>
+      <p>{{ check_license }}</p>   
+    </div>
+  </div>
+
+	<div class="scroll-arrows-wrap">
+		<div class="scroll-arrow prev" title="go to prev"><i class="fa fa-angle-up"></i></div>
+		<div class="scroll-arrow next" title="go to next"><i class="fa fa-angle-down"></i></div>
+	</div>
+
+{{ js_product_list }}
+{{ js_dynamic_content }}
+{{ js_attributes }}
+{{ js_options }}
+
+<script src='view/javascript/4handy/tinymce/tinymce.min.js'></script>
+
+<script type="text/javascript">
+  // save login
+  // based on https://forum.opencart.pro/topic/3269-как-увеличить-время-админской-сессии/
+  function pingServer() {
+    $.ajax({ url: '{{ constant('HTTPS_SERVER') }}index.php?route=common/dashboard&user_token={{ user_token }}' });
+  }
+  $(document).ready(function() {
+     setInterval('pingServer()', 60000);
+  });
+</script>
+
+<script>
+function strip_tags (input, allowed) { // eslint-disable-line camelcase
+  //  discuss at: http://locutus.io/php/strip_tags/
+  // original by: Kevin van Zonneveld (http://kvz.io)
+  // improved by: Luke Godfrey
+  // improved by: Kevin van Zonneveld (http://kvz.io)
+  //    input by: Pul
+  //    input by: Alex
+  //    input by: Marc Palau
+  //    input by: Brett Zamir (http://brett-zamir.me)
+  //    input by: Bobby Drake
+  //    input by: Evertjan Garretsen
+  // bugfixed by: Kevin van Zonneveld (http://kvz.io)
+  // bugfixed by: Onno Marsman (https://twitter.com/onnomarsman)
+  // bugfixed by: Kevin van Zonneveld (http://kvz.io)
+  // bugfixed by: Kevin van Zonneveld (http://kvz.io)
+  // bugfixed by: Eric Nagel
+  // bugfixed by: Kevin van Zonneveld (http://kvz.io)
+  // bugfixed by: Tomasz Wesolowski
+  //  revised by: Rafał Kukawski (http://blog.kukawski.pl)
+  //   example 1: strip_tags('<p>Kevin</p> <br /><b>van</b> <i>Zonneveld</i>', '<i><b>')
+  //   returns 1: 'Kevin <b>van</b> <i>Zonneveld</i>'
+  //   example 2: strip_tags('<p>Kevin <img src="someimage.png" onmouseover="someFunction()">van <i>Zonneveld</i></p>', '<p>')
+  //   returns 2: '<p>Kevin van Zonneveld</p>'
+  //   example 3: strip_tags("<a href='http://kvz.io'>Kevin van Zonneveld</a>", "<a>")
+  //   returns 3: "<a href='http://kvz.io'>Kevin van Zonneveld</a>"
+  //   example 4: strip_tags('1 < 5 5 > 1')
+  //   returns 4: '1 < 5 5 > 1'
+  //   example 5: strip_tags('1 <br/> 1')
+  //   returns 5: '1  1'
+  //   example 6: strip_tags('1 <br/> 1', '<br>')
+  //   returns 6: '1 <br/> 1'
+  //   example 7: strip_tags('1 <br/> 1', '<br><br/>')
+  //   returns 7: '1 <br/> 1'
+
+  // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
+  allowed = (((allowed || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
+
+  var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi
+  var commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi
+
+  return input.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
+    return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : ''
+  })
+}
+
+// https://overcoder.net/q/35900/htmlspecialchars-%D1%8D%D0%BA%D0%B2%D0%B8%D0%B2%D0%B0%D0%BB%D0%B5%D0%BD%D1%82-%D0%B2-javascript
+// it is necessary for product list and mass editt to
+function escapeHtml(text) {
+  var map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+//function tinyMCEInit() {
+//	tinymce.init({
+//		selector: '.tinymce',
+//		skin: 'bootstrap',
+//		language: 'ru',
+//		height: 400,
+//		plugins: [
+//			'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
+//			'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+//			'save table contextmenu directionality emoticons template paste textcolor colorpicker'
+//		],
+//		toolbar: 'bold italic sizeselect fontselect fontsizeselect | hr alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | insertfile undo redo | forecolor backcolor emoticons | code',
+//		fontsize_formats: "8pt 10pt 12pt 14pt 18pt 24pt 36pt",
+//
+//		paste_remove_styles: true,
+//		paste_remove_spans: true,
+//		paste_strip_class_attributes: 'all',
+//		paste_block_drop: true,
+//
+//		paste_preprocess : function(pl, o) {
+//			o.content = strip_tags(o.content, '<p><br><h2><h3><h4><h5><h6><ul><ol><li><strong><b><table><tbody><tr><td><img><iframe>');
+//		},
+//		init_instance_callback: function (editor) {
+//			editor.on('blur', function (e) {
+//				$('#' + e.target.id).val(editor.getContent());
+//				$('#' + e.target.id).trigger('change');
+//			});
+//		}
+//	});
+//}
+
+//		$('.tinymce').each(function() {
+//			tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+//		});
+//
+//		setTimeout(function() {
+//				tinyMCEInit();
+//		}, 300);
+
+var tinymceInit = 0;
+$('body').on('focus', '.le-value.tinymce', function(e) {
+	e.preventDefault();
+  
+  
+	
+//	$(this).css('display', 'none');
+	var identifier = '#' + $(this).attr('id');
+	
+	if (debug) {
+    console.log('.le-value.tinymce focus() :: identifier : ' + identifier);
+  }	
+	
+	setTimeout(function() {
+		tinyMCEInit(identifier);
+	}, 100);
+  
+  
+  if (tinymceInit > 0) {
+    return false;
+  }
+  
+  $('.tinymce').each(function() {
+    let identifier = '#' + $(this).attr('id');
+    console.log('identifier : ' + identifier);
+      
+    setTimeout(function() {
+      tinyMCEInit(identifier);
+    }, 300);
+  });
+      
+    
+    tinymceInit = tinymceInit + 1;
+
+  });
+
+function tinyMCEInit(identifier) {
+	tinymce.init({
+		selector: identifier,
+		skin: 'bootstrap',
+		language: 'ru',
+		height: 400,
+		plugins: [
+			'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
+			'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+			'save table contextmenu directionality emoticons template paste textcolor colorpicker'
+		],
+		toolbar: 'bold italic sizeselect fontselect fontsizeselect | hr alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | insertfile undo redo | forecolor backcolor emoticons | code',
+		fontsize_formats: "8pt 10pt 12pt 14pt 18pt 24pt 36pt",
+
+		paste_remove_styles: true,
+		paste_remove_spans: true,
+		paste_strip_class_attributes: 'all',
+		paste_block_drop: true,
+
+		paste_preprocess : function(pl, o) {
+			o.content = strip_tags(o.content, '<p><br><h2><h3><h4><h5><h6><ul><ol><li><strong><b><table><tbody><tr><td><img><iframe>');
+		},
+		init_instance_callback: function (editor) {
+			editor.on('blur', function (e) {
+				$('#' + e.target.id).val(editor.getContent());
+				$('#' + e.target.id).trigger('change');
+			});
+		}
+	});
+}
+</script>
+
+<script>
+function resizableInit() {
+	$("td").resizable({
+    handles: 's, e',
+    resize: function (event, ui) {
+      console.log(ui.size.height);
+      $(this).siblings().height(ui.size.height);
+    }
+	});
+}
+</script>
+</div>
+{{ footer }}

@@ -26,11 +26,12 @@ class ControllerProductSearch extends Controller {
 			$tag = '';
 		}
 
-		if (isset($this->request->get['description'])) {
+		/*if (isset($this->request->get['description'])) {
 			$description = $this->request->get['description'];
 		} else {
 			$description = '';
-		}
+		}*/
+        $description = 1;
 
 		if (isset($this->request->get['category_id'])) {
 			$category_id = $this->request->get['category_id'];
@@ -61,6 +62,10 @@ class ControllerProductSearch extends Controller {
 		} else {
 			$page = 1;
 		}
+        $pre_title = '';
+        if($page > 1){
+            $pre_title = 'Сторінка '.$page.' - ';
+        }
 
 		if (isset($this->request->get['limit'])) {
 			$limit = (int)$this->request->get['limit'];
@@ -69,11 +74,11 @@ class ControllerProductSearch extends Controller {
 		}
 
 		if (isset($this->request->get['search'])) {
-			$this->document->setTitle($this->language->get('heading_title') .  ' - ' . $this->request->get['search']);
+			$this->document->setTitle($pre_title.$this->language->get('heading_title') .  ' - ' . $this->request->get['search']);
 		} elseif (isset($this->request->get['tag'])) {
-			$this->document->setTitle($this->language->get('heading_title') .  ' - ' . $this->language->get('heading_tag') . $this->request->get['tag']);
+			$this->document->setTitle($pre_title.$this->language->get('heading_title') .  ' - ' . $this->language->get('heading_tag') . $this->request->get['tag']);
 		} else {
-			$this->document->setTitle($this->language->get('heading_title'));
+			$this->document->setTitle($pre_title.$this->language->get('heading_title'));
 		}
 		
 		$this->document->setRobots('noindex,follow');
@@ -129,9 +134,9 @@ class ControllerProductSearch extends Controller {
 		);
 
 		if (isset($this->request->get['search'])) {
-			$data['heading_title'] = $this->language->get('heading_title') .  ' - ' . $this->request->get['search'];
+			$data['heading_title'] = $pre_title.$this->language->get('heading_title') .  ' - ' . $this->request->get['search'];
 		} else {
-			$data['heading_title'] = $this->language->get('heading_title');
+			$data['heading_title'] = $pre_title.$this->language->get('heading_title');
 		}
 		
 		$this->document->setRobots('noindex,follow');
@@ -190,56 +195,100 @@ class ControllerProductSearch extends Controller {
 				'start'               => ($page - 1) * $limit,
 				'limit'               => $limit
 			);
-
+		
+			// Спочатку отримуємо звичайні продукти
 			$product_total = $this->model_catalog_product->getTotalProducts($filter_data);
-
 			$results = $this->model_catalog_product->getProducts($filter_data);
-
-			foreach ($results as $result) {
-				if ($result['image']) {
-					$image = $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
-				} else {
-					$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
+			
+			// Якщо звичайних продуктів немає, шукаємо в JCB products
+			if ($product_total == 0) {
+				// Отримуємо кількість JCB продуктів
+				$jcb_sql = "SELECT COUNT(*) as total FROM " . DB_PREFIX . "simple_products 
+						   WHERE LOWER(name) LIKE '%" . $this->db->escape(utf8_strtolower($search)) . "%'
+						   OR LOWER(sku) LIKE '%" . $this->db->escape(utf8_strtolower($search)) . "%'";
+				$jcb_total_query = $this->db->query($jcb_sql);
+				$product_total = $jcb_total_query->row['total'];
+		
+				// Отримуємо JCB продукти
+				if ($product_total > 0) {
+					$jcb_sql = "SELECT * FROM " . DB_PREFIX . "simple_products 
+							   WHERE LOWER(name) LIKE '%" . $this->db->escape(utf8_strtolower($search)) . "%'
+							   OR LOWER(sku) LIKE '%" . $this->db->escape(utf8_strtolower($search)) . "%'
+							   ORDER BY name ASC 
+							   LIMIT " . (int)(($page - 1) * $limit) . "," . (int)$limit;
+					$jcb_query = $this->db->query($jcb_sql);
+					$results = $jcb_query->rows;
+		
+					// Форматуємо результати JCB продуктів
+					foreach ($results as $result) {
+						$image = $this->model_tool_image->resize('catalog/jcb-parts-all/pre-order.jpg', 
+							$this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'),
+							$this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height')
+						);
+		
+						if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+							$price = $this->currency->format(
+								$this->tax->calculate($result['price'], 0, $this->config->get('config_tax')),
+								$this->session->data['currency']
+							);
+						} else {
+							$price = false;
+						}
+		
+						$data['products'][] = array(
+							'product_id'  => 'jcb_' . $result['id'],
+							'thumb'       => $image,
+							'name'        => $result['name'],
+							'description' => '',
+							'price'       => $price,
+							'special'     => false,
+							'tax'         => false,
+							'minimum'     => 1,
+							'rating'      => 0,
+							'href'        => '/all-jcb-parts/item/' . $result['seo_url']
+						);
+					}
 				}
-
-				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				} else {
-					$price = false;
+			} else {
+				// Обробка звичайних продуктів (залишити оригінальний код)
+				foreach ($results as $result) {
+					if ($result['image']) {
+						$image = $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
+					} else {
+						$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
+					}
+		
+					if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+						$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+					} else {
+						$price = false;
+					}
+		
+					if ((float)$result['special']) {
+						$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+					} else {
+						$special = false;
+					}
+		
+					if ($this->config->get('config_tax')) {
+						$tax = $this->currency->format((float)$result['special'] ? $result['special'] : $result['price'], $this->session->data['currency']);
+					} else {
+						$tax = false;
+					}
+		
+					$data['products'][] = array(
+						'product_id'  => $result['product_id'],
+						'thumb'       => $image,
+						'name'        => $result['name'],
+						'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
+						'price'       => $price,
+						'special'     => $special,
+						'tax'         => $tax,
+						'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
+						'rating'      => $result['rating'],
+						'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'] . $url)
+					);
 				}
-
-				if (!is_null($result['special']) && (float)$result['special'] >= 0) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-					$tax_price = (float)$result['special'];
-				} else {
-					$special = false;
-					$tax_price = (float)$result['price'];
-				}
-	
-				if ($this->config->get('config_tax')) {
-					$tax = $this->currency->format($tax_price, $this->session->data['currency']);
-				} else {
-					$tax = false;
-				}
-
-				if ($this->config->get('config_review_status')) {
-					$rating = (int)$result['rating'];
-				} else {
-					$rating = false;
-				}
-
-				$data['products'][] = array(
-					'product_id'  => $result['product_id'],
-					'thumb'       => $image,
-					'name'        => $result['name'],
-					'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
-					'price'       => $price,
-					'special'     => $special,
-					'tax'         => $tax,
-					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
-					'rating'      => $result['rating'],
-					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'] . $url)
-				);
 			}
 
 			$url = '';
@@ -410,7 +459,8 @@ class ControllerProductSearch extends Controller {
 			$pagination->limit = $limit;
 			$pagination->url = $this->url->link('product/search', $url . '&page={page}');
 
-			$data['pagination'] = $pagination->render();
+            //$data['pagination'] = str_replace('&amp;page=1','',$pagination->render());
+            $data['pagination'] = $pagination->render();
 
 			$data['results'] = sprintf($this->language->get('text_pagination'), ($product_total) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($product_total - $limit)) ? $product_total : ((($page - 1) * $limit) + $limit), $product_total, ceil($product_total / $limit));
 

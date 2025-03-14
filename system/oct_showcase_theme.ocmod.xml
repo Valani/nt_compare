@@ -1636,9 +1636,58 @@
 					}
 
 					if (isset($image_original)) {
-						imagewebp($image_original, DIR_IMAGE . $oct_webp_image, 85);
+						// Check if image is from products directory
+						if (strpos($image_new, 'catalog/product/') !== false) {
+							// Load the watermark image
+							$watermark = imagecreatefrompng(DIR_IMAGE . 'watermark.png');
+							
+							// Get dimensions of both images
+							$watermark_width = imagesx($watermark);
+							$watermark_height = imagesy($watermark);
+							$image_width = imagesx($image_original);
+							$image_height = imagesy($image_original);
+							
+							// Calculate watermark scale based on image size
+							$scale_factor = 0.6; // Watermark will be 30% of image width for full size
+							if ($width < 500) { // For thumbnails and preview images
+								$scale_factor = 0.4; // Reduce to 20% for smaller images
+							}
+							
+							// Calculate new watermark dimensions
+							$new_watermark_width = intval($image_width * $scale_factor);
+							$scale = $new_watermark_width / $watermark_width;
+							$new_watermark_height = intval($watermark_height * $scale);
+							
+							// Create resized watermark
+							$watermark_resized = imagecreatetruecolor($new_watermark_width, $new_watermark_height);
+							
+							// Preserve transparency
+							imagealphablending($watermark_resized, false);
+							imagesavealpha($watermark_resized, true);
+							$transparent = imagecolorallocatealpha($watermark_resized, 255, 255, 255, 127);
+							imagefilledrectangle($watermark_resized, 0, 0, $new_watermark_width, $new_watermark_height, $transparent);
+							
+							// Resize watermark
+							imagecopyresampled($watermark_resized, $watermark, 0, 0, 0, 0, 
+								$new_watermark_width, $new_watermark_height, $watermark_width, $watermark_height);
+							
+							// Calculate center position
+							$dest_x = ($image_width - $new_watermark_width) / 2;
+							$dest_y = ($image_height - $new_watermark_height) / 2;
+							
+							// Copy the watermark onto the original image
+							imagecopy($image_original, $watermark_resized, $dest_x, $dest_y, 0, 0, 
+								$new_watermark_width, $new_watermark_height);
+							
+							// Clean up
+							imagedestroy($watermark);
+							imagedestroy($watermark_resized);
+						}
+						
+						// Save as WebP
+						imagewebp($image_original, DIR_IMAGE . $oct_webp_image, 100);
 						imagedestroy($image_original);
-
+						
 						if (filesize(DIR_IMAGE . $oct_webp_image) % 2 == 1) {
 							file_put_contents(DIR_IMAGE . $oct_webp_image, "\0", FILE_APPEND);
 						}

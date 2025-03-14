@@ -18,7 +18,7 @@ class ControllerOCTemplatesModuleOctPopupFoundCheaper extends Controller {
 			} else {
 				$product_id = 0;
 			}
-
+            $data['privacy_link'] = $this->url->link('information/information/agree', 'information_id=3');
 			$this->load->model('catalog/product');
 
 			$product_info = $this->model_catalog_product->getProduct($product_id);
@@ -31,7 +31,7 @@ class ControllerOCTemplatesModuleOctPopupFoundCheaper extends Controller {
 				if ($product_info['image']) {
 					$data['thumb'] = $this->model_tool_image->resize($product_info['image'], 540, 600);
 				} else {
-					$data['thumb'] = '';
+					$data['thumb'] = '/image/cache/webp/no-thumb-600x600.webp';
 				}
 
 				$results = $this->model_catalog_product->getProductImages((int)$product_id);

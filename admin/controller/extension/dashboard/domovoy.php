@@ -203,7 +203,7 @@ class ControllerExtensionDashboardDomovoy extends Controller
 
             $cache = $this->config->get('domovoy_folders_' . $key);
 
-            $time = $this->date_diff(date('Y-m-d H:i'), (isset($cache['date']) ? $cache['date'] : ''));
+            $time = $this->date_diff(date('Y-m-d H:i'), $cache['date']);
             if ($cron[$key]['status'] && $time > $cron_time) {
                 $this->calc($key);
             }

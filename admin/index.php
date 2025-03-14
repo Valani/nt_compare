@@ -2,8 +2,7 @@
 // Version
 define('VERSION', '3.0.3.7');
 define('VERSION_CORE', 'ocStore');
-define('VERSION_BUILD', '0002');
-define('VERSION_LANGPACK', 'UK-EN-RU');
+define('VERSION_BUILD', '0001');
 
 // Configuration
 if (is_file('config.php')) {

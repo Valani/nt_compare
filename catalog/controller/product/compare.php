@@ -76,7 +76,9 @@ class ControllerProductCompare extends Controller {
 				if ($product_info['quantity'] <= 0) {
 					$availability = $product_info['stock_status'];
 				} elseif ($this->config->get('config_stock_display')) {
-					$availability = $product_info['quantity'];
+                    if($product_info['quantity'] > 10){
+                        $availability = '> 10';
+                    }else $availability = $product_info['quantity'];
 				} else {
 					$availability = $this->language->get('text_instock');
 				}

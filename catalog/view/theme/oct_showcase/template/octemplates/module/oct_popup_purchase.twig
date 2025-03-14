@@ -215,10 +215,11 @@
                         {% endif %}
                         <input type="hidden" name="product_id" value="{{ product_id }}"/>
                         {% if text_agree %}
-                            <div class="form-check d-flex pb-3">
-                                <input id="agreePurchaseCheck" type="checkbox" class="form-check-input" name="agree">
+                            <div class="d-flex pb-3">
+                                <input id="agreePurchaseCheck" type="checkbox" class="form-check-input hidden" name="agree" checked>
                                 <label class="form-check-label" for="agreePurchaseCheck">
-                                    {{ text_agree }}
+                                    <p>{{ text_agree2 }}:</p>
+                                    <p><a href="{{ privacy_link }}" class="agree">{{ text_privacy2 }}</a></p>
                                 </label>
                             </div>
                         {% endif %}

@@ -53,7 +53,7 @@ class ControllerExtensionModuleOctSlideshowPlus extends Controller {
 			$image = json_decode($result['image'], true);
 
 			if (isset($image[(int)$this->config->get('config_language_id')]) && is_file(DIR_IMAGE.$image[(int)$this->config->get('config_language_id')])) {
-				$data['status_additional_banners']	= $result['status_additional_banners'];
+				$data['status_additional_banners']	= /*$result['status_additional_banners']*/ false;
 				$data['position_banners']			= $result['position_banners'];
 				$data['timer_view']					= $result['timer_view'];
 				$data['full_img']					= $result['full'];
@@ -98,8 +98,8 @@ class ControllerExtensionModuleOctSlideshowPlus extends Controller {
 			}
 		}
 
-		$products_data = $this->model_octemplates_module_oct_slideshow_plus->getSlideshowProduct($setting['slideshow_id']);
-
+		//$products_data = $this->model_octemplates_module_oct_slideshow_plus->getSlideshowProduct($setting['slideshow_id']);
+        $products_data = [];
 		$data['paginations_status'] = isset($setting['paginations_status']) && $setting['paginations_status'] ? true : false;
 		$data['slider_with_megamenu'] = isset($setting['slider_with_megamenu']) && $setting['slider_with_megamenu'] ? true : false;
 

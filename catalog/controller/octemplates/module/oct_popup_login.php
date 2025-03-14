@@ -28,6 +28,15 @@ class ControllerOCTemplatesModuleOctPopupLogin extends Controller {
 				}
 			}
 
+            $parameters = [
+                'redirect_uri'  => GOOGLE_REDIRECT_URI,
+                'response_type' => 'code',
+                'client_id'     => GOOGLE_CLIENT_ID,
+                'scope'         => implode(' ', GOOGLE_SCOPES),
+            ];
+            $data['uri_google'] = GOOGLE_AUTH_URI . '?' . http_build_query($parameters);
+            $data['entry_google_in'] = $this->language->get('entry_google_in');
+
 			$this->response->setOutput($this->load->view('octemplates/module/oct_popup_login', $data));
 		} else {
 			$this->response->redirect($this->url->link('error/not_found', '', true));
@@ -98,6 +107,23 @@ class ControllerOCTemplatesModuleOctPopupLogin extends Controller {
 			if ($customer_info && !$customer_info['status']) {
 				$json['warning'] = $this->language->get('error_approved');
 			}
+
+            if($customer_info && trim($customer_info['allowed_ips']) != ''){
+                $ips = explode("\n",$customer_info['allowed_ips']);
+                $cur_ip = $this->request->server['REMOTE_ADDR'];
+                if(!empty($ips)){
+                    $allow = false;
+                    foreach($ips as $ip){
+                        if(trim($ip) == $cur_ip){
+                            $allow = true;
+                            break;
+                        }
+                    }
+                    if(!$allow){
+                        $json['warning'] = $this->language->get('error_approved');
+                    }
+                }
+            }
 			
 			if (!isset($this->request->post['password']) || utf8_strlen(trim($this->request->post['password'])) < 2) {
 					$json['warning'] = $this->language->get('error_invalid_password');

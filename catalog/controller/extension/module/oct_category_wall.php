@@ -80,13 +80,28 @@ class ControllerExtensionModuleOctCategoryWall extends Controller {
                         $category_children = $this->model_catalog_category->getOCTCategories($category_info['category_id'], $data['limit'], $filter_data);
 
                         foreach ($category_children as $child) {
+                            $path_ids = [];
+                            $pathes = $this->db->query("SELECT path_id FROM ".DB_PREFIX."category_path WHERE category_id = ".intval($child['category_id'])." ORDER BY level ");
+                            $pathes = $pathes->rows;
+                            if(!empty($pathes)){
+                                foreach($pathes as $p){
+                                    $path_ids[] = $p['path_id'];
+                                }
+                            }
                             $sub_categories[] = [
                                 'name' => $child['name'],
-                                'href' => $this->url->link('product/category', 'path=' . $category_info['category_id'] . '_' . $child['category_id'])
+                                'href' => $this->url->link('product/category', 'path=' . (!empty($path_ids) ? implode('_',$path_ids) : $category_info['category_id'] . '_' . $child['category_id']))
                             ];
                         }
                     }
-
+                    $path_ids = [];
+                    $pathes = $this->db->query("SELECT path_id FROM ".DB_PREFIX."category_path WHERE category_id = ".intval($category_info['category_id'])." ORDER BY level ");
+                    $pathes = $pathes->rows;
+                    if(!empty($pathes)){
+                        foreach($pathes as $p){
+                            $path_ids[] = $p['path_id'];
+                        }
+                    }
                     $categories_wall[] = [
                         'category_id'   => $category_info['category_id'],
                         'sort_order'    => $category_info['sort_order'],
@@ -95,7 +110,7 @@ class ControllerExtensionModuleOctCategoryWall extends Controller {
                         'height'        => $setting['height'],
                         'name'          => $category_info['name'],
                         'children'      => $sub_categories,
-                        'href'          => $this->url->link('product/category', 'path=' . $category_info['category_id'])
+                        'href'          => $this->url->link('product/category', 'path=' . (!empty($path_ids) ? implode('_',$path_ids) : $category_info['category_id']))
                     ];
 	            }
 

@@ -7,6 +7,7 @@
 
 class ControllerOCTemplatesMenuOCTMenu extends Controller {
     public function index() {
+
         $this->load->language('octemplates/menu/oct_menu');
         $this->load->language('octemplates/module/oct_popup_login');
 
@@ -70,7 +71,7 @@ class ControllerOCTemplatesMenuOCTMenu extends Controller {
                 $data['forgotten_url'] = $this->url->link('account/forgotten', '', true);
                 $data['register_url'] = $this->url->link('account/register', '', true);
 			}
-			
+
 			$data['compare_link'] = $this->url->link('product/compare','', true);
 			$data['compare_total'] = (isset($this->session->data['compare']) ? count($this->session->data['compare']) : 0);
 
@@ -196,7 +197,7 @@ class ControllerOCTemplatesMenuOCTMenu extends Controller {
             ];
 
             $menu_items = $this->model_octemplates_menu_oct_menu->getOCTMenuItems($types);
-
+            
             $this->cache->set('octemplates.menuItems.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . $oct_webP, $menu_items);
         }
 

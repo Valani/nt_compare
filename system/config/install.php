@@ -4,8 +4,8 @@ $_['site_base']         = HTTP_SERVER;
 $_['site_ssl']          = HTTP_SERVER;
 
 // Language
-$_['language_default']  = 'uk-ua';
-$_['language_autoload'] = array('uk-ua');
+$_['language_default']  = 'en-gb';
+$_['language_autoload'] = array('en-gb');
 
 // Session
 $_['session_engine']     = 'file';

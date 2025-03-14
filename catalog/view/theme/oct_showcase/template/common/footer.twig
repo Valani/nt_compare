@@ -20,7 +20,7 @@
 				</div>
 				<div class="sc-footer-socials-box d-flex align-items-center justify-content-center justify-content-xl-start">
 					{% for social in oct_showcase_data.socials %}
-					<a rel="noopener noreferrer" href="{{ (social.link == "#" or social.link is empty) ? 'javascript:;' : social.link }}" class="sc-footer-socials-item sc-footer-socials-item-{{ social.icone|replace({'fa ': "", "fab " : "", "far " : "", "fas " : ""}) }} d-flex align-items-center justify-content-center" target="_blank">
+					<a rel="noopener noreferrer nofollow" href="{{ (social.link == "#" or social.link is empty) ? 'javascript:;' : social.link }}" class="sc-footer-socials-item sc-footer-socials-item-{{ social.icone|replace({'fa ': "", "fab " : "", "far " : "", "fas " : ""}) }} d-flex align-items-center justify-content-center" target="_blank">
 						<i class="{{ social.icone }}"></i>
 						{{ social.link }}
 					</a>
@@ -116,32 +116,32 @@
 						{% if oct_showcase_data.contact_telegram is defined and oct_showcase_data.contact_telegram %}
                         <li class="d-flex align-items-center mb-2">
 							<img class="me-2" width="20" height="20" src="catalog/view/theme/oct_showcase/img/sprite.svg#include--telegram-icon" alt="">
-							<a rel="noopener noreferrer" href="https://t.me/{{ oct_showcase_data.contact_telegram }}" target="_blank">Telegram</a>
+							<a rel="noopener noreferrer nofollow" href="https://t.me/{{ oct_showcase_data.contact_telegram }}" target="_blank">Telegram</a>
 						</li>
 						{% endif %}
 						{% if oct_showcase_data.contact_viber is defined and oct_showcase_data.contact_viber %}
                         <li class="d-flex align-items-center mb-2">
 							<img class="me-2" width="20" height="20" src="catalog/view/theme/oct_showcase/img/sprite.svg#include--viber-icon" alt="">
-							<a rel="noopener noreferrer" href="viber://chat?number=+{{ oct_showcase_data.contact_viber }}" target="_blank" class="d-none d-xl-inline">Viber</a>
-							<a rel="noopener noreferrer" href="viber://add?number={{ oct_showcase_data.contact_viber }}" target="_blank" class="d-xl-none">Viber</a>
+							<a rel="noopener noreferrer nofollow" href="viber://chat?number=+{{ oct_showcase_data.contact_viber }}" target="_blank" class="d-none d-xl-inline">Viber</a>
+							<a rel="noopener noreferrer nofollow" href="viber://add?number={{ oct_showcase_data.contact_viber }}" target="_blank" class="d-xl-none">Viber</a>
 						</li>
 						{% endif %}
 						{% if oct_showcase_data.contact_whatsapp is defined and oct_showcase_data.contact_whatsapp %}
                         <li class="d-flex align-items-center mb-2">
 							<img class="me-2" width="20" height="20" src="catalog/view/theme/oct_showcase/img/sprite.svg#include--whatsapp-icon" alt="">
-							<a rel="noopener noreferrer" href="https://api.whatsapp.com/send?phone={{ oct_showcase_data.contact_whatsapp }}" target="_blank">WhatsApp</a>
+							<a rel="noopener noreferrer nofollow" href="https://api.whatsapp.com/send?phone={{ oct_showcase_data.contact_whatsapp }}" target="_blank">WhatsApp</a>
 						</li>
 						{% endif %}
 						{% if oct_showcase_data.contact_messenger is defined and oct_showcase_data.contact_messenger %}
                         <li class="d-flex align-items-center mb-2">
 							<img class="me-2" width="20" height="20" src="catalog/view/theme/oct_showcase/img/sprite.svg#include--messenger-icon" alt="">
-							<a rel="noopener noreferrer" href="https://m.me/{{ oct_showcase_data.contact_messenger }}" target="_blank">Messenger</a>
+							<a rel="noopener noreferrer nofollow" href="https://m.me/{{ oct_showcase_data.contact_messenger }}" target="_blank">Messenger</a>
 						</li>
 						{% endif %}
 						{% if oct_showcase_data.contact_skype is defined and oct_showcase_data.contact_skype %}
                         <li class="d-flex align-items-center mb-2">
 							<img class="me-2" width="20" height="20" src="catalog/view/theme/oct_showcase/img/sprite.svg#include--skype-icon" alt="">
-							<a rel="noopener noreferrer" href="skype:{{ oct_showcase_data.contact_skype }}?chat">Skype</a>
+							<a rel="noopener noreferrer nofollow" href="skype:{{ oct_showcase_data.contact_skype }}?chat">Skype</a>
 						</li>
 						{% endif %}
                     </ul>
@@ -163,28 +163,28 @@
 		</div>
 		<div class="sc-fixed-contact-dropdown d-flex flex-column align-items-start">
 			{% if (oct_feedback_data.feedback_messenger is defined and oct_feedback_data.feedback_messenger) and (oct_showcase_data.contact_messenger is defined and oct_showcase_data.contact_messenger) %}
-			<a rel="noopener noreferrer" href="https://m.me/{{ oct_showcase_data.contact_messenger }}" target="_blank" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-messenger d-flex align-items-center justify-content-center"><i class="fab fa-facebook-messenger"></i></span><span>Messenger</span></a>
+			<a rel="noopener noreferrer nofollow" href="https://m.me/{{ oct_showcase_data.contact_messenger }}" target="_blank" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-messenger d-flex align-items-center justify-content-center"><i class="fab fa-facebook-messenger"></i></span><span>Messenger</span></a>
 			{% endif %}
 
 			{% if (oct_feedback_data.feedback_viber is defined and oct_feedback_data.feedback_viber) and (oct_showcase_data.contact_viber is defined and oct_showcase_data.contact_viber) %}
-			<a rel="noopener noreferrer" href="viber://chat?number=+{{ oct_showcase_data.contact_viber }}" target="_blank" class="sc-fixed-contact-item d-none d-xl-flex align-items-center sc-fixed-contact-viber-desktop"><span class="sc-fixed-contact-item-icon sc-fixed-contact-viber d-flex align-items-center justify-content-center"><i class="fab fa-viber"></i></span><span>Viber</span></a>
-			<a rel="noopener noreferrer" href="viber://add?number={{ oct_showcase_data.contact_viber }}" target="_blank" class="sc-fixed-contact-item d-flex d-xl-none align-items-center sc-fixed-contact-viber-mobile"><span class="sc-fixed-contact-item-icon sc-fixed-contact-viber d-flex align-items-center justify-content-center"><i class="fab fa-viber"></i></span><span>Viber</span></a>
+			<a rel="noopener noreferrer nofollow" href="viber://chat?number=+{{ oct_showcase_data.contact_viber }}" target="_blank" class="sc-fixed-contact-item d-none d-xl-flex align-items-center sc-fixed-contact-viber-desktop"><span class="sc-fixed-contact-item-icon sc-fixed-contact-viber d-flex align-items-center justify-content-center"><i class="fab fa-viber"></i></span><span>Viber</span></a>
+			<a rel="noopener noreferrer nofollow" href="viber://add?number={{ oct_showcase_data.contact_viber }}" target="_blank" class="sc-fixed-contact-item d-flex d-xl-none align-items-center sc-fixed-contact-viber-mobile"><span class="sc-fixed-contact-item-icon sc-fixed-contact-viber d-flex align-items-center justify-content-center"><i class="fab fa-viber"></i></span><span>Viber</span></a>
 			{% endif %}
 
 			{% if (oct_feedback_data.feedback_telegram is defined and oct_feedback_data.feedback_telegram) and (oct_showcase_data.contact_telegram is defined and oct_showcase_data.contact_telegram) %}
-			<a rel="noopener noreferrer" href="https://t.me/{{ oct_showcase_data.contact_telegram }}" target="_blank" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-telegram d-flex align-items-center justify-content-center"><i class="fab fa-telegram"></i></span><span>Telegram</span></a>
+			<a rel="noopener noreferrer nofollow" href="https://t.me/{{ oct_showcase_data.contact_telegram }}" target="_blank" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-telegram d-flex align-items-center justify-content-center"><i class="fab fa-telegram"></i></span><span>Telegram</span></a>
 			{% endif %}
 
 			{% if (oct_feedback_data.feedback_skype is defined and oct_feedback_data.feedback_skype) and (oct_showcase_data.contact_skype is defined and oct_showcase_data.contact_skype) %}
-			<a rel="noopener noreferrer" href="skype:{{ oct_showcase_data.contact_skype }}?chat" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-skype d-flex align-items-center justify-content-center"><i class="fab fa-skype"></i></span><span>Skype</span></a>
+			<a rel="noopener noreferrer nofollow" href="skype:{{ oct_showcase_data.contact_skype }}?chat" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-skype d-flex align-items-center justify-content-center"><i class="fab fa-skype"></i></span><span>Skype</span></a>
 			{% endif %}
 
 			{% if (oct_feedback_data.feedback_whatsapp is defined and oct_feedback_data.feedback_whatsapp) and (oct_showcase_data.contact_whatsapp is defined and oct_showcase_data.contact_whatsapp) %}
-			<a rel="noopener noreferrer" href="https://api.whatsapp.com/send?phone={{ oct_showcase_data.contact_whatsapp }}" target="_blank" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-whatsapp d-flex align-items-center justify-content-center"><i class="fab fa-whatsapp"></i></span><span>WhatsApp</span></a>
+			<a rel="noopener noreferrer nofollow" href="https://api.whatsapp.com/send?phone={{ oct_showcase_data.contact_whatsapp }}" target="_blank" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-whatsapp d-flex align-items-center justify-content-center"><i class="fab fa-whatsapp"></i></span><span>WhatsApp</span></a>
 			{% endif %}
 
 			{% if (oct_feedback_data.feedback_email is defined and oct_feedback_data.feedback_email) and (oct_showcase_data.contact_email is defined and oct_showcase_data.contact_email) %}
-			<a rel="noopener noreferrer" href="mailto:{{ oct_showcase_data.contact_email }}" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-email d-flex align-items-center justify-content-center"><i class="far fa-envelope"></i></span><span>{{ oct_showcase_data.contact_email }}</span></a>
+			<a rel="noopener noreferrer nofollow" href="mailto:{{ oct_showcase_data.contact_email }}" class="sc-fixed-contact-item d-flex align-items-center"><span class="sc-fixed-contact-item-icon sc-fixed-contact-email d-flex align-items-center justify-content-center"><i class="far fa-envelope"></i></span><span>{{ oct_showcase_data.contact_email }}</span></a>
 			{% endif %}
 
 			{% if (oct_feedback_data.feedback_callback is defined and oct_feedback_data.feedback_callback) and (oct_popup_call_phone_status is defined and oct_popup_call_phone_status) %}

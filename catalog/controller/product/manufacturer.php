@@ -96,12 +96,16 @@ class ControllerProductManufacturer extends Controller {
 
 		if (isset($this->request->get['page'])) {
 			$page = (int)$this->request->get['page'];
-            if (!in_array('page', $disallow_params, true) && $this->config->get('config_noindex_status')) {
-                $this->document->setRobots('noindex,follow');
-            }
+            //if (!in_array('page', $disallow_params, true) && $this->config->get('config_noindex_status')) {
+                $this->document->setRobots('noindex nofollow');
+            //}
 		} else {
 			$page = 1;
 		}
+        $pre_title = '';
+        if($page > 1){
+            $pre_title = 'Сторінка '.$page.' - ';
+        }
 
 		if (isset($this->request->get['limit'])) {
 			$limit = (int)$this->request->get['limit'];
@@ -129,9 +133,9 @@ class ControllerProductManufacturer extends Controller {
 		if ($manufacturer_info) {
 
 			if ($manufacturer_info['meta_title']) {
-				$this->document->setTitle($manufacturer_info['meta_title']);
+				$this->document->setTitle($pre_title.$manufacturer_info['meta_title']);
 			} else {
-				$this->document->setTitle($manufacturer_info['name']);
+				$this->document->setTitle($pre_title.$manufacturer_info['name']);
 			}
 
 			if ($manufacturer_info['noindex'] <= 0 && $this->config->get('config_noindex_status')) {
@@ -139,12 +143,12 @@ class ControllerProductManufacturer extends Controller {
 			}
 
 			if ($manufacturer_info['meta_h1']) {
-				$data['heading_title'] = $manufacturer_info['meta_h1'];
+				$data['heading_title'] = $pre_title.$manufacturer_info['meta_h1'];
 			} else {
-				$data['heading_title'] = $manufacturer_info['name'];
+				$data['heading_title'] = $pre_title.$manufacturer_info['name'];
 			}
 
-			$this->document->setDescription($manufacturer_info['meta_description']);
+			$this->document->setDescription($pre_title.$manufacturer_info['meta_description']);
 			$this->document->setKeywords($manufacturer_info['meta_keyword']);
 			$data['description'] = html_entity_decode($manufacturer_info['description'], ENT_QUOTES, 'UTF-8');
 
@@ -193,7 +197,9 @@ class ControllerProductManufacturer extends Controller {
 			);
 
 			$product_total = $this->model_catalog_product->getTotalProducts($filter_data);
-
+            if($page > ceil($product_total/$limit)){
+                $this->response->redirect($this->url->link('product/manufacturer/info', 'manufacturer_id=' . $this->request->get['manufacturer_id']));
+            }
 			$results = $this->model_catalog_product->getProducts($filter_data);
 
 			foreach ($results as $result) {
@@ -203,19 +209,43 @@ class ControllerProductManufacturer extends Controller {
 					$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
 				}
 
-				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				} else {
-					$price = false;
-				}
+                $is_rent = 0;
+                $is_remont = 0;
+                $cats = $this->model_catalog_product->getCategories($result['product_id']);
+                if(!empty($cats)){
+                    foreach($cats as $cat){
+                        if($cat['category_id'] == 15){
+                            $is_rent = 1;
+                        }
+                        if($cat['category_id'] == 13){
+                            $is_remont = 1;
+                        }
+                    }
+                }
 
-				if (!is_null($result['special']) && (float)$result['special'] >= 0) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-					$tax_price = (float)$result['special'];
-				} else {
-					$special = false;
-					$tax_price = (float)$result['price'];
-				}
+                if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                    if($is_rent == 1){
+                        $price = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $data['price'] = 'За домовленістю';
+                    }else $price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                } else {
+                    $price = false;
+                }
+
+                if (!is_null($result['special']) && (float)$result['special'] >= 0) {
+                    if($is_rent == 1){
+                        $special = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $special = false;
+                    }else{
+                        $special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    }
+                    $tax_price = (float)$result['special'];
+                } else {
+                    $special = false;
+                    $tax_price = (float)$result['price'];
+                }
 
 				if ($this->config->get('config_tax')) {
 					$tax = $this->currency->format($tax_price, $this->session->data['currency']);
@@ -351,6 +381,7 @@ class ControllerProductManufacturer extends Controller {
 			$pagination->limit = $limit;
 			$pagination->url = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $this->request->get['manufacturer_id'] .  $url . '&page={page}');
 
+			//$data['pagination'] = str_replace('&amp;page=1','',$pagination->render());
 			$data['pagination'] = $pagination->render();
 
 			$data['results'] = sprintf($this->language->get('text_pagination'), ($product_total) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($product_total - $limit)) ? $product_total : ((($page - 1) * $limit) + $limit), $product_total, ceil($product_total / $limit));
@@ -378,9 +409,23 @@ class ControllerProductManufacturer extends Controller {
                 $request_url = rtrim($server, '/') . $this->request->server['REQUEST_URI'];
                 $canonical_url = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $this->request->get['manufacturer_id']);
 
-                if (($request_url != $canonical_url) || $this->config->get('config_canonical_self')) {
-                    $this->document->addLink($canonical_url, 'canonical');
+                //if (($request_url != $canonical_url) || $this->config->get('config_canonical_self')) {
+                $can_u = explode("?",'https://'.$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+                $can_u_final = $can_u[0];
+                if(isset($can_u[1])){
+                    $mas_part_u = explode('&', $can_u[1]);
+                    if(!empty($mas_part_u)){
+                        foreach($mas_part_u as $mpu){
+                            if(strpos($mpu, 'page') !== false){
+                                $can_u_final .= '?'.$mpu;
+                                break;
+                            }
+                        }
+                    }
                 }
+                //$this->document->addLink('https://'.$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], 'canonical');
+                $this->document->addLink($can_u_final, 'canonical');
+                //}
 
                 if ($this->config->get('config_add_prevnext')) {
 

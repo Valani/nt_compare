@@ -59,32 +59,38 @@
 					</div>
 					<div class="h3 my-4">{{ text_order }}</div>
 					<div class="table-responsive-sm sc-account-table">
-					    <table class="table table-hover">
-					       	<thead class="thead-dark">
-					         	<tr>
-						            <th scope="col">{{ oct_account_n_order }}</th>
-						            <th scope="col">{{ oct_account_order_status }}</th>
-						            <th scope="col">{{ oct_account_order_date }}</th>
-						            <th scope="col">{{ oct_account_order_amount }}</th>
-					            </tr>
-					        </thead>
-					        <tbody>
+						<table class="table table-hover">
+							<thead class="thead-dark">
+								<tr>
+									<th scope="col">{{ oct_account_n_order }}</th>
+									<th scope="col">{{ oct_account_order_status }}</th>
+									<th scope="col">{{ oct_account_order_date }}</th>
+									<th scope="col">{{ oct_account_order_amount }}</th>
+									<th scope="col">PDF</th>
+								</tr>
+							</thead>
+							<tbody>
 								{% if orders|length >= 1 %}
 								{% for order in orders %}
-					            <tr>
-					                <td><a href="{{ order.href }}">#{{ order.order_id }}</a></td>
-					            	<td>{{ order.status }}</td>
-					            	<td>{{ order.date_added }}</td>
-					            	<td>{{ order.total }}</td>
-					          	</tr>
+								<tr>
+									<td><a href="{{ order.href }}">#{{ order.order_id }}</a></td>
+									<td>{{ order.status }}</td>
+									<td>{{ order.date_added }}</td>
+									<td>{{ order.total }}</td>
+									<td>
+										<a href="{{ order.pdf_url }}" target="_blank">
+											Рахунок
+										</a>
+									</td>
+								</tr>
 								{% endfor %}
 								{% else %}
-					            <tr>
-					            	<td>{{ oct_account_no_orders }}</td>
-					          	</tr>
+								<tr>
+									<td colspan="5">{{ oct_account_no_orders }}</td>
+								</tr>
 								{% endif %}
-					        </tbody>
-					    </table>
+							</tbody>
+						</table>
 					</div>
 			    </div>
 		    </div>

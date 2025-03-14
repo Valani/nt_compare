@@ -1,0 +1,560 @@
+{{ header }}
+<style>
+	.panel-body {
+		position: relative;
+	}
+	
+	.panel-body.with-loader::before {
+		content: "";
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background: rgba(255, 255, 255, .5);
+		z-index: 3;
+	}
+	
+	.loader {
+		z-index: 9;
+		position: fixed;
+		display: none;
+		left: 45%;
+		top: 45%;
+		
+		width: 280px;
+		text-align: center;
+	}
+		
+	.loader-icon {
+		display: inline-block;
+		width: 40px;
+		height: 40px;
+		
+    border: 3px solid #8c8d9a; /* bg */
+    border-top: 3px solid #fcb92b; /* primary */
+    border-radius: 50%;
+    
+    animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+	}
+  
+  .loader-dialog {
+    text-shadow: 1px 1px 2px #f3f3f3;
+	}
+  
+  .loader-stopwatch {
+		margin-top: 8px;
+    color: #ff0000;
+	}
+	
+</style>
+{{ column_left }} 
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-warning"><i class="fa fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+          <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+        {% endfor %} 
+      </ul>
+    </div>
+  </div>
+  <!-- /page-header -->
+  <div class="container-fluid">
+    {% if (error_warning) %} 
+    <div class="alert alert-danger">
+      <i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %} 
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <span class="panel-title"><i class="fa fa-magic"></i> {{ text_part_generate }}</span>
+      </div>
+
+      <!-- Customization.Begin -->
+      <!-- Loader icon -->
+      <link href="view/stylesheet/load-bar.css" type="text/css"	rel="stylesheet" media="screen" />
+      <!-- custom syle -->
+      <style>
+        ._relative {
+          position: relative; /* for button loading */
+        }
+      </style>
+
+      <div class="panel-body">
+
+        <div class="module-navigation">
+          <a class="btn btn-default navbar-btn" href="{{ link_part_settings }}">{{ text_part_settings }}</a>
+          <a class="btn btn-default navbar-btn active" href="{{ link_part_generate }}">{{ text_part_generate }}</a>
+          <!--
+          <a class="btn btn-default navbar-btn" href="{{ link_part_edit_seo_url }}">{{ text_part_edit }}</a>
+          <a class="btn btn-default navbar-btn" href="{{ link_part_redirects }}">{{ text_part_redirects }}</a>
+          -->
+        </div>
+        <hr>
+
+        <form action="" method="post" enctype="multipart/form-data" id="form-html" class="form-horizontal">
+          {% if (errors['error_formulas_none'] is defined) %} 
+          <div class="alert alert-danger">{{ errors['error_formulas_none'] }}</div>
+          {% else %} 
+          <fieldset>
+            
+            <!-- Loader -->
+            <div class="loader">
+              <div class="loader-icon"></div>
+              <div class="loader-dialog">
+                <div class="loader-stopwatch timerDisplay">00 : 00 : 00 : 000</div>
+                <div class="loader-statistics"></div>
+              </div>
+            </div>
+
+            <!-- tab.begin
+            ======================================================================================================== -->
+            <div class="tab-pane">
+              <ul class="nav nav-tabs" id="tab-generate">
+                <li class="active"><a href="#tab-generate-product" data-toggle="tab">{{ tab_product }}</a></li>
+                <li><a href="#tab-generate-category" data-toggle="tab">{{ tab_category }}</a></li>
+                <li><a href="#tab-generate-manufacturer" data-toggle="tab">{{ tab_manufacturer }}</a></li>
+                <li><a href="#tab-generate-information" data-toggle="tab">{{ tab_information }}</a></li>
+                <!-- custom tabs -->
+                {% for tab in custom_tabs %} 
+                  <li><a href="#tab-generate-{{ tab['table'] }}" data-toggle="tab">{{ tab['title'] }}</a></li>
+                  {% endfor %} 
+              </ul>
+              <div class="tab-content">
+
+                <!-- product -->
+                <div class="tab-pane active" id="tab-generate-product" data-essence-name="{{ tab_product }}">
+                  <div id="generation-answer_product" class="form-control">{{ text_answer_place }}</div>
+                  <br>
+                  <button id="generate-seo-url_product_empty" class="btn btn-primary _relative">
+										{{ button_generate_seo_url_product_empty }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                  <button id="generate-seo-url_product_replace" class="btn btn-warning _relative">
+										{{ button_generate_seo_url_product_replace }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                <!-- category -->
+                <div class="tab-pane" id="tab-generate-category"  data-essence-name="{{ tab_category }}">
+                  <div id="generation-answer_category" class="form-control">{{ text_answer_place }}</div>
+                  <br>
+                  <button id="generate-seo-url_category_empty" class="btn btn-primary _relative">
+										{{ button_generate_seo_url_category_empty }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                  <button id="generate-seo-url_category_replace" class="btn btn-warning _relative">
+										{{ button_generate_seo_url_category_replace }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                <!-- manufacturer -->
+                <div class="tab-pane" id="tab-generate-manufacturer" data-essence-name="{{ tab_manufacturer }}">
+                  <div id="generation-answer_manufacturer" class="form-control">{{ text_answer_place }}</div>
+                  <br>
+                  <button id="generate-seo-url_manufacturer_empty" class="btn btn-primary _relative">
+										{{ button_generate_seo_url_manufacturer_empty }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                  <button id="generate-seo-url_manufacturer_replace" class="btn btn-warning _relative">
+										{{ button_generate_seo_url_manufacturer_replace }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                <!-- information -->
+                <div class="tab-pane" id="tab-generate-information" data-essence-name="{{ tab_information }}">
+                  <div id="generation-answer_information" class="form-control">{{ text_answer_place }}</div>
+                  <br>
+                  <button id="generate-seo-url_information_empty" class="btn btn-primary _relative">
+										{{ button_generate_seo_url_information_empty }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                  <button id="generate-seo-url_information_replace" class="btn btn-warning _relative">
+										{{ button_generate_seo_url_information_replace }} 
+                    <div class="load-bar">
+                      <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                <!-- custom tabs -->
+                {% for tab in custom_tabs %} 
+                  <div class="tab-pane" id="tab-generate-{{ tab['table'] }}" data-essence-name="{{ tab['title'] }}">
+                    <div id="generation-answer_{{ tab['table'] }}" class="form-control">{{ text_answer_place }}</div>
+                    <br>
+                    <button id="generate-seo-url_{{ tab['table'] }}_empty" class="btn btn-primary _relative" >
+											{{ button_generate_seo_url_custom_empty ~ ' ' ~ tab['title'] }} 
+                      <div class="load-bar">
+                        <div class="spinner">
+                          <div class="bounce1"></div>
+                          <div class="bounce2"></div>
+                          <div class="bounce3"></div>
+                        </div>
+                      </div>
+                    </button>
+                    <button id="generate-seo-url_{{ tab['table'] }}_replace" class="btn btn-warning _relative">
+											{{ button_generate_seo_url_custom_replace ~ ' ' ~ tab['title'] }} 
+                      <div class="load-bar">
+                        <div class="spinner">
+                          <div class="bounce1"></div>
+                          <div class="bounce2"></div>
+                          <div class="bounce3"></div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                {% endfor %} 
+
+              </div>
+              <!-- /tab-content -->
+            </div>
+            <!-- /tab-pane -->
+            <!-- tab.end
+            ======================================================================================================== -->
+          </fieldset>
+           {% endif %} 
+        </form>
+      </div>
+      <!-- /panel-body-->
+      <!-- /Customization.End -->
+
+
+
+    </div>
+    <!-- /panel-default-->
+
+    <div class="copywrite" style="padding: 10px 10px 0 10px; border: 1px dashed #ccc;">
+      <p>&copy; {{ text_author }}: <a href="https://bit.ly/3HOE1sc" target="_blank">Serge Tkach</a>
+        <br />
+        {{ text_author_support }}: <a href="mailto:sergetkach.help@gmail.com">sergetkach.help@gmail.com</a>
+      </p>
+    </div>
+
+  </div>
+  <!-- /container-fluid-->
+</div>
+<!-- /content-->
+
+<!-- js.begin-->
+<script>
+
+/* product */
+$('#generate-seo-url_product_empty').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('product', 'empty');
+});
+$('#generate-seo-url_product_replace').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('product', 'replace');
+});
+
+/* category */
+$('#generate-seo-url_category_empty').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('category', 'empty');
+});
+$('#generate-seo-url_category_replace').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('category', 'replace');
+});
+
+/* manufacturer */
+$('#generate-seo-url_manufacturer_empty').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('manufacturer', 'empty');
+});
+$('#generate-seo-url_manufacturer_replace').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('manufacturer', 'replace');
+});
+
+/* information */
+$('#generate-seo-url_information_empty').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('information', 'empty');
+});
+$('#generate-seo-url_information_replace').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('information', 'replace');
+});
+
+/* custom tabs */
+{% for tab in custom_tabs %} 
+$('#generate-seo-url_{{ tab['table'] }}_empty').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('{{ tab['table'] }}', 'empty', true);
+});
+$('#generate-seo-url_{{ tab['table'] }}_replace').click(function (e) {
+  e.preventDefault();
+  actionMassGenerateURLByAjax('{{ tab['table'] }}', 'replace', true);
+});
+{% endfor %} 
+
+
+
+/* generate by ajax
+ ---------------------------------------------------------------- */
+var succesMassGenerateUrl;
+  
+function actionMassGenerateURLByAjax(essence, generationType, customTab) {
+  // defaults
+  if (!customTab)
+    customTab = false;
+    
+  $('#generation-answer_' + essence).html('<p>{{ text_answer_processing }}</p>');
+
+  let buttonId = '#generate-seo-url_' + essence + '_' + generationType;
+  var i = 1;
+	
+	console.log('button ' + buttonId + ' is pressed');
+	
+	succesMassGenerateUrl = '{{ success_mass_generate_url }}'.replace(/\[essence\]/, $('#tab-generate-' + essence).data('essence-name'));
+	
+	console.log('essence : ' + essence);
+	console.log('succesMassGenerateUrl : ' + succesMassGenerateUrl);
+	console.log('$(\'#tab-generate-\' + essence).data(\'essence-name\') : ' + $('#tab-generate-' + essence).data('essence-name'));
+  
+  loaderOn(buttonId);
+  
+  loopQueries(essence, generationType, customTab, i)
+    .then(function() {
+      console.log('All requests completed successfully.');
+    })
+    .catch(function(error) {
+      console.log('Error during requests: ' + error);
+    })
+    .finally(function() {
+      loaderOff(buttonId);
+    });
+}
+
+function loopQueries(essence, generationType, customTab, i) {
+  return new Promise(function(resolve, reject) {
+    let postData = 'step=' + i + '&essence=' + essence + '&generationType=' + generationType + '&custom_tab=' + customTab;
+
+    if (i === 1) {
+      postData += '&new_submit=1';
+    }
+
+    $.ajax({
+      url: 'index.php?route=extension/module/seo_url_generator/actionMassGenerateURL&user_token={{ user_token }}',
+      type: 'POST',
+      dataType: 'json',
+      data: postData,
+      success: function(response) {
+        console.log('Success httpResponse: ' + i);
+        console.debug(response);
+
+        if (response.status === 'Finish') {
+          console.log('Processing Finish: ' + i);
+          $('#generation-answer_' + essence).html('<p class="text-success">' + succesMassGenerateUrl + '</p>');
+          
+          resolve(); // Завершаем текущий запрос и переходим к следующему
+          
+        } else if (response.status === 'Continue') {
+          console.log('Processing Continue: ' + i);
+          
+          //$('#generation-answer_' + essence).html('<p class="text-success">' + response.answer + '</p>');
+          $('.loader-statistics').html('<p class="text-success">' + response.answer + '</p>');
+          
+          i++;
+          
+          loopQueries(essence, generationType, customTab, i) // Рекурсивно вызываем следующий запрос
+            .then(resolve) // Передаем resolve внешнего промиса
+            .catch(reject); // Передаем reject внешнего промиса
+    
+        } else if (response.status === 'Error') {
+          $('#generation-answer_' + essence).empty();
+          $('#generation-answer_' + essence).html('<p class="text-danger">' + response.answer + '</p>');
+          
+          reject('Error response received.'); // Ошибка в ответе
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        reject('AJAX query Error in loopQueries() - ' + i + ': ' + textStatus);
+        
+        /*
+        $('#generation-answer_' + essence).empty();
+        $('#generation-answer_' + essence).html("<p class='text-danger'>{{ errors['error_ajax_response'] | format("index.php?route=tool/log&user_token=" ~ user_token) }}</p>");
+				
+        console.log('response: ' + xhr.status); // пoкaжeм oтвeт сeрвeрa
+        console.log('error description: ' + thrownError); // и тeкст oшибки
+        */
+      }
+    });
+  });
+}
+
+
+function loaderOn(buttonId) {
+	$('.panel-body').addClass('with-loader');
+	$('.loader').show();
+
+	$(buttonId).attr('disabled', true);
+	$(buttonId + ' .load-bar').css('display', 'block');
+  $('.loader-statistics').html('<p>{{ text_answer_processing }}</p>');
+
+	startStopwatch();
+}
+
+function loaderOff(buttonId) {
+  console.log('loaderOff() called');
+	$('.panel-body').removeClass('with-loader');
+	$('.loader').hide();
+
+	$(buttonId).attr('disabled', false);
+	$(buttonId + ' .load-bar').css('display', 'none');
+	$('.loader-statistics').html('');
+
+	resetStopwatch();
+}
+
+
+
+
+/* Time Counter
+ ---------------------------------------------------------------- */
+// Source: https://foolishdeveloper.com/create-a-simple-stopwatch-using-javascript-tutorial-code/
+// It's modified by ChatGPT to count time when switch the browser tab
+
+let timerWorker = null;
+let timerRef = document.querySelector('.timerDisplay');
+
+function startStopwatch() {
+	if (timerWorker === null) {
+		const workerCode = `
+			let [milliseconds, seconds, minutes, hours] = [0, 0, 0, 0];
+			let int = null;
+
+			function displayStopwatch() {
+				milliseconds += 10;
+				if (milliseconds == 1000) {
+					milliseconds = 0;
+					seconds++;
+					if (seconds == 60) {
+						seconds = 0;
+						minutes++;
+						if (minutes == 60) {
+							minutes = 0;
+							hours++;
+						}
+					}
+				}
+				let h = hours < 10 ? '0' + hours : hours;
+				let m = minutes < 10 ? '0' + minutes : minutes;
+				let s = seconds < 10 ? '0' + seconds : seconds;
+				let ms = milliseconds < 10 ? '00' + milliseconds : milliseconds < 100 ? '0' + milliseconds : milliseconds;
+
+				postMessage(\` \${h} : \${m} : \${s} : \${ms}\`); // Отправляем обновленное время основному потоку
+			}
+
+			function startTimer() {
+				if (int !== null) {
+					clearInterval(int);
+				}
+				int = setInterval(displayStopwatch, 10);
+			}
+
+			function stopTimer() {
+				clearInterval(int);
+				int = null;
+			}
+
+			onmessage = function(event) {
+				let command = event.data;
+
+				switch (command) {
+					case 'start':
+						startTimer();
+						break;
+					case 'stop':
+						stopTimer();
+						break;
+				}
+			};
+		`;
+
+		const blob = new Blob([workerCode], { type: 'application/javascript' });
+		const workerURL = URL.createObjectURL(blob);
+
+		timerWorker = new Worker(workerURL); // Создаем Web Worker
+		timerWorker.onmessage = function(event) {
+			timerRef.innerHTML = event.data; // Обновляем таймер на основной странице
+		};
+	}
+
+	timerWorker.postMessage('start'); // Запускаем таймер в Web Worker
+}
+
+function resetStopwatch() {
+	if (timerWorker !== null) {
+		timerWorker.terminate(); // Останавливаем Web Worker
+		timerWorker = null;
+	}
+
+	timerRef.innerHTML = '00 : 00 : 00 : 000 ';
+}
+
+
+
+</script>
+<!-- /js.end -->
+{{ footer }} 

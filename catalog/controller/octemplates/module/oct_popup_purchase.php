@@ -14,7 +14,7 @@ class ControllerOCTemplatesModuleOctPopupPurchase extends Controller {
 			$this->load->model('catalog/product');
 			$this->load->language('octemplates/module/oct_popup_purchase');
 			$this->load->model('tool/image');
-
+            $data['privacy_link'] = $this->url->link('information/information/agree', 'information_id=3');
 			if (isset($this->request->post['product_id']) && !empty($this->request->post['product_id'])) {
 	            $product_id = (int) $this->request->post['product_id'];
 	        } else {

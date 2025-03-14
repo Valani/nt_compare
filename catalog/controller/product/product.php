@@ -161,6 +161,20 @@ class ControllerProductProduct extends Controller {
 
 		$product_info = $this->model_catalog_product->getProduct($product_id);
 
+        $data['is_rent'] = 0;
+        $data['is_remont'] = 0;
+        $cats = $this->model_catalog_product->getCategories($product_id);
+        if(!empty($cats)){
+            foreach($cats as $cat){
+                if($cat['category_id'] == 15){
+                    $data['is_rent'] = 1;
+                }
+                if($cat['category_id'] == 13){
+                    $data['is_remont'] = 1;
+                }
+            }
+        }
+
 		if ($product_info) {
 			$url = '';
 
@@ -253,6 +267,16 @@ class ControllerProductProduct extends Controller {
 			$data['product_id'] = (int)$this->request->get['product_id'];
 			$data['manufacturer'] = $product_info['manufacturer'];
 			$data['manufacturers'] = $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $product_info['manufacturer_id']);
+			
+			if ($product_info['manufacturer_id']) {
+				$manufacturer_info = $this->model_catalog_manufacturer->getManufacturer($product_info['manufacturer_id']);
+				if ($manufacturer_info && $manufacturer_info['image']) {
+					$data['manufacturer_image'] = 'image/' . $manufacturer_info['image'];
+				} else {
+					$data['manufacturer_image'] = '';
+				}
+			}
+
 			$data['model'] = $product_info['model'];
 			$data['reward'] = $product_info['reward'];
 			$data['points'] = $product_info['points'];
@@ -261,7 +285,9 @@ class ControllerProductProduct extends Controller {
 			if ($product_info['quantity'] <= 0) {
 				$data['stock'] = $product_info['stock_status'];
 			} elseif ($this->config->get('config_stock_display')) {
-				$data['stock'] = $product_info['quantity'];
+                if($product_info['quantity'] > 10){
+                    $data['stock'] = '> 10';
+                }else $data['stock'] = $product_info['quantity'];
 			} else {
 				$data['stock'] = $this->language->get('text_instock');
 			}
@@ -269,7 +295,7 @@ class ControllerProductProduct extends Controller {
 			$this->load->model('tool/image');
 
 			if ($product_info['image']) {
-				$data['popup'] = $this->model_tool_image->resize($product_info['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height'));
+				$data['popup'] = $this->model_tool_image->resize($product_info['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width')*2, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height')*2);
 			} else {
 				$data['popup'] = '';
 			}
@@ -286,19 +312,31 @@ class ControllerProductProduct extends Controller {
 
 			foreach ($results as $result) {
 				$data['images'][] = array(
-					'popup' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height')),
+					'popup' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width')*2, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height')*2),
 					'thumb' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_height'))
 				);
 			}
 
 			if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-				$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                if($data['is_rent'] == 1){
+                    $data['price'] = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                }else if($data['is_remont'] == 1){
+                    $data['price'] = 'За домовленістю';
+                }else{
+                    $data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                }
 			} else {
 				$data['price'] = false;
 			}
 
 			if (!is_null($product_info['special']) && (float)$product_info['special'] >= 0) {
-				$data['special'] = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                if($data['is_rent'] == 1){
+                    $data['special'] = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                }else if($data['is_remont'] == 1){
+                    $data['special'] = false;
+                }else{
+                    $data['special'] = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                }
 				$tax_price = (float)$product_info['special'];
 			} else {
 				$data['special'] = false;
@@ -389,6 +427,41 @@ class ControllerProductProduct extends Controller {
 
 			$data['share'] = $this->url->link('product/product', 'product_id=' . (int)$this->request->get['product_id']);
 
+			if (isset($this->request->get['load_more']) && isset($this->request->get['product_id'])) {
+				// Додаємо логування
+				$this->log->write('Load more request received. Product ID: ' . $this->request->get['product_id']);
+				
+				// Перевіряємо, чи це AJAX запит
+				if (!empty($this->request->server['HTTP_X_REQUESTED_WITH']) && 
+					strtolower($this->request->server['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+					
+					$json = array();
+					$this->load->model('catalog/product');
+					
+					// Додаємо логування
+					$this->log->write('Getting equipment data for product: ' . $this->request->get['product_id']);
+					
+					$equipment_groups = $this->model_catalog_product->getProductEquipment($this->request->get['product_id'], false);
+					
+					// Додаємо логування результату
+					$this->log->write('Equipment data received: ' . print_r($equipment_groups, true));
+					
+					$json['equipment_groups'] = $equipment_groups;
+					$json['success'] = true;
+					
+					// Додаємо логування відповіді
+					$this->log->write('Sending JSON response: ' . json_encode($json));
+					
+					$this->response->addHeader('Content-Type: application/json');
+					$this->response->setOutput(json_encode($json));
+					return;
+				}
+			}
+			
+			// Regular page load - get initial data only
+			$data['equipment_groups'] = $this->model_catalog_product->getProductEquipment($this->request->get['product_id'], true);
+			$data['has_more_equipment'] = $this->model_catalog_product->hasMoreEquipment($this->request->get['product_id']);
+
 			$data['attribute_groups'] = $this->model_catalog_product->getProductAttributes($this->request->get['product_id']);
 
 			$data['products'] = array();
@@ -402,19 +475,43 @@ class ControllerProductProduct extends Controller {
 					$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_height'));
 				}
 
-				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				} else {
-					$price = false;
-				}
+                $is_rent = 0;
+                $is_remont = 0;
+                $cats = $this->model_catalog_product->getCategories($result['product_id']);
+                if(!empty($cats)){
+                    foreach($cats as $cat){
+                        if($cat['category_id'] == 15){
+                            $is_rent = 1;
+                        }
+                        if($cat['category_id'] == 13){
+                            $is_remont = 1;
+                        }
+                    }
+                }
 
-				if (!is_null($result['special']) && (float)$result['special'] >= 0) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-					$tax_price = (float)$result['special'];
-				} else {
-					$special = false;
-					$tax_price = (float)$result['price'];
-				}
+                if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                    if($is_rent == 1){
+                        $price = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $data['price'] = 'За домовленістю';
+                    }else $price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                } else {
+                    $price = false;
+                }
+
+                if (!is_null($result['special']) && (float)$result['special'] >= 0) {
+                    if($is_rent == 1){
+                        $special = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $special = false;
+                    }else{
+                        $special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    }
+                    $tax_price = (float)$result['special'];
+                } else {
+                    $special = false;
+                    $tax_price = (float)$result['price'];
+                }
 	
 				if ($this->config->get('config_tax')) {
 					$tax = $this->currency->format($tax_price, $this->session->data['currency']);
@@ -458,14 +555,15 @@ class ControllerProductProduct extends Controller {
 			$data['recurrings'] = $this->model_catalog_product->getProfiles($this->request->get['product_id']);
 
 			$this->model_catalog_product->updateViewed($this->request->get['product_id']);
-			
+
+
 			$data['column_left'] = $this->load->controller('common/column_left');
 			$data['column_right'] = $this->load->controller('common/column_right');
 			$data['content_top'] = $this->load->controller('common/content_top');
 			$data['content_bottom'] = $this->load->controller('common/content_bottom');
 			$data['footer'] = $this->load->controller('common/footer');
 			$data['header'] = $this->load->controller('common/header');
-
+            $data['button_cart'] = 'Купити';
 			$this->response->setOutput($this->load->view('product/product', $data));
 		} else {
 			$url = '';
@@ -540,6 +638,45 @@ class ControllerProductProduct extends Controller {
 		}
 	}
 
+	public function loadMoreEquipment() {
+		$json = array();
+		
+		if (isset($this->request->get['product_id'])) {
+			$this->load->model('catalog/product');
+			$json['equipment_groups'] = $this->model_catalog_product->getProductEquipment($this->request->get['product_id'], false);
+			$json['success'] = true;
+		} else {
+			$json['success'] = false;
+		}
+		
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
+
+	public function equipment() {
+		$json = array();
+		
+		if (isset($this->request->get['product_id'])) {
+			$this->load->model('catalog/product');
+			
+			$equipment_groups = $this->model_catalog_product->getProductEquipment($this->request->get['product_id'], false);
+			
+			if ($equipment_groups) {
+				$json['equipment_groups'] = $equipment_groups;
+				$json['success'] = true;
+			} else {
+				$json['success'] = false;
+				$json['error'] = 'No equipment found';
+			}
+		} else {
+			$json['success'] = false;
+			$json['error'] = 'Product ID not provided';
+		}
+		
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
+
 	public function review() {
 		$this->load->language('product/product');
 
@@ -589,9 +726,9 @@ class ControllerProductProduct extends Controller {
 				$json['error'] = $this->language->get('error_name');
 			}
 
-			if ((utf8_strlen($this->request->post['text']) < 25) || (utf8_strlen($this->request->post['text']) > 1000)) {
+			/*if ((utf8_strlen($this->request->post['text']) < 25) || (utf8_strlen($this->request->post['text']) > 1000)) {
 				$json['error'] = $this->language->get('error_text');
-			}
+			}*/
 
 			if (empty($this->request->post['rating']) || $this->request->post['rating'] < 0 || $this->request->post['rating'] > 5) {
 				$json['error'] = $this->language->get('error_rating');

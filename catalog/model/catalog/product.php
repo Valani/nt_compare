@@ -10,7 +10,19 @@ class ModelCatalogProduct extends Model {
 	public function getProduct($product_id) {
 		$query = $this->db->query("SELECT DISTINCT *, pd.name AS name, p.image, p.noindex AS noindex, m.name AS manufacturer, (SELECT price FROM " . DB_PREFIX . "product_discount pd2 WHERE pd2.product_id = p.product_id AND pd2.customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "' AND pd2.quantity = '1' AND ((pd2.date_start = '0000-00-00' OR pd2.date_start < NOW()) AND (pd2.date_end = '0000-00-00' OR pd2.date_end > NOW())) ORDER BY pd2.priority ASC, pd2.price ASC LIMIT 1) AS discount, (SELECT price FROM " . DB_PREFIX . "product_special ps WHERE ps.product_id = p.product_id AND ps.customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "' AND ((ps.date_start = '0000-00-00' OR ps.date_start < NOW()) AND (ps.date_end = '0000-00-00' OR ps.date_end > NOW())) ORDER BY ps.priority ASC, ps.price ASC LIMIT 1) AS special, (SELECT points FROM " . DB_PREFIX . "product_reward pr WHERE pr.product_id = p.product_id AND pr.customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "') AS reward, (SELECT ss.name FROM " . DB_PREFIX . "stock_status ss WHERE ss.stock_status_id = p.stock_status_id AND ss.language_id = '" . (int)$this->config->get('config_language_id') . "') AS stock_status, (SELECT wcd.unit FROM " . DB_PREFIX . "weight_class_description wcd WHERE p.weight_class_id = wcd.weight_class_id AND wcd.language_id = '" . (int)$this->config->get('config_language_id') . "') AS weight_class, (SELECT lcd.unit FROM " . DB_PREFIX . "length_class_description lcd WHERE p.length_class_id = lcd.length_class_id AND lcd.language_id = '" . (int)$this->config->get('config_language_id') . "') AS length_class, (SELECT AVG(rating) AS total FROM " . DB_PREFIX . "review r1 WHERE r1.product_id = p.product_id AND r1.status = '1' GROUP BY r1.product_id) AS rating, (SELECT COUNT(*) AS total FROM " . DB_PREFIX . "review r2 WHERE r2.product_id = p.product_id AND r2.status = '1' GROUP BY r2.product_id) AS reviews, p.sort_order FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) LEFT JOIN " . DB_PREFIX . "product_to_store p2s ON (p.product_id = p2s.product_id) LEFT JOIN " . DB_PREFIX . "manufacturer m ON (p.manufacturer_id = m.manufacturer_id) WHERE p.product_id = '" . (int)$product_id . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.status = '1' AND p.date_available <= NOW() AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "'");
 
+        $is_rent = false;
+        $config_catinall = $this->config->get('config_catinall');
+        if($config_catinall != ''){
+            $cat_in_rent = $this->db->query("SELECT COUNT(category_id) as cnt FROM ".DB_PREFIX."product_to_category WHERE product_id = '" . (int)$product_id . "' AND category_id IN (".$config_catinall.")")->row['cnt'];
+            if($cat_in_rent > 0){
+                $is_rent = true;
+            }
+        }
+
 		if ($query->num_rows) {
+            if($is_rent && $query->row['quantity'] < 1){
+                $query->row['quantity'] = 1;
+            }
 			return array(
 				'product_id'       => $query->row['product_id'],
 				'name'             => $query->row['name'],
@@ -540,5 +552,114 @@ class ModelCatalogProduct extends Model {
 		} else {
 			return 0;
 		}
+	}
+
+	public function getProductEquipment($product_id, $initial_only = true) {
+		$equipment_data = array();
+	
+		// Get all equipment types for this product
+		$types_query = $this->db->query("
+			SELECT DISTINCT et.type_id, et.name as type_name, eb.name as brand_name, eb.sort_order as brand_sort
+			FROM " . DB_PREFIX . "product_to_equipment p2e
+			LEFT JOIN " . DB_PREFIX . "equipment_model em ON (p2e.model_id = em.model_id)
+			LEFT JOIN " . DB_PREFIX . "equipment_type et ON (em.type_id = et.type_id)
+			LEFT JOIN " . DB_PREFIX . "equipment_brand eb ON (et.brand_id = eb.brand_id)
+			WHERE p2e.product_id = '" . (int)$product_id . "'
+			ORDER BY eb.sort_order, et.sort_order
+		");
+	
+		foreach ($types_query->rows as $type) {
+			// Get models/series for each type
+			$models_query = $this->db->query("
+				SELECT em.*, es.name as series_name
+				FROM " . DB_PREFIX . "product_to_equipment p2e
+				LEFT JOIN " . DB_PREFIX . "equipment_model em ON (p2e.model_id = em.model_id)
+				LEFT JOIN " . DB_PREFIX . "equipment_series es ON (em.series_id = es.series_id)
+				WHERE p2e.product_id = '" . (int)$product_id . "'
+				AND em.type_id = '" . (int)$type['type_id'] . "'
+				ORDER BY es.sort_order, em.sort_order
+			");
+	
+			// For initial load, take only first series
+			// For additional load, skip first series
+			if ($initial_only) {
+				$current_series = null;
+				$models_to_show = array();
+				
+				foreach ($models_query->rows as $result) {
+					$series_name = $result['series_name'] ?: 'default';
+					
+					// If this is the first model or belongs to the same series as the first model
+					if ($current_series === null || $current_series === $series_name) {
+						$current_series = $series_name;
+						$models_to_show[] = $result;
+					}
+				}
+				$models_to_process = $models_to_show;
+			} else {
+				// Skip models from the first series
+				$first_series = null;
+				$models_to_process = array();
+				
+				foreach ($models_query->rows as $result) {
+					$series_name = $result['series_name'] ?: 'default';
+					
+					if ($first_series === null) {
+						$first_series = $series_name;
+					} elseif ($first_series !== $series_name) {
+						$models_to_process[] = $result;
+					}
+				}
+			}
+	
+			foreach ($models_to_process as $result) {
+				$brand_name = $type['brand_name'];
+				$type_name = $type['type_name'];
+				$series_name = $result['series_name'] ?: 'default';
+				$model_name = $result['name'];
+	
+				if (!isset($equipment_data[$brand_name])) {
+					$equipment_data[$brand_name] = array();
+				}
+				
+				if (!isset($equipment_data[$brand_name][$type_name])) {
+					$equipment_data[$brand_name][$type_name] = array();
+				}
+				
+				if (!isset($equipment_data[$brand_name][$type_name][$series_name])) {
+					$equipment_data[$brand_name][$type_name][$series_name] = array();
+				}
+				
+				$equipment_data[$brand_name][$type_name][$series_name][] = $model_name;
+			}
+		}
+	
+		return $equipment_data;
+	}
+	
+	public function hasMoreEquipment($product_id) {
+		$query = $this->db->query("
+			SELECT COUNT(DISTINCT es.series_id) as series_count,
+				   COUNT(DISTINCT em.model_id) as model_count
+			FROM " . DB_PREFIX . "product_to_equipment p2e
+			LEFT JOIN " . DB_PREFIX . "equipment_model em ON (p2e.model_id = em.model_id)
+			LEFT JOIN " . DB_PREFIX . "equipment_series es ON (em.series_id = es.series_id)
+			WHERE p2e.product_id = '" . (int)$product_id . "'
+		");
+		
+		// Отримуємо кількість моделей та серій які вже показані
+		$initial_query = $this->db->query("
+			SELECT COUNT(DISTINCT es.series_id) as shown_series,
+				   COUNT(DISTINCT em.model_id) as shown_models
+			FROM " . DB_PREFIX . "product_to_equipment p2e
+			LEFT JOIN " . DB_PREFIX . "equipment_model em ON (p2e.model_id = em.model_id)
+			LEFT JOIN " . DB_PREFIX . "equipment_series es ON (em.series_id = es.series_id)
+			WHERE p2e.product_id = '" . (int)$product_id . "'
+			GROUP BY es.series_id
+			LIMIT 1
+		");
+	
+		return ($query->row['series_count'] > ($initial_query->num_rows ? $initial_query->row['shown_series'] : 0)) ||
+			   ($query->row['model_count'] > ($initial_query->num_rows ? $initial_query->row['shown_models'] : 0));
 	}
 }

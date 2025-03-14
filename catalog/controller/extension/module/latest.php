@@ -19,19 +19,43 @@ class ControllerExtensionModuleLatest extends Controller {
 					$image = $this->model_tool_image->resize('placeholder.png', $setting['width'], $setting['height']);
 				}
 
-				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				} else {
-					$price = false;
-				}
+                $is_rent = 0;
+                $is_remont = 0;
+                $cats = $this->model_catalog_product->getCategories($result['product_id']);
+                if(!empty($cats)){
+                    foreach($cats as $cat){
+                        if($cat['category_id'] == 15){
+                            $is_rent = 1;
+                        }
+                        if($cat['category_id'] == 13){
+                            $is_remont = 1;
+                        }
+                    }
+                }
 
-				if (!is_null($result['special']) && (float)$result['special'] >= 0) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-					$tax_price = (float)$result['special'];
-				} else {
-					$special = false;
-					$tax_price = (float)$result['price'];
-				}
+                if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                    if($is_rent == 1){
+                        $price = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $data['price'] = 'За домовленістю';
+                    }else $price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                } else {
+                    $price = false;
+                }
+
+                if (!is_null($result['special']) && (float)$result['special'] >= 0) {
+                    if($is_rent == 1){
+                        $special = str_replace('грн.','грн',$this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']).' / год');
+                    }else if($is_remont == 1){
+                        $special = false;
+                    }else{
+                        $special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    }
+                    $tax_price = (float)$result['special'];
+                } else {
+                    $special = false;
+                    $tax_price = (float)$result['price'];
+                }
 	
 				if ($this->config->get('config_tax')) {
 					$tax = $this->currency->format($tax_price, $this->session->data['currency']);

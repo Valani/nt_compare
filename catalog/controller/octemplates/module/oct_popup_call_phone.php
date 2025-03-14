@@ -16,7 +16,7 @@ class ControllerOCTemplatesModuleOctPopupCallPhone extends Controller {
 
 	        $data['name']      = $this->customer->isLogged() ? $this->customer->getFirstName() : '';
 	        $data['telephone'] = $this->customer->isLogged() ? $this->customer->getTelephone() : '';
-
+            $data['privacy_link'] = $this->url->link('information/information/agree', 'information_id=3');
 	        $data['comment'] = '';
 	        $data['mask']    = (isset($oct_popup_call_phone_data['mask']) && !empty($oct_popup_call_phone_data['mask'])) ? $oct_popup_call_phone_data['mask'] : '';
 

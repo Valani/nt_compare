@@ -106,7 +106,7 @@ class ControllerStartupSeoUrl extends Controller {
 		$data = array();
 
 		parse_str($url_info['query'], $data);
-		
+
 		//seo_pro baseRewrite
 		if($this->config->get('config_seo_pro')){		
 			list($url, $data, $postfix) =  $this->seo_pro->baseRewrite($data, (int)$this->config->get('config_language_id'));	
@@ -114,9 +114,7 @@ class ControllerStartupSeoUrl extends Controller {
 		
 		
 
-		
 		//seo_pro baseRewrite
-
 		foreach ($data as $key => $value) {
 			if (isset($data['route'])) {
 				if (($data['route'] == 'product/product' && $key == 'product_id') || (($data['route'] == 'product/manufacturer/info' || $data['route'] == 'product/product') && $key == 'manufacturer_id') || ($data['route'] == 'information/information' && $key == 'information_id')) {
@@ -167,6 +165,7 @@ class ControllerStartupSeoUrl extends Controller {
 		} else {
 			$condition = $url;
 		}
+
 
 		if ($condition) {
 			if($this->config->get('config_seo_pro')){		

@@ -10,8 +10,11 @@
 		</div>
 	    {% if text_terms %}
 	    <div class="d-flex align-items-center justify-content-center mt-2 text-center">
-	        <input type="checkbox" class="form-check-input" name="agree" id="oct-scales-static">
-			<label class="form-check-label fsz-10" for="oct-scales-static">{{ text_terms }}</label>
+	        <input type="checkbox" class="form-check-input hidden" name="agree" id="oct-scales-static" checked>
+			<label class="form-check-label fsz-10" for="oct-scales-static">
+				<p>{{ text_agree2 }}:</p>
+				<p><a href="/index.php?route=information/information/agree&information_id=3" class="agree">{{ text_privacy2 }}</a></p>
+			</label>
 	    </div>
 	    {% endif %}
 	</form>

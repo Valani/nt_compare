@@ -1,0 +1,411 @@
+{{ header }}
+<style>
+  .well {
+    resize: vertical;
+  }
+  
+  .disabled-label {
+    color: #acabab;
+  }
+  .disabled-label:hover {
+    cursor: not-allowed;
+  }
+</style>
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form_handy" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title_2 }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+        <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+        {% endfor %} 
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if (error_warning) %} 
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %} 
+    {% if (success) %} 
+    <div class="alert alert-success"><i class="fa fa-exclamation-circle"></i> {{ success }} 
+    </div>
+    {% endif %} 
+    
+    <div class="module-navigation">
+      <a class="btn btn-sm btn-warning navbar-btn active" href="{{ link_part_settings }}">{{ text_part_settings }}</a>
+      {% if (valid_licence) %} 
+      <a class="btn btn-sm btn-default navbar-btn" href="{{ link_part_productlist }}">{{ text_part_productlist }}</a>
+      <a class="btn btn-sm btn-default navbar-btn" href="{{ link_part_massedit }}">{{ text_part_massedit }}</a>
+      {% endif %} 
+    </div>
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-cogs"></i> {{ text_part_settings }}</h3>
+      </div>
+      <div class="panel-body">
+        
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form_handy" class="form-horizontal">
+          {% if (not valid_licence) %} 
+          <!-- Licence Save -->
+          <div class="form-group required" id="input-licence-wrapper" style="padding-top: 5px; padding-bottom: 5px;">
+            <label class="col-sm-3 control-label" for="input-licence">{{ entry_licence }}</label>
+            <div class="col-sm-7">
+              <input type="text" name="module_handy_licence" value="{{ module_handy_licence }}" placeholder="{{ entry_licence }}" id="input-licence" class="form-control" />
+              {% if (errors['licence'] is defined) %}<div class="text-danger">{{ errors['licence'] }}</div>{% endif %} 
+            </div>
+            <div class="col-sm-2">
+              <button id="save-licence" class="btn btn-danger">{{ button_save_licence }}</button>
+            </div>
+          </div>
+          {% else %} 
+          <input type="hidden" name="module_handy_licence" value="{{ module_handy_licence }}" id="input-licence" />
+          {% endif %} 
+          <!-- module-work-area -->
+          <div id="module-work-area" {{ not valid_licence ? 'style="display: none;"' : '' }}>
+						<fieldset style="border: 1px dashed #ccc; border-radius: 3px; margin-bottom: 15px; padding-top: 5px; padding-bottom: 15px;">
+
+							<!-- status -->
+							<div class="form-group" style="padding-bottom: 5px;">
+								<label class="col-sm-3 control-label" for="input_status">{{ entry_status }}:</label>
+								<div class="col-sm-2">
+									<select name="module_handy_status" id="input_status" class="form-control">
+										{% if (module_handy_status) %}
+										<option value="1" selected="selected">{{ text_enabled }}</option>
+										<option value="0">{{ text_disabled }}</option>
+										{% else %} 
+										<option value="1">{{ text_enabled }}</option>
+										<option value="0" selected="selected">{{ text_disabled }}</option>
+										{% endif %} 
+									</select>
+								</div>
+							</div>
+							<hr style="border: none; margin: 5px auto;" />
+
+              <!-- debug -->
+              <div class="form-group" style="padding-top: 5px; padding-bottom: 5px;">
+                <label class="col-sm-3 control-label" for="input_debug" style="padding-top: 0px;"><span data-toggle="tooltip" title="{{ help_debug }}">{{ entry_debug }}:</span></label>
+                <div class="col-sm-3">
+                  <select name="module_handy_debug" id="input_debug" class="form-control">
+                    {% for debug_item_key,debug_item_value in debug_levels %} 
+                      <option value="{{ debug_item_key }}" {{ debug_item_key == module_handy_debug ? 'selected' : '' }}>{{ debug_item_value }}</option>
+                    {% endfor %} 
+                  </select>
+                </div>
+              </div>
+              <hr style="border: none; margin: 5px auto;" />
+
+						</fieldset>
+
+						<fieldset style="border: 1px dashed #ccc; border-radius: 3px; margin-bottom: 15px; padding-top: 5px; padding-bottom: 15px;">
+							<h4 style="padding-left: 15px; padding-top: 10px;">{{ fieldset_product_list }}</h4>
+							<!-- product_list_field -->
+							<div class="form-group" style="padding-bottom: 0px;">
+								<label style="padding-top: 0px;" class="col-sm-3 control-label">{{ entry_product_list_field }}:</label>
+								<div class="special well well-sm col-sm-3" style="height: 500px; overflow: auto;">
+									{% for field in a_exist_product_fields %} 
+                    {% set checked = '' %}
+                    {% if field in module_handy_product_list_field %}
+											{% set checked = ' checked="checked"' %}
+										{% endif %}
+
+										{% set not_editable = '' %}
+                    {% if field in a_required_product_field %}
+											{% set checked = ' checked="checked"' %}
+											{% set not_editable = ' readonly="true" disabled' %}
+										{% endif %}
+									<div class="checkbox {% if not_editable != '' %}disabled{% endif %}">
+										<label {% if not_editable != '' %}class="disabled-label"{% endif %}><input id="input_product_list_field_{{ field }}"	type="checkbox" name="module_handy_product_list_field[]" style="float: left; margin-right: 7px;"{{ checked }}{{ not_editable }} value="{{ field }}" />{{ text4fields[field] }}</label>
+									</div>
+									{% endfor %} 
+								</div>
+							</div>
+							<hr />
+              {% if product_table_columns_custom_exist is iterable and product_table_columns_custom_exist is not empty %} 
+							<!-- product_list_custom_fields -->
+							<div class="form-group" style="padding-top: 0px; padding-bottom: 0px;">
+								<label style="padding-top: 0px;" class="col-sm-3 control-label">{{ entry_product_list_field_custom }}:</label>
+								<div class="col-sm-9 row">
+                  
+									{% for field,type in product_table_columns_custom_exist %}
+									<div class="form-group">
+										<div class="col-sm-3">
+											<label class="control-label">{{ entry_field_key }}</label>
+											<div class="checkbox">
+                        {% set checked = '' %}
+												{% if (module_handy_product_list_field_custom[field]['status'] is defined and 'on' == module_handy_product_list_field_custom[field]['status']) %}
+													{% set checked = ' checked="checked"' %}
+												{% endif %}
+												
+												<label><input type="checkbox" name="module_handy_product_list_field_custom[{{ field }}][status]" style="float: left; margin-right: 7px;"{{ checked }}{{ not_editable }} value="on" />{{ field }} - {{ type }}</label>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<label class="control-label">{{ entry_field_name }}</label>
+											{% for language in languages %} 
+											<div class="input-group ">
+												<span class="input-group-addon">
+													<img src="language/{{ language['code'] }}/{{ language['code'] }}.png" title="{{ language['name'] }}" />
+												</span>
+												<input name="module_handy_product_list_field_custom[{{ field }}][description][{{ language['language_id'] }}]" value="{{ module_handy_product_list_field_custom[field]['description'][language['language_id']] }}" class="form-control" />
+											</div>
+											{% endfor %} 
+										</div>
+										<div class="col-sm-3">
+											<label for="input_field_custom_{{ field }}" style="padding-top: 0px;" class="control-label">{{ entry_field_type }}</label>
+											<select name="module_handy_product_list_field_custom[{{ field }}][field_type]" class="form-control" id="input_field_custom_{{ field }}">
+												{% for key,text in custom_fields_types_exist %} 
+												<option value="{{ key }}" {{ module_handy_product_list_field_custom[field]['field_type'] == key ? 'selected="selected"' : '' }}>{{ text }}</option>
+												{% endfor %} 
+											</select>
+										</div>
+									</div>
+
+									{% endfor %} 
+									
+								</div>
+							</div>
+							<hr />
+              {% endif %} 
+
+							<!-- product_list_limit -->
+							<div class="form-group" style="padding-top: 0px; padding-bottom: 5px;">
+								<label for="input_product_list_limit" style="padding-top: 0px;" class="col-sm-3 control-label">{{ entry_product_list_limit }}:</label>
+								<div class="col-sm-1">
+									<input id="input_product_list_limit"	type="text" name="module_handy_product_list_limit" value="{{ module_handy_product_list_limit }}" class="form-control" maxlength="4"/>
+									{% if (errors['product_list_limit'] is defined) %}<div class="text-danger">{{ errors['product_list_limit'] }}</div>{% endif %} 
+								</div>
+							</div>
+              
+              <hr /> 
+              <!-- model_automatic_change -->
+              <div class="form-group" style="padding-top: 0px; padding-bottom: 5px;">
+                <label class="col-sm-3 control-label" for="input_model_automatic_change" style="padding-top: 0px;">{{ entry_model_automatic_change }}:</label>
+                <div class="col-sm-2">
+                  <select name="module_handy_model_automatic_change" id="input_model_automatic_change" class="form-control">
+                    {% if (module_handy_model_automatic_change) %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                    {% else %} 
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %} 
+                  </select>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-warning"><i>{{ help_model_automatic_change }}</i></span>
+                </div>
+              </div>
+              <hr />  
+              
+              <!-- sku_automatic_change -->
+							<div class="form-group" style="padding-top: 0px; padding-bottom: 5px;">
+								<label class="col-sm-3 control-label" for="input_sku_automatic_change" style="padding-top: 0px;">{{ entry_sku_automatic_change }}:</label>
+								<div class="col-sm-2">
+									<select name="module_handy_sku_automatic_change" id="input_sku_automatic_change" class="form-control">
+										{% if (module_handy_sku_automatic_change) %}
+										<option value="1" selected="selected">{{ text_enabled }}</option>
+										<option value="0">{{ text_disabled }}</option>
+										{% else %} 
+										<option value="1">{{ text_enabled }}</option>
+										<option value="0" selected="selected">{{ text_disabled }}</option>
+										{% endif %} 
+									</select>
+								</div>
+                <div class="col-sm-6">
+                  <span class="text-warning"><i>{{ help_sku_automatic_change }}</i></span>
+                </div>
+							</div>
+                
+                
+<!--							<hr />-->
+
+							<!-- product_edit_model_require -->
+<!--							<div class="form-group">
+								<label class="col-sm-3 control-label" for="product_edit_model_require" style="padding-top: 0px;">{{ entry_product_edit_model_require }}:</label>
+								<div class="col-sm-3">
+									<select name="module_handy_product_edit_model_require" id="product_edit_model_require" class="form-control">
+										{% if (module_handy_product_edit_model_require) %} 
+										<option value="1" selected="selected">{{ text_enabled }}</option>
+										<option value="0">{{ text_disabled }}</option>
+										{% else %} 
+										<option value="1">{{ text_enabled }}</option>
+										<option value="0" selected="selected">{{ text_disabled }}</option>
+										{% endif %} 
+									</select>
+								</div>
+							</div>-->
+                    
+						</fieldset>
+                  
+            <fieldset style="border: 1px dashed #ccc; border-radius: 3px; margin-bottom: 15px; padding-top: 5px; padding-bottom: 15px;">
+              <h4 style="padding-left: 15px; padding-top: 10px;">{{ fieldset_upload }}</h4>
+              <!-- language & translits -->
+							<div class="form-group" style="padding-top: 5px; padding-bottom: 5px;">
+								<label class="col-sm-3 control-label" for="input-language">{{ entry_transliteration }}:</label>
+								<!-- langauge ID -->
+								<div class="col-sm-3">
+									{{ entry_language_id }} 
+									<select name="module_handy_language" id="input-language" class="form-control">
+										{% for language in languages %} 
+										<option value="{{ language['language_id'] }}" {{ module_handy_language == language['language_id'] ? 'selected' : '' }}>{{ language['name'] }}</option>{% endfor %} 
+									</select>
+								</div>
+								<!-- translit function -->
+								<div class="col-sm-3">
+									{{ entry_translit_function }} 
+									<select name="module_handy_translit_function" id="input-translit-function" class="form-control">
+										{% for key,function in translit_functions %} 
+										<option value="{{ key }}" {{ module_handy_translit_function == key ? 'selected' : '' }}>{{ function }}</option>
+										{% endfor %} 
+									</select>
+								</div>
+							</div>              
+              <hr />
+              <!-- rename_mode -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label" for="rename_mode">{{ entry_upload_rename_mode }}:</label>
+                <div class="col-sm-3">
+                  <select name="module_handy_upload_settings[rename_mode]" id="rename_mode" class="form-control">
+                    {% for mode,label in a_upload_rename_modes %} 
+                    <option value="{{ mode }}" {{ mode == module_handy_upload_settings['rename_mode'] ? 'selected="selected"' : '' }}>{{ label }}</option>
+                    {% endfor %} 
+                  </select>
+                </div>
+              </div>
+              <hr />
+              <!-- rename_formula -->
+              <div class="form-group" style="padding-top: 0px;">
+                <label for="rename_formula" style="padding-top: 0px;" class="col-sm-3 control-label">{{ entry_upload_rename_formula }}:</label>
+                <div class="col-sm-6">
+                  <input id="rename_formula"	type="text" name="module_handy_upload_settings[rename_formula]" value="{{ module_handy_upload_settings['rename_formula'] is defined ? module_handy_upload_settings['rename_formula'] : '' }}" class="form-control" maxlength="50" />
+                  <div><i>{{ text_available_vars }}</i>: [product_name], [model], [sku]</div>
+                  {% if (errors['rename_formula'] is defined) %}<div class="text-danger">{{ errors['rename_formula'] }}</div>{% endif %} 
+                </div>
+              </div>    
+              <hr />
+              <!-- max_size_in_mb -->
+              <div class="form-group" style="padding-top: 0px;">
+                <label for="max_size_in_mb" class="col-sm-3 control-label">{{ entry_upload_max_size_in_mb }}:</label>
+                <div class="col-sm-1">
+                  <input id="max_size_in_mb"	type="text" name="module_handy_upload_settings[max_size_in_mb]" value="{{ module_handy_upload_settings['max_size_in_mb'] is defined ? module_handy_upload_settings['max_size_in_mb'] : '' }}" class="form-control" maxlength="50" />
+                  {% if (errors['max_size_in_mb'] is defined) %}<div class="text-danger">{{ errors['max_size_in_mb'] }}</div>{% endif %} 
+                </div>
+              </div>
+							<hr />
+              <!-- upload_mode -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label" style="padding-top: 0px;" for="upload_mode">{{ entry_upload_mode }}:</label>
+                <div class="col-sm-6">
+                  <select name="module_handy_upload_settings[upload_mode]" id="upload_mode" class="form-control">
+                    {% for mode,label in a_upload_modes %} 
+                    <option value="{{ mode }}" {{ mode == module_handy_upload_settings['upload_mode'] ? 'selected="selected"' : '' }}>{{ label }}</option>
+                    {% endfor %} 
+                  </select>
+                </div>
+              </div>
+              <hr />
+
+            </fieldset>
+
+            <!-- Other Settings -->
+            <fieldset style="border: 1px dashed #ccc; border-radius: 3px; margin-bottom: 15px; padding-top: 5px; padding-bottom: 15px;">
+              <h4 style="padding-left: 15px; padding-top: 10px;">{{ fieldset_other }}</h4>
+              
+              <!-- categories_mode -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label" for="categories_mode">{{ entry_categories_mode }}:</label>
+                <div class="col-sm-3">
+                  <select name="module_handy_categories_mode" id="categories_mode" class="form-control">
+                    <option value="autocomplete" {{ 'autocomplete' == module_handy_categories_mode ? 'selected="selected"' : '' }}>{{ categories_mode_autocomplete }}</option>
+                    <option value="tree_view" {{ 'tree_view' == module_handy_categories_mode ? 'selected="selected"' : '' }}>{{ categories_mode_tree_view }}</option>
+                  </select>
+                </div>
+              </div>
+              <hr />
+              
+              <!-- Options price_prefix -->
+              <div class="form-group" style="padding-bottom: 0px;">
+                <label style="padding-top: 0px;" class="col-sm-3 control-label">{{ entry_price_prefixes }}:</label>
+                <div class="special well well-sm col-sm-3" style="height: 160px; overflow: auto;">
+                  {% for key,symbol in a_price_prefixes_possible %}
+                    <div class="checkbox">
+                      {% set checked = '' %}
+                      {% if symbol in module_handy_price_prefixes %}
+                        {% set checked = ' checked="checked"' %}
+                      {% endif %}
+                      <label><input type="checkbox" name="module_handy_price_prefixes[{{ key }}]" style="float: left; margin-right: 7px;"{{ checked }} value="{{ symbol }}" />{{ symbol }}</label>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </fieldset>
+
+
+          </div>
+          <!-- /module-work-area -->
+        </form>
+      </div>
+    </div>
+    <div class="copywrite" style="padding: 10px 10px 0 10px; border: 1px dashed #ccc;">
+      <p>{{ text_version }}</p>
+    	<p>
+    		&copy; {{ text_author }}: <a href="https://bit.ly/mod-handy" target="_blank">Serge Tkach</a>
+    		<br/>
+				{{ text_author_support }}: <a href="mailto:sergetkach.help@gmail.com">sergetkach.help@gmail.com</a>
+    	</p>
+      <p>{{ check_license }}</p>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+$('#save-licence').click(function(e){
+  e.preventDefault();
+
+  $('.alert').remove();
+
+  var licence = $('#input-licence').val();
+
+  $.ajax({
+    url: 'index.php?route=extension/module/handy/saveLicence&user_token={{ user_token }}',
+    type: 'POST',
+    dataType: 'json',
+    data: "licence=" + licence,
+    beforeSend: function() {
+
+    },
+    success: function(json) {
+      console.log('request success');
+      if (json['success']) {
+         console.log('licence success');
+        // success
+
+        $('#input-licence-wrapper').parent('form').prepend('<div class="alert alert-success">'+ json['success'] +'</div>');
+
+        $('#input-licence-wrapper').remove();
+        $('#module-work-area').prepend('<input type="hidden" name="module_handy_licence" value="' + licence + '" />');
+        $('#module-work-area').show();
+      } else {
+        console.log('licence error');
+        $('#input-licence-wrapper').parent('form').prepend('<div class="alert alert-danger">'+ json['error'] +'</div>');
+      }
+    },
+    error: function( jqXHR, textStatus, errorThrown ){
+      // Error ajax query
+      console.log('AJAX query Error: ' + textStatus );
+    },
+    complete: function() {
+      $('#button-review').button('reset');
+    },
+
+  });
+});
+
+</script>
+{{ footer }}

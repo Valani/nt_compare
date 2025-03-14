@@ -316,7 +316,13 @@
 								</label>
 							</div>
 						{% endif %}
-						<button type="submit" class="sc-btn sc-btn-primary br-4 sc-account-login-button">{{ button_continue }}</button>
+						<div class="wrapper-btns-l">
+							<button type="submit" class="sc-btn sc-btn-primary br-4 sc-account-login-button">{{ button_continue }}</button>
+							<a href="{{ uri_google }}" id="popup-login-google" type="button" class="sc-btn sc-btn-primary br-2 mt-2 login-popup-btn">
+								<img src="/catalog/view/theme/oct_showcase/img/Google__G__logo.svg " alt="">
+								<span>{{ entry_google_in }}</span>
+							</a>
+						</div>
 					</form>
 			    </div>
 		    </div>

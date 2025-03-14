@@ -151,7 +151,26 @@ class ControllerCheckoutOctFastorder extends Controller {
         $data['products'] = [];
 
         $products = $this->cart->getProducts();
-
+        $cnt_products = 0;
+        $data['text_agree_aprove'] = $this->language->get('text_agree_aprove');
+        $data['text_agree_ugoda2'] = $this->language->get('text_agree_ugoda2');
+        $data['text_agree_privacy'] = $this->language->get('text_agree_privacy');
+        $data['text_new_user'] = $this->language->get('text_new_user');
+        $data['text_old_user'] = $this->language->get('text_old_user');
+        $data['text_register'] = $this->language->get('text_register');
+        $data['text_lost_pass'] = $this->language->get('text_lost_pass');
+        $data['entry_password'] = $this->language->get('entry_password');
+        $data['text_shipping_address'] = $this->language->get('text_shipping_address');
+        $data['text_to_login'] = $this->language->get('text_to_login');
+        $data['text_abo'] = $this->language->get('text_abo');
+        $data['text_shipp_cour'] = $this->language->get('text_shipp_cour');
+        $data['text_shipp_mp'] = $this->language->get('text_shipp_mp');
+        $data['text_shipp_sat'] = $this->language->get('text_shipp_sat');
+        $data['text_shipp_pick'] = $this->language->get('text_shipp_pick');
+        $data['ugoda_link'] = $this->url->link('information/information/agree', 'information_id=5', 'SSL');
+        $data['privacy_link'] = $this->url->link('information/information/agree', 'information_id=3', 'SSL');
+        $data['current_shipp_meth'] = $this->session->data['shipping_method']['code'];
+        $data['current_pay_meth'] = $this->session->data['payment_method']['code'];
         foreach ($products as $product) {
             $product_total = 0;
 
@@ -278,6 +297,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 'total' => $total,
                 'href' => $this->url->link('product/product', 'product_id=' . $product['product_id'])
             );
+            $cnt_products += $product['quantity'];
         }
 
         // Gift Voucher
@@ -354,7 +374,7 @@ class ControllerCheckoutOctFastorder extends Controller {
 
             if ($information_info) {
 
-                $data['text_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information/agree', 'information_id=' . $this->config->get('config_checkout_id'), 'SSL'), $information_info['title'], $information_info['title']);
+                $data['text_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_checkout_id'), 'SSL'), $this->language->get('text_agree_ugoda'), $this->language->get('text_agree_ugoda'));
 
             } else {
                 $data['text_agree'] = '';
@@ -376,7 +396,7 @@ class ControllerCheckoutOctFastorder extends Controller {
 
             if ($information_info) {
 
-                $data['text_payment_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information/agree', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $information_info['title'], $information_info['title']);
+                $data['text_payment_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $this->language->get('text_agree_ugoda'), $this->language->get('text_agree_ugoda'));
 
             } else {
                 $data['text_payment_agree'] = '';
@@ -458,7 +478,33 @@ class ControllerCheckoutOctFastorder extends Controller {
                 }
             }
         }
-       
+        if($cnt_products % 10 == 1){
+            $data['text_product_cart'] = $this->language->get('text_product_cart1');
+        }else if($cnt_products % 10 > 1 && $cnt_products % 10 < 5){
+            $data['text_product_cart'] = $this->language->get('text_product_cart2');
+        }else $data['text_product_cart'] = $this->language->get('text_product_cart3');
+        $data['totals'][0]['title'] = $cnt_products.' '.$data['text_product_cart'];
+        if($data['totals'][1]['title'] == 'Доставка у відділення Нової пошти' || $data['totals'][1]['title'] == 'Доставка кур`єром Нової пошти на адресу'
+            || $data['totals'][1]['title'] == 'Доставка в поштомат Нової пошти'){
+            $data['totals'][1]['title'] = 'Вартість доставки';
+            $data['totals'][1]['text'] = 'За тарифами переізника';
+        }else if($data['totals'][1]['title'] == 'Самовивіз з магазину'){
+            $data['totals'][1]['title'] = 'Вартість доставки';
+            $data['totals'][1]['text'] = 'Безкоштовно';
+        }else if($data['totals'][1]['title'] == 'Доставка у відділення SAT'){
+            $data['totals'][1]['title'] = 'Вартість доставки';
+            $data['totals'][1]['text'] = 'За тарифами переізника';
+        }
+
+        $parameters = [
+            'redirect_uri'  => GOOGLE_REDIRECT_URI,
+            'response_type' => 'code',
+            'client_id'     => GOOGLE_CLIENT_ID,
+            'scope'         => implode(' ', GOOGLE_SCOPES),
+        ];
+        $data['uri_google'] = GOOGLE_AUTH_URI . '?' . http_build_query($parameters);
+        $data['entry_google_in'] = $this->language->get('entry_google_in');
+
         $this->response->setOutput($this->load->view('checkout/oct_fastorder/fastorder', $data));
     }
 
@@ -883,7 +929,7 @@ class ControllerCheckoutOctFastorder extends Controller {
             $information_info = $this->model_catalog_information->getInformation($this->config->get('config_checkout_id'));
 
             if ($information_info) {
-                $data['text_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information/agree', 'information_id=' . $this->config->get('config_checkout_id'), 'SSL'), $information_info['title'], $information_info['title']);
+                $data['text_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_checkout_id'), 'SSL'), $this->language->get('text_agree_ugoda'), $this->language->get('text_agree_ugoda'));
 
             } else {
                 $data['text_agree'] = '';
@@ -905,7 +951,7 @@ class ControllerCheckoutOctFastorder extends Controller {
 
             if ($information_info) {
 
-                $data['text_payment_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information/agree', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $information_info['title'], $information_info['title']);
+                $data['text_payment_agree'] = sprintf($this->language->get('text_agree'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), 'SSL'), $this->language->get('text_agree_ugoda'), $this->language->get('text_agree_ugoda'));
 
             } else {
                 $data['text_payment_agree'] = '';
@@ -1126,6 +1172,8 @@ class ControllerCheckoutOctFastorder extends Controller {
             $json['redirect'] = $this->url->link('checkout/oct_fastorder', '', 'SSL');
         }
 
+        $ship_meth = isset($this->request->post['shipping_method']) ? $this->request->post['shipping_method'] : '';
+
         if (!$json) {
             if (isset($this->request->post['firstname']) && ((utf8_strlen(trim($this->request->post['firstname'])) < 1) || (utf8_strlen(trim($this->request->post['firstname'])) > 32))) {
                 $json['error']['firstname'] = $this->language->get('error_firstname');
@@ -1173,7 +1221,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 }
             }
 
-            if ($oct_fastorder_data['address_1'] == 2) {
+            if ($oct_fastorder_data['address_1'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
                 if (isset($this->request->post['address_1']) && ((utf8_strlen(trim($this->request->post['address_1'])) < 3) || (utf8_strlen(trim($this->request->post['address_1'])) > 128))) {
                     $json['error']['address_1'] = $this->language->get('error_address_1');
                 }
@@ -1185,7 +1233,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 }
             }
 
-            if ($oct_fastorder_data['city'] == 2) {
+            if ($oct_fastorder_data['city'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
 				if (isset($this->request->post['city']) && ((utf8_strlen(trim($this->request->post['city'])) < 2) || (utf8_strlen(trim($this->request->post['city'])) > 128))) {
 					$json['error']['city'] = $this->language->get('error_city');
 				}
@@ -1209,8 +1257,10 @@ class ControllerCheckoutOctFastorder extends Controller {
             }
 
             if (!isset($this->request->post['zone_id']) || $this->request->post['zone_id'] == '') {
-                $json['error']['zone']    = $this->language->get('error_zone');
-                $json['error']['zone_id'] = $this->language->get('error_zone');
+                if($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free'){
+                    $json['error']['zone']    = $this->language->get('error_zone');
+                    $json['error']['zone_id'] = $this->language->get('error_zone');
+                }
             }
 
             if (isset($this->request->post['customer_group_id']) && is_array($this->config->get('config_customer_group_display')) && in_array($this->request->post['customer_group_id'], $this->config->get('config_customer_group_display'))) {
@@ -1373,7 +1423,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 break;
             }
         }
-
+        $ship_meth = isset($this->request->post['shipping_method']) ? $this->request->post['shipping_method'] : '';
         if (!$json) {
             $this->load->model('account/customer');
 
@@ -1437,7 +1487,7 @@ class ControllerCheckoutOctFastorder extends Controller {
 
             $customer_group = $this->model_account_customer_group->getCustomerGroup($customer_group_id);
 
-            if ($oct_fastorder_data['address_1'] == 2) {
+            if ($oct_fastorder_data['address_1'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
                 if (isset($this->request->post['address_1']) && ((utf8_strlen($this->request->post['address_1']) < 3) || (utf8_strlen($this->request->post['address_1']) > 128))) {
                     $json['error']['address_1'] = $this->language->get('error_address');
                 }
@@ -1449,7 +1499,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 }
             }
 
-			if ($oct_fastorder_data['city'] == 2) {
+			if ($oct_fastorder_data['city'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
 				if (isset($this->request->post['city']) && ((utf8_strlen($this->request->post['city']) < 2) || (utf8_strlen($this->request->post['city']) > 128))) {
 					$json['error']['city'] = $this->language->get('error_city');
 				}
@@ -1470,7 +1520,9 @@ class ControllerCheckoutOctFastorder extends Controller {
             }
 
             if (!isset($this->request->post['zone_id']) || $this->request->post['zone_id'] == '') {
-                $json['error']['zone_id'] = $this->language->get('error_zone');
+                if($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free'){
+                    $json['error']['zone_id'] = $this->language->get('error_zone');
+                }
             }
 
             if (isset($this->request->post['register']) && ((utf8_strlen($this->request->post['password']) < 4) || (utf8_strlen($this->request->post['password']) > 20))) {
@@ -1575,7 +1627,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 break;
             }
         }
-
+        $ship_meth = isset($this->request->post['shipping_method']) ? $this->request->post['shipping_method'] : '';
         if (!$json) {
             if (isset($this->request->post['payment_address']) && $this->request->post['payment_address'] == 'existing') {
                 $this->load->model('account/address');
@@ -1604,7 +1656,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                     }
                 }
 
-                if ($oct_fastorder_data['address_1'] == 2) {
+                if ($oct_fastorder_data['address_1'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
                     if (!isset($this->request->post['address_1']) || ((utf8_strlen(trim($this->request->post['address_1'])) < 3) || (utf8_strlen(trim($this->request->post['address_1'])) > 128))) {
                         $json['error']['address_1'] = $this->language->get('error_address_1');
                     }
@@ -1616,7 +1668,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                     }
                 }
 
-				if ($oct_fastorder_data['city'] == 2) {
+				if ($oct_fastorder_data['city'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
 					if (!isset($this->request->post['city']) || ((utf8_strlen($this->request->post['city']) < 2) || (utf8_strlen($this->request->post['city']) > 128))) {
 						$json['error']['city'] = $this->language->get('error_city');
 					}
@@ -1636,7 +1688,9 @@ class ControllerCheckoutOctFastorder extends Controller {
                 }
 
                 if (!isset($this->request->post['zone_id']) || $this->request->post['zone_id'] == '') {
-                    $json['error']['zone_id'] = $this->language->get('error_zone');
+                    if($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free'){
+                        $json['error']['zone_id'] = $this->language->get('error_zone');
+                    }
                 }
 
                 // Custom field validation
@@ -1697,6 +1751,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 break;
             }
         }
+        $ship_meth = isset($this->request->post['shipping_method']) ? $this->request->post['shipping_method'] : '';
 
         if (!$json) {
             if (isset($this->request->post['shipping_address']) && $this->request->post['shipping_address'] == 'existing') {
@@ -1739,7 +1794,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                     }
                 }
 
-                if ($oct_fastorder_data['address_1'] == 2) {
+                if ($oct_fastorder_data['address_1'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
                     if ((utf8_strlen($this->request->post['address_1']) < 3) || (utf8_strlen($this->request->post['address_1']) > 128)) {
                         $json['error']['address_1'] = $this->language->get('error_address_1');
                     }
@@ -1751,7 +1806,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                     }
                 }
 
-				if ($oct_fastorder_data['city'] == 2) {
+				if ($oct_fastorder_data['city'] == 2 && ($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free')) {
 					if ((utf8_strlen($this->request->post['city']) < 2) || (utf8_strlen($this->request->post['city']) > 128)) {
 						$json['error']['city'] = $this->language->get('error_city');
 					}
@@ -1770,8 +1825,10 @@ class ControllerCheckoutOctFastorder extends Controller {
                 }
 
                 if (!isset($this->request->post['shipping_zone_id']) || $this->request->post['shipping_zone_id'] == '') {
-                    $json['error']['shipping_zone'] = $this->language->get('error_zone');
-                    $json['error']['shipping_zone_id'] = $this->language->get('error_zone');
+                    if($ship_meth != 'pickup.pickup' && $ship_meth != 'free.free'){
+                        $json['error']['shipping_zone'] = $this->language->get('error_zone');
+                        $json['error']['shipping_zone_id'] = $this->language->get('error_zone');
+                    }
                 }
 
                 if (!$json) {
@@ -2138,7 +2195,7 @@ class ControllerCheckoutOctFastorder extends Controller {
         $data['products'] = [];
 
         $products = $this->cart->getProducts();
-
+        $cnt_products = 0;
         foreach ($products as $product) {
             $product_total = 0;
 
@@ -2265,6 +2322,7 @@ class ControllerCheckoutOctFastorder extends Controller {
                 'total' => $total,
                 'href' => $this->url->link('product/product', 'product_id=' . $product['product_id'])
             );
+            $cnt_products += $product['quantity'];
         }
 
         $data['products_recurring'] = [];
@@ -2427,7 +2485,23 @@ class ControllerCheckoutOctFastorder extends Controller {
                 'text'  => $this->currency->format($total['value'], $this->session->data['currency'])
             );
         }
-
+        if($cnt_products % 10 == 1){
+            $data['text_product_cart'] = $this->language->get('text_product_cart1');
+        }else if($cnt_products % 10 > 1 && $cnt_products % 10 < 5){
+            $data['text_product_cart'] = $this->language->get('text_product_cart2');
+        }else $data['text_product_cart'] = $this->language->get('text_product_cart3');
+        $data['totals'][0]['title'] = $cnt_products.' '.$data['text_product_cart'];
+        if($data['totals'][1]['title'] == 'Доставка у відділення Нової пошти' || $data['totals'][1]['title'] == 'Доставка кур`єром Нової пошти на адресу'
+            || $data['totals'][1]['title'] == 'Доставка в поштомат Нової пошти'){
+            $data['totals'][1]['title'] = 'Вартість доставки';
+            $data['totals'][1]['text'] = 'За тарифами переізника';
+        }else if($data['totals'][1]['title'] == 'Самовивіз з магазину'){
+            $data['totals'][1]['title'] = 'Вартість доставки';
+            $data['totals'][1]['text'] = 'Безкоштовно';
+        }else if($data['totals'][1]['title'] == 'Доставка у відділення SAT'){
+            $data['totals'][1]['title'] = 'Вартість доставки';
+            $data['totals'][1]['text'] = 'За тарифами переізника';
+        }
         $data['continue'] = $this->url->link('common/home');
         $data['action']   = $this->url->link('checkout/cart');
         $data['checkout'] = $this->url->link('checkout/oct_fastorder', '', 'SSL');

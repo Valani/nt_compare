@@ -42,14 +42,19 @@
 							<div class="oct-checkout-block">
 								<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
 									<div class="oct-checkout-block-title d-flex align-items-center mb-3 mb-md-0">
-										<img src="catalog/view/theme/oct_showcase/img/sprite-fastorder.svg#include--user-icon" alt="" width="24" height="24">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+											<path d="M15.7692 0.531982H4.23077C1.50256 0.531982 0 2.03455 0 4.76275V16.3012C0 19.0294 1.50256 20.532 4.23077 20.532H15.7692C18.4974 20.532 20 19.0294 20 16.3012V4.76275C20 2.03455 18.4974 0.531982 15.7692 0.531982ZM15.3846 18.9935H4.61539V18.6038C4.61539 17.7494 4.87696 14.9627 8.24619 14.9627H11.7538C15.123 14.9627 15.3846 17.7494 15.3846 18.6038V18.9935ZM18.4615 16.3012C18.4615 17.7433 17.9867 18.5494 16.9231 18.8509V18.6038C16.9231 16.214 15.5692 13.4242 11.7538 13.4242H8.24619C4.43081 13.4242 3.07692 16.2151 3.07692 18.6038V18.8509C2.01333 18.5494 1.53846 17.7422 1.53846 16.3012V4.76275C1.53846 2.87557 2.34359 2.07044 4.23077 2.07044H15.7692C17.6564 2.07044 18.4615 2.87557 18.4615 4.76275V16.3012ZM10.0083 4.63455C7.88826 4.63455 6.16211 6.35967 6.16211 8.4807C6.16211 10.6017 7.88826 12.3269 10.0083 12.3269C12.1283 12.3269 13.8544 10.6017 13.8544 8.4807C13.8544 6.35967 12.1283 4.63455 10.0083 4.63455ZM10.0083 10.7884C8.73647 10.7884 7.70057 9.75352 7.70057 8.4807C7.70057 7.20788 8.73647 6.17301 10.0083 6.17301C11.2801 6.17301 12.316 7.20788 12.316 8.4807C12.316 9.75352 11.2801 10.7884 10.0083 10.7884Z" fill="#00171F"></path>
+										</svg>
 										<span class="text-uppercase">{{ heading_user_block }}</span>
 									</div>
-									{% if not user_logged %}
-										<a onclick="octPopupLogin();" class="blue-link">{{ heading_login_block }}</a>
-									{% endif %}
 								</div>
-								<div class="row mt-3 gx-3 gx-md-4 gy-3 register_block">
+								{% if not user_logged %}
+									<div class="new-tabs">
+										<a href="#" class="tab_a active" data-tab="1">{{ text_new_user }}</a>
+										<a href="#" class="tab_a" data-tab="2">{{ text_old_user }}</a>
+									</div>
+								{% endif %}
+								<div class="row mt-3 gx-3 gx-md-4 gy-3 register_block tab_cont" data-tab="1">
 									{% if oct_fastorder_data.customer_groups == 1 and customer_groups and not user_logged and oct_fastorder_data.registration == 1 %}
 										<div class="col-lg-12 mb-3">
 											<label class="dark-text fsz-14 fw-500 mb-1">{{ entry_customer_group }}</label>
@@ -62,6 +67,27 @@
 										</div>
 									{% else %}
 										<input type="hidden" name="customer_group_id" value="{{ customer_group_id }}"/>
+									{% endif %}
+									<div class="form-group col-lg-6">
+										<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-telephone">
+											<span class="required">*</span>
+											{{ entry_telephone }}</label>
+										<input type="tel" name="telephone" value="{{ telephone_user ? telephone_user : telephone }}" placeholder="{{ entry_telephone }}" id="input-payment-telephone" class="form-control" inputmode="tel">
+									</div>
+									{% if oct_fastorder_data.email and oct_fastorder_data.email == 2 %}
+										<div class="form-group col-lg-6">
+											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-email">
+												<span class="required">*</span>
+												{{ entry_email }}</label>
+											<input type="text" name="email" value="{{ email_user ? email_user : email }}" placeholder="{{ entry_email }}" id="input-payment-email" class="form-control" inputmode="email">
+										</div>
+									{% elseif oct_fastorder_data.email and oct_fastorder_data.email == 1 %}
+										<div class="form-group col-lg-6">
+											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-email">{{ entry_email }}</label>
+											<input type="text" name="email" value="{{ email_user ? email_user : email }}" placeholder="{{ entry_email }}" id="input-payment-email" class="form-control" inputmode="email">
+										</div>
+									{% else %}
+										<input type="hidden" name="email" value="{{ oct_fastorder_data.notify_email }}"/>
 									{% endif %}
 									<div class="form-group col-lg-6">
 										<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-firstname">
@@ -79,27 +105,6 @@
 									{% else %}
 										<input type="hidden" name="lastname" value=""/>
 									{% endif %}
-									{% if oct_fastorder_data.email and oct_fastorder_data.email == 2 %}
-										<div class="form-group col-lg-6">
-											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-email">
-												<span class="required">*</span>
-												{{ entry_email }}</label>
-											<input type="text" name="email" value="{{ email_user ? email_user : email }}" placeholder="{{ entry_email }}" id="input-payment-email" class="form-control" inputmode="email">
-										</div>
-									{% elseif oct_fastorder_data.email and oct_fastorder_data.email == 1 %}
-										<div class="form-group col-lg-6">
-											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-email">{{ entry_email }}</label>
-											<input type="text" name="email" value="{{ email_user ? email_user : email }}" placeholder="{{ entry_email }}" id="input-payment-email" class="form-control" inputmode="email">
-										</div>
-									{% else %}
-										<input type="hidden" name="email" value="{{ oct_fastorder_data.notify_email }}"/>
-									{% endif %}
-									<div class="form-group col-lg-6">
-										<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-telephone">
-											<span class="required">*</span>
-											{{ entry_telephone }}</label>
-										<input type="tel" name="telephone" value="{{ telephone_user ? telephone_user : telephone }}" placeholder="{{ entry_telephone }}" id="input-payment-telephone" class="form-control" inputmode="tel">
-									</div>
 									{% if oct_fastorder_data.fax and oct_fastorder_data.fax == 1 %}
 										<div class="form-group col-lg-6">
 											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-fax">{{ entry_fax }}</label>
@@ -271,72 +276,9 @@
 									{% endif %}
 									<input type="hidden" name="company_id" value=""/>
 									<input type="hidden" name="tax_id" value=""/>
-									{% if oct_fastorder_data.country_and_region == 1 or oct_fastorder_data.country_and_region == 2 %}
-										<div class="form-group  col-lg-6" {% if (customer_id and addresses) or not show_country %} style="display:none" {% endif %}>
-											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-country"><span class="required">*</span>{{ entry_country }}</label>
-											<select name="country_id" id="input-payment-country" class="form-control rm-select">
-												<option value="">{{ text_select }}</option>
-												{% for country in countries %}
-													{% if country.country_id == country_id %}
-														<option value="{{ country.country_id }}" selected="selected">{{ country.name }}
-														</option>
-													{% else %}
-														<option value="{{ country.country_id }}">{{ country.name }}</option>
-													{% endif %}
-												{% endfor %}
-											</select>
-										</div>
-										<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
-											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-zone">
-												<span class="required">*</span>
-												{{ entry_zone }}</label>
-											<select name="zone_id" id="input-payment-zone" class="form-control rm-select"></select>
-										</div>
-									{% else %}
-										<select name="country_id" style="display: none;">
-											<option value="{{ oct_fastorder_data.default_country }}" selected="selected"></option>
-										</select>
-										<select name="zone_id" style="display: none;"></select>
-									{% endif %}
 
-									{% if shipping_address_id is defined and shipping_address_id == 0 %}
-										{% if oct_fastorder_data.city == 1 or oct_fastorder_data.city == 2 %}
-											<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
-												<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-city">
-													{% if oct_fastorder_data.city == 2 %}
-														<span class="required">*</span>
-													{% endif %}
-													{{ entry_city }}</label>
-												<input type="text" name="city" value="{% if city is defined and city %}{{ city }}{% elseif oct_fastorder_data.default_city is defined and oct_fastorder_data.default_city %}{{ oct_fastorder_data.default_city }}{% endif %}" placeholder="{{ entry_city }}" id="input-payment-city" class="form-control" inputmode="text">
-											</div>
-										{% else %}
-											<input type="hidden" name="city" value="{{ oct_fastorder_data.default_city }}"/>
-										{% endif %}
-										{% if oct_fastorder_data.address_1 == 1 or oct_fastorder_data.address_1 == 2 %}
-											<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
-												<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-address-1">
-													{% if oct_fastorder_data.address_1 == 2 %}
-														<span class="required">*</span>
-													{% endif %}
-													{{ entry_address_1 }}</label>
-												<input type="text" name="address_1" value="{% if address_1 is defined and address_1 %}{{ address_1 }}{% endif %}" placeholder="{{ entry_address_1 }}" id="input-payment-address-1" class="form-control" inputmode="text">
-											</div>
-										{% else %}
-											<input type="hidden" name="address_1" value=""/>
-										{% endif %}
-										{% if oct_fastorder_data.address_2 == 1 or oct_fastorder_data.address_2 == 2 %}
-											<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
-												<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-address-2">
-													{% if oct_fastorder_data.address_2 == 2 %}
-														<span class="required">*</span>
-													{% endif %}
-													{{ entry_address_2 }}</label>
-												<input type="text" name="address_2" value="{% if address_2 is defined and address_2 %}{{ address_2 }}{% endif %}" placeholder="{{ entry_address_2 }}" id="input-payment-address-2" class="form-control" inputmode="text">
-											</div>
-										{% else %}
-											<input type="hidden" name="address_2" value=""/>
-										{% endif %}
-									{% endif %}
+
+
 
 									{% if oct_fastorder_data.postcode == 1 or oct_fastorder_data.postcode == 2 %}
 										<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
@@ -609,7 +551,7 @@
 									{% if oct_fastorder_data.comment == 1 %}
 										<div class="form-group col-lg-12 mt-3">
 											<label class="dark-text fsz-14 fw-500 mb-1">{{ text_comments }}</label>
-											<textarea name="comment" rows="8" class="form-control">{{ comment }}</textarea>
+											<textarea name="comment" rows="4" class="form-control">{{ comment }}</textarea>
 										</div>
 									{% else %}
 										<textarea name="comment" rows="4" class="form-control" style="display:none;"></textarea>
@@ -635,6 +577,114 @@
 										<input type="password" name="confirm" value="" placeholder="{{ entry_confirm }}" id="input-payment-confirm" class="form-control"/>
 									</div>
 								</div>
+								{% if not user_logged %}
+								<div class="row mt-3 gx-3 gx-md-4 gy-3 register_block_auth hidden tab_cont" data-tab="2">
+									<form method="post" class="cFormAuthCheckout" enctype="multipart/form-data" data-gtm-form-interact-id="2">
+										<div class="form-group mb-3">
+											<label class="fsz-14 dark-text fw-500 pb-1" for="cinputEmailLogin"><span class="required">* </span>{{ entry_email }}</label>
+											<input type="email" class="form-control" id="cinputEmailLogin" aria-describedby="emailHelp" placeholder="{{ entry_email }}" name="email" inputmode="text" data-gtm-form-interact-field-id="4">
+										</div>
+										<div class="form-group">
+											<label class="fsz-14 dark-text fw-500 pb-1" for="cinputPasswordLogin"><span class="required">* </span>{{ entry_password }}</label>
+											<input type="password" class="form-control" id="cinputPasswordLogin" placeholder="{{ entry_password }}" name="password" data-gtm-form-interact-field-id="5">
+										</div>
+										<div class="d-flex justify-content-between my-4 fw-500 fsz-14">
+											<a class="blue-link" href="/forgot-password">{{ text_lost_pass }}</a>
+											<a class="blue-link" href="/create-account">{{ text_register }}</a>
+										</div>
+										<button id="c-login-button" type="button" class="sc-btn sc-btn-primary br-2">{{ text_to_login }}</button>
+									</form>
+									<div class="middle-r hidden-mobile"><span>{{ text_abo }}</span></div>
+									<div class="girgt-auth-pannel">
+										<span>{{ entry_google_in }}</span>
+										<a href="{{ uri_google }}" id="popup-login-google" type="button" class="sc-btn sc-btn-primary br-2 mt-2 login-popup-btn">
+											<img src="/catalog/view/theme/oct_showcase/img/Google__G__logo.svg " alt="">
+											<span>Google</span>
+										</a>
+									</div>
+								</div>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="row mb-4 shipp-block order-3 {% if current_shipp_meth == 'pickup.pickup' or current_shipp_meth == 'free.free' %}hidden{% endif %}">
+						<div class="col-12">
+							<div class="oct-checkout-block">
+								<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
+									<div class="oct-checkout-block-title d-flex align-items-center mb-3 mb-md-0">
+										<svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M10.9374 10.2883C10.5908 10.0432 10.5078 9.56317 10.7519 9.21649C10.997 8.86981 11.474 8.7857 11.8248 9.03084L12.0719 9.2052L11.6832 7.00308C11.6093 6.5846 11.8883 6.18561 12.3068 6.11176C12.7263 6.03791 13.1242 6.31792 13.197 6.73537L13.5889 8.95597L13.7817 8.68211C14.0269 8.33441 14.5049 8.25133 14.8546 8.49646C15.2013 8.7416 15.2843 9.22162 15.0402 9.5683L13.7817 11.352C13.7787 11.3561 13.7735 11.3581 13.7705 11.3622C13.7069 11.4484 13.6237 11.5171 13.5283 11.5715C13.4924 11.592 13.4556 11.6002 13.4176 11.6145C13.3735 11.632 13.3345 11.6576 13.2863 11.6668C13.2412 11.6751 13.196 11.6792 13.1519 11.6792C13.1489 11.6792 13.1458 11.6771 13.1417 11.6771C13.0617 11.6761 12.9827 11.6617 12.9058 11.635C12.874 11.6248 12.8473 11.6063 12.8175 11.592C12.7816 11.5745 12.7437 11.5622 12.7098 11.5386L10.9374 10.2883ZM6.75271 8.03286C6.52706 6.75589 6.683 5.75687 7.22661 4.9794C7.77124 4.20091 8.65845 3.71372 9.93542 3.48807L13.6628 2.8306C14.9398 2.60495 15.9366 2.76086 16.7162 3.30447C17.4947 3.84911 17.9808 4.73529 18.2065 6.01227L18.8639 9.7396C19.0896 11.0166 18.9337 12.0156 18.389 12.7941C17.8454 13.5715 16.9592 14.0598 15.6812 14.2844L11.954 14.9418C11.5888 15.0065 11.2421 15.0393 10.9159 15.0393C8.9948 15.0393 7.79069 13.9213 7.41016 11.7602L6.75271 8.03286ZM8.26769 7.76617L8.92514 11.4935C9.22361 13.1818 9.99595 13.7244 11.6873 13.4279L15.4147 12.7705C16.269 12.6197 16.83 12.3387 17.1285 11.912C17.4269 11.4853 17.4988 10.8627 17.3491 10.0083L16.6916 6.28099C16.5408 5.4266 16.2598 4.86556 15.8331 4.56709C15.551 4.36913 15.1818 4.27066 14.7161 4.27066C14.4802 4.27066 14.2176 4.29527 13.9283 4.34655L10.2011 5.00402C9.34672 5.1548 8.78565 5.43584 8.48717 5.86252C8.1887 6.28818 8.11691 6.91178 8.26769 7.76617ZM19.9882 15.6557C20.062 16.0742 19.783 16.4732 19.3645 16.547L8.68099 18.4271C8.5015 19.8108 7.32915 20.8867 5.8973 20.8867C4.34135 20.8867 3.07668 19.622 3.07668 18.0661C3.07668 16.7942 3.92796 15.7285 5.08698 15.3778L2.99667 3.48088C2.87462 2.7865 2.20485 2.32392 1.50636 2.4429L0.897108 2.54649C0.486835 2.61521 0.0806513 2.3352 0.010905 1.91673C-0.059867 1.49722 0.221184 1.10028 0.640687 1.02951L1.2458 0.926932C2.76586 0.66128 4.2419 1.68594 4.51166 3.21318L6.64503 15.3572C7.45429 15.5819 8.11793 16.1501 8.4605 16.9029L19.0978 15.03C19.5173 14.9572 19.9153 15.2372 19.9882 15.6557ZM7.17941 18.0661C7.17941 17.3594 6.604 16.784 5.8973 16.784C5.19061 16.784 4.6152 17.3594 4.6152 18.0661C4.6152 18.7728 5.19061 19.3482 5.8973 19.3482C6.604 19.3482 7.17941 18.7728 7.17941 18.0661Z" fill="#00171F"></path>
+										</svg>
+										<span class="text-uppercase">{{ text_shipping_address }}</span>
+									</div>
+								</div>
+								<div class="row mt-3 gx-3 gx-md-4 gy-3 shipp_address_block">
+									{% if oct_fastorder_data.country_and_region == 1 or oct_fastorder_data.country_and_region == 2 %}
+										<div class="form-group  col-lg-6" {% if (customer_id and addresses) or not show_country %} style="display:none" {% endif %}>
+											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-country"><span class="required">*</span>{{ entry_country }}</label>
+											<select name="country_id" id="input-payment-country" class="form-control rm-select">
+												<option value="">{{ text_select }}</option>
+												{% for country in countries %}
+													{% if country.country_id == country_id %}
+														<option value="{{ country.country_id }}" selected="selected">{{ country.name }}
+														</option>
+													{% else %}
+														<option value="{{ country.country_id }}">{{ country.name }}</option>
+													{% endif %}
+												{% endfor %}
+											</select>
+										</div>
+										<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
+											<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-zone">
+												<span class="required">*</span>
+												{{ entry_zone }}</label>
+											<select name="zone_id" id="input-payment-zone" class="form-control rm-select"></select>
+										</div>
+									{% else %}
+										<select name="country_id" style="display: none;">
+											<option value="{{ oct_fastorder_data.default_country }}" selected="selected"></option>
+										</select>
+										<select name="zone_id" style="display: none;"></select>
+									{% endif %}
+									{% if shipping_address_id is defined and shipping_address_id == 0 %}
+										{% if oct_fastorder_data.city == 1 or oct_fastorder_data.city == 2 %}
+											<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
+												<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-city">
+													{% if oct_fastorder_data.city == 2 %}
+														<span class="required">*</span>
+													{% endif %}
+													{{ entry_city }}</label>
+												<input type="text" name="city" value="{% if city is defined and city %}{{ city }}{% elseif oct_fastorder_data.default_city is defined and oct_fastorder_data.default_city %}{{ oct_fastorder_data.default_city }}{% endif %}" placeholder="{{ entry_city }}" id="input-payment-city" class="form-control" inputmode="text">
+											</div>
+										{% else %}
+											<input type="hidden" name="city" value="{{ oct_fastorder_data.default_city }}"/>
+										{% endif %}
+										{% if oct_fastorder_data.address_1 == 1 or oct_fastorder_data.address_1 == 2 %}
+											<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
+												<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-address-1">
+													{% if oct_fastorder_data.address_1 == 2 %}
+														<span class="required">*</span>
+													{% endif %}
+													{{ entry_address_1 }}</label>
+												<input type="text" name="address_1" value="{% if address_1 is defined and address_1 %}{{ address_1 }}{% endif %}" placeholder="{{ entry_address_1 }}" id="input-payment-address-1" class="form-control" inputmode="text">
+											</div>
+										{% else %}
+											<input type="hidden" name="address_1" value=""/>
+										{% endif %}
+										{% if oct_fastorder_data.address_2 == 1 or oct_fastorder_data.address_2 == 2 %}
+											<div class="form-group col-lg-6" {% if customer_id and addresses %} style="display:none" {% endif %}>
+												<label class="dark-text fsz-14 fw-500 mb-1" for="input-payment-address-2">
+													{% if oct_fastorder_data.address_2 == 2 %}
+														<span class="required">*</span>
+													{% endif %}
+													{{ entry_address_2 }}</label>
+												<input type="text" name="address_2" value="{% if address_2 is defined and address_2 %}{{ address_2 }}{% endif %}" placeholder="{{ entry_address_2 }}" id="input-payment-address-2" class="form-control" inputmode="text">
+											</div>
+										{% else %}
+											<input type="hidden" name="address_2" value=""/>
+										{% endif %}
+									{% endif %}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -642,7 +692,9 @@
 						<div class="col-lg-6">
 							<div class="oct-checkout-block h-100 shipping-method">
 								<div class="oct-checkout-block-title d-flex align-items-center mb-3">
-									<img src="catalog/view/theme/oct_showcase/img/sprite-fastorder.svg#include--delivery-icon" alt="" width="24" height="24">
+									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+										<path d="M19.9457 10.06C19.9457 10.0549 19.9487 10.0508 19.9487 10.0457C19.9487 10.0313 19.9416 10.02 19.9405 10.0057C19.9293 9.93593 19.9139 9.86621 19.8985 9.79647C19.8913 9.77596 19.8893 9.75442 19.8811 9.73494C19.839 9.55648 19.7959 9.37799 19.7282 9.20261L18.6637 6.57303C18.1929 5.38027 17.7058 4.14752 15.0967 4.14752H12.8199V2.35274C12.8199 1.07999 11.784 0.045166 10.5123 0.045166H2.30758C1.03585 0.045166 0 1.07999 0 2.35274V13.6342C0 14.829 0.915805 15.8023 2.07985 15.9192C2.07062 16.0125 2.05118 16.1028 2.05118 16.1982C2.05118 17.753 3.31573 19.0186 4.87155 19.0186C6.42737 19.0186 7.69192 17.753 7.69192 16.1982C7.69192 16.11 7.67344 16.0269 7.66626 15.9418H12.3337C12.3255 16.0269 12.3081 16.11 12.3081 16.1982C12.3081 17.753 13.5726 19.0186 15.1284 19.0186C16.6843 19.0186 17.9488 17.753 17.9488 16.1982C17.9488 16.1028 17.9304 16.0115 17.9202 15.9192C19.0842 15.8023 20 14.829 20 13.6342V10.6395C20 10.4456 19.9744 10.2528 19.9457 10.06ZM15.0977 5.68691C16.6596 5.68691 16.8053 6.05307 17.2361 7.14429L18.0986 9.27647H12.8209V5.68691H15.0977ZM4.87255 17.4812C4.16592 17.4812 3.59057 16.9058 3.59057 16.1992C3.59057 15.4926 4.16592 14.9172 4.87255 14.9172C5.57918 14.9172 6.15454 15.4926 6.15454 16.1992C6.15454 16.9058 5.57918 17.4812 4.87255 17.4812ZM15.1284 17.4812C14.4218 17.4812 13.8465 16.9058 13.8465 16.1992C13.8465 15.4926 14.4218 14.9172 15.1284 14.9172C15.8351 14.9172 16.4104 15.4926 16.4104 16.1992C16.4104 16.9058 15.8351 17.4812 15.1284 17.4812ZM17.6924 14.4044H17.2863C16.7684 13.7829 15.9992 13.3788 15.1284 13.3788C14.2577 13.3788 13.4885 13.7829 12.9706 14.4044H7.0294C6.51147 13.7829 5.74228 13.3788 4.87155 13.3788C4.00083 13.3788 3.23163 13.7829 2.71371 14.4044H2.30758C1.88401 14.4044 1.53838 14.0598 1.53838 13.6352V10.8149H7.94832C8.37291 10.8149 8.71751 10.4703 8.71751 10.0457C8.71751 9.62107 8.37291 9.27647 7.94832 9.27647H1.53838V2.35374C1.53838 1.92915 1.88401 1.58455 2.30758 1.58455H10.5123C10.9359 1.58455 11.2815 1.92915 11.2815 2.35374V10.8149H18.4606V13.6352C18.4616 14.0598 18.116 14.4044 17.6924 14.4044Z" fill="#00171F"></path>
+									</svg>
 									<span class="text-uppercase ps-3">{{ heading_shipping_block }}</span>
 								</div>
 								{% if error_warning %}
@@ -654,20 +706,44 @@
 									<p class="mb-3">{{ text_shipping_method }}</p>
 									<div class="shipping-method-box">
 										{% for shipping_method in shipping_methods %}
-											<p class="mb-2">
-												<strong>{{ shipping_method.title }}</strong>
-											</p>
 											{% if not shipping_method.error %}
 												{% for quote in shipping_method['quote'] %}
-													<div class="form-check d-flex align-items-center mb-2">
+													<div class="form-check d-flex align-items-center mb-2 custom-wrap {% if quote.code == current_shipp_meth %}active{% endif %}">
+														<div class="title-shipp">
+															{% if quote.code == 'novaposhta.department' %}
+																{{ text_shipp_mp }}
+															{% endif %}
+															{% if quote.code == 'novaposhta.doors' %}
+																{{ text_shipp_cour }}
+															{% endif %}
+															{% if quote.code == 'free.free' %}
+																{{ text_shipp_sat }}
+															{% endif %}
+															{% if quote.code == 'pickup.pickup' %}
+																{{ text_shipp_pick }}
+															{% endif %}
+														</div>
 														<label class="form-check-label d-flex align-items-center">
-															{% if quote.code == code or  not code %}
-																{% set code = quote.code %}
+															{% if quote.code == current_shipp_meth %}
 																<input type="radio" class="form-check-input" name="shipping_method" value="{{ quote.code }}" title="{{ quote.title }}" checked="checked"/>
 															{% else %}
 																<input type="radio" class="form-check-input" name="shipping_method" value="{{ quote.code }}" title="{{ quote.title }}"/>
 															{% endif %}
-															{{ quote.title }}{% if show_cost_in_delivery_block is defined and show_cost_in_delivery_block %} - {{ quote.text }}{% endif %}</label>
+															{% if quote.code == 'novaposhta.department' or quote.code == 'novaposhta.poshtomat' %}
+																<img src="/catalog/view/theme/oct_showcase/img/novaposhta.svg" alt="{{ quote.title }}" class="me-2" width="20" height="20">
+															{% endif %}
+															{% if quote.code == 'novaposhta.doors' %}
+																<img src="/catalog/view/theme/oct_showcase/img/moped-40x40.png" alt="{{ quote.title }}" class="me-2" width="20" height="20">
+															{% endif %}
+															{% if quote.code == 'pickup.pickup' %}
+																<img src="/catalog/view/theme/oct_showcase/img/delivery-truck.svg" alt="{{ quote.title }}" class="me-2" width="20" height="20">
+															{% endif %}
+															{% if quote.code == 'text_shipp_sat' %}
+																<img src="/catalog/view/theme/oct_showcase/img/Ukrposhta.svg" alt="{{ quote.title }}" class="me-2" width="20" height="20">
+															{% endif %}
+															<span>{{ quote.title }}</span>
+															{% if show_cost_in_delivery_block is defined and show_cost_in_delivery_block %} - {{ quote.text }}{% endif %}
+														</label>
 													</div>
 												{% endfor %}
 											{% else %}
@@ -681,7 +757,9 @@
 						<div class="col-lg-6 mt-4 mt-md-0">
 							<div class="oct-checkout-block h-100 payment-method">
 								<div class="oct-checkout-block-title d-flex align-items-center mb-3">
-									<img src="catalog/view/theme/oct_showcase/img/sprite-fastorder.svg#include--payment-icon" alt="" width="24" height="24">
+									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17" fill="none">
+										<path d="M16.1538 0.583252H3.84615C1.36615 0.583252 0 1.94941 0 4.42941V12.6345C0 15.1145 1.36615 16.4807 3.84615 16.4807H16.1538C18.6338 16.4807 20 15.1145 20 12.6345V4.42941C20 1.94941 18.6338 0.583252 16.1538 0.583252ZM18.4615 12.6345C18.4615 14.252 17.7713 14.9422 16.1538 14.9422H3.84615C2.22872 14.9422 1.53846 14.252 1.53846 12.6345V7.24992H18.4615V12.6345ZM18.4615 5.71146H1.53846V4.42941C1.53846 2.81197 2.22872 2.12171 3.84615 2.12171H16.1538C17.7713 2.12171 18.4615 2.81197 18.4615 4.42941V5.71146ZM4.10256 11.6089C4.10256 11.1843 4.44718 10.8397 4.8718 10.8397H7.94872C8.37333 10.8397 8.71795 11.1843 8.71795 11.6089C8.71795 12.0335 8.37333 12.3781 7.94872 12.3781H4.8718C4.44718 12.3781 4.10256 12.0335 4.10256 11.6089Z" fill="#00171F"></path>
+									</svg>
 									<span class="text-uppercase ps-3">{{ heading_payment_block }}</span>
 								</div>
 								{% if error_warning %}
@@ -692,15 +770,23 @@
 								{% if payment_methods %}
 									<p class="mb-3">{{ text_payment_method }}</p>
 									{% for payment_method in payment_methods %}
-										<div class="form-check d-flex align-items-center mb-0 ps-3 mb-2">
+										<div class="form-check d-flex align-items-center mb-0 ps-3 mb-2 custom-wrap {% if payment_method.code == current_pay_meth%}active{% endif %}">
 											<label class="form-check-label d-flex align-items-center">
-												{% if payment_method.code == code or  not code %}
-													{% set code = payment_method.code %}
+												{% if payment_method.code == current_pay_meth%}
 													<input type="radio" class="form-check-input" name="payment_method" value="{{ payment_method.code }}" title="{{ payment_method.title }}" checked="checked"/>
 												{% else %}
 													<input type="radio" class="form-check-input" name="payment_method" value="{{ payment_method.code }}" title="{{ payment_method.title }}"/>
 												{% endif %}
-												{{ payment_method.title }}
+												{% if payment_method.code == 'bank_transfer' %}
+													<img src="/catalog/view/theme/oct_showcase/img/payments-icon-bank.svg" alt="{{ payment_method.title }}" class="me-2" width="20" height="20">
+												{% endif %}
+												{% if payment_method.code == 'liqpay' %}
+													<img src="/catalog/view/theme/oct_showcase/img/liqpay-40x40.png" alt="{{ payment_method.title }}" class="me-2" width="20" height="20">
+												{% endif %}
+												{% if payment_method.code == 'cod' %}
+													<img src="/catalog/view/theme/oct_showcase/img/cash-svgrepo-com.svg" alt="{{ payment_method.title }}" class="me-2" width="20" height="20">
+												{% endif %}
+												<span>{{ payment_method.title }}</span>
 											</label>
 										</div>
 									{% endfor %}
@@ -798,23 +884,6 @@
 			<div class="oct-checkout-column mt-4 mt-md-0">
 				<div class="oct-checkout-block oct-checkout-actions">
 					<div class="oct-checkout-actions-title">{{ text_next }}</div>
-					{% if modules %}
-						<p class="mt-3 pb-3">{{ text_next_choice }}</p>
-						{% set key_step = key_step + 1 %}
-						<div class="panel-group fastorder-panel-group" id="accordion">
-							{% for module in modules %}
-								{{ module }}
-							{% endfor %}
-						</div>
-						<script>
-							window.addEventListener('DOMContentLoaded', () => {
-								$('.sc-cart-actions-block-title').on('click', function (e) {
-									$(this).toggleClass('clicked');
-									$(this).next().toggleClass('opened');
-								});
-							});
-						</script>
-					{% endif %}
 					<div class="oct-checkout-actions-total">
 						{% for total in totals %}
 							<div class="oct-checkout-actions-total-item d-flex justify-content-between">
@@ -830,11 +899,11 @@
 						{% endif %}
 					</div>
 					{% if text_agree %}
-						<div id="agree-block" class="form-check d-flex">
+						<div id="agree-block" class="form-check d-flex hidden">
 							{% if agree %}
 								<input id="checkoutCheckbox" class="form-check-input" type="checkbox" name="agree" value="1" checked="checked"/>
 							{% else %}
-								<input id="checkoutCheckbox" class="form-check-input" type="checkbox" name="agree" value="1"/>
+								<input id="checkoutCheckbox" class="form-check-input" type="checkbox" name="agree" value="1" checked="checked"/>
 							{% endif %}
 							<label class="form-check-label" for="checkoutCheckbox">{{ text_agree }}</label>
 						</div>
@@ -857,6 +926,11 @@
 								<span class="sc-btn-text">{{ button_checkout }}</span>
 							</button>
 						{% endif %}
+					</div>
+					<div class="wrapper-links">
+						<p>{{ text_agree_aprove }}</p>
+						<p><a href="{{ ugoda_link }}" class="agree">{{ text_agree_ugoda2 }}</a></p>
+						<p><a href="{{ privacy_link }}" class="agree">{{ text_agree_privacy }}</a></p>
 					</div>
 				</div>
 			</div>

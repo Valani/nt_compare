@@ -189,5 +189,5 @@ class ControllerOCTemplatesEventsMenuModule extends Controller {
     private function isAjax() {
         return isset($this->request->server['HTTP_X_REQUESTED_WITH']) && !empty($this->request->server['HTTP_X_REQUESTED_WITH']) && strtolower($this->request->server['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
-    
+
 }

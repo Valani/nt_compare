@@ -1,0 +1,211 @@
+{{ header }}
+<div id="product-jcbproduct" class="container-fluid container-lg flex-grow-1">
+    <nav aria-label="breadcrumb">
+        <ul class="breadcrumb sc-breadcrumb fsz-12">
+            {% for breadcrumb in breadcrumbs %}
+                {% if loop.last %}
+                    <li class="breadcrumb-item sc-breadcrumb-item">{{ breadcrumb.text }}</li>
+                {% else %}
+                    <li class="breadcrumb-item sc-breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+    
+    <main class="main">
+        <div class="row g-4">
+            <div id="productImages" class="col-lg-6 mt-md-3">
+                <div class="content-block sc-product-images px-0 pt-3 pt-md-4 mobile-no-radius no-hover-shadow sticky-md-top h-100 bg-white">
+                    <div class="sc-module-stickers d-flex align-items-center justify-content-between mb-3 px-3 px-md-4">
+                        <div class="sc-module-stickers-left d-flex align-items-center">
+                            <div class="sc-module-sticker br-4 fsz-12 fw-500 sc-module-sticker-stickers_sold">Оригінал</div>
+                        </div>
+                        <div class="sc-module-sticker br-4 fsz-12 fw-500 sc-module-sticker-green">Під замовлення</div>
+                    </div>
+                    <div class="sc-product-images-main px-3">
+                        <div class="sc-product-images-slide pb-3 pb-md-4">
+                            <div class="d-block">
+                                <img src="https://nawiteh.ua/image/catalog/jcb-parts-all/pre-order.jpg" 
+                                    class="d-block mx-auto" 
+                                    alt="Product Image" 
+                                    title="Product Image" 
+                                    width="600" 
+                                    height="600" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Details Column -->
+            <div class="col-md-6">
+                <h1 class="product-title fsz-32 fw-600 mb-4">{{ heading_title }}</h1>
+
+                <!-- Product Info Block -->
+                <div class="product-info-block p-4 rounded mb-4" style="background-color: #F8F9FA;">
+                    <div class="product-info">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="product-details flex-grow-1">
+                                <div class="product-code mb-2">
+                                    <span class="fw-medium" style="color: #212121;">Код товару:</span>
+                                    <span class="ms-2" style="color: #666;">{{ sku }}</span>
+                                </div>
+                                <div class="product-manufacturer">
+                                    <span class="fw-medium" style="color: #212121;">Виробник:</span>
+                                    <span class="ms-2" style="color: #666;">JCB</span>
+                                </div>
+                            </div>
+                            <img src="https://nawiteh.ua/image/catalog/brands/jcb-logo.png" alt="JCB" 
+                                style="max-height: 72px; width: auto;" />
+                        </div>
+                    </div>
+
+                    <hr style="border-top: 1px solid #000000; margin: 1.5rem 0;">
+
+                    <!-- Price and Order Block -->
+                    <div class="sc-product-actions">
+                        {% if price %}
+                            <div class="sc-module-price-box mb-4">
+                                <div class="sc-module-price fw-800 dark-text" style="font-size: 24px;">{{ price }}</div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="sc-product-buttons">
+                            <button type="button" class="sc-btn sc-btn-primary br-4 py-3" 
+                                style="font-weight: 600; width: 280px;" 
+                                onclick="octStockNotifier('{{ product_id }}');">
+                                <span class="sc-btn-text">Замовити</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Consultation Block -->
+                <div class="consultation-block p-4 rounded mt-4" style="background-color: #F8F9FA;">
+                    <div class="fw-bold mb-3" style="color: #212121; font-size: 1.25rem;">Виникли питання?</div>
+                    <p style="color: #666; margin-bottom: 1rem;">
+                        Наші спеціалісти допоможуть вам з вибором та дадуть відповідь на всі питання
+                    </p>
+                    <button type="button" class="btn d-flex align-items-center gap-2" 
+                        style="background-color: #F1BC0F; color: #212121; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600;" 
+                        onclick="octPopupCallPhone();">
+                        <span class="sc-btn-icon sc-btn-icon-phone"></span>
+                        <span>Отримати консультацію</span>
+                    </button>
+                </div>
+                
+                <!-- Delivery Block -->
+                <div class="delivery-payment-block mt-4 p-4 rounded" style="background-color: #F8F9FA;">
+                    <div class="delivery-section">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <img src="https://nawiteh.ua/image/catalog/jcb-parts-all/delivery.png" alt="Нова пошта" width="24" height="24">
+                            <div class="fw-bold" style="color: #212121; font-size: 1.25rem;">Доставка</div>
+                        </div>
+                        <div class="delivery-options">
+                            <div class="delivery-option d-flex align-items-start gap-2 mb-2">
+                                <div>
+                                    <span class="fw-medium" style="color: #212121;">Нова пошта</span>
+                                    <p class="mb-0" style="color: #666; font-size: 0.875rem;">Доставка у відділення або поштомат</p>
+                                </div>
+                            </div>
+                            <div class="delivery-option d-flex align-items-start gap-2 mb-2">
+                                <div>
+                                    <span class="fw-medium" style="color: #212121;">Кур'єр Нової пошти</span>
+                                    <p class="mb-0" style="color: #666; font-size: 0.875rem;">Доставка за вашою адресою</p>
+                                </div>
+                            </div>
+                            <div class="delivery-option d-flex align-items-start gap-2">
+                                <div>
+                                    <span class="fw-medium" style="color: #212121;">Самовивіз</span>
+                                    <p class="mb-0" style="color: #666; font-size: 0.875rem;">с. Скнилів, Окружна, 25, Львівська область</p>
+                                </div>
+                            </div>
+                            <hr style="border-top: 1px solid #000000; margin: 1.5rem 0;">
+                            <div class="delivery-option d-flex align-items-start gap-2 mb-2">
+                                <div>
+                                    <span class="fw-medium" style="color: #212121;">Середній термін доставки протягом 4 тижнів</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+function octStockNotifier(product_id) {
+    masked('body', true);
+    $(".modal-backdrop").remove();
+    
+    $.ajax({
+        type: 'post',
+        dataType: 'html',
+        url: 'index.php?route=octemplates/module/oct_stock_notifier',
+        data: 'product_id=' + product_id,
+        cache: false,
+        success: function(data) {
+            masked('body', false);
+            $(".modal-holder").html(data);
+            $("#octStockNotifier").modal("show");
+            popupClose();
+        }
+    });
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "{{ heading_title }}",
+    "sku": "{{ sku }}",
+    "mpn": "{{ sku }}",
+    "brand": {
+        "@type": "Brand",
+        "name": "JCB"
+    },
+    "manufacturer": {
+        "@type": "Organization",
+        "name": "JCB"
+    },
+    "description": "{{ heading_title }} - оригінальна запчастина JCB. Артикул: {{ sku }}",
+    "offers": {
+        "@type": "Offer",
+        "url": "{{ canonical_url }}",
+        "priceValidUntil": "{{ 'now'|date_modify('+30 days')|date('Y-m-d') }}",
+        "availability": "http://schema.org/PreOrder",
+        "price": "{{ price_raw }}",
+        "priceCurrency": "UAH",
+        "itemCondition": "http://schema.org/NewCondition"
+    }
+}
+</script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+                "@type": "Thing",
+                "@id": "{{ base_url }}/all-jcb-parts",
+                "name": "Каталог запчастин JCB"
+            }
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+                "@type": "Thing",
+                "@id": "{{ canonical_url }}",
+                "name": "{{ heading_title }}"
+            }
+        }
+    ]
+}
+</script>
+{{ footer }}

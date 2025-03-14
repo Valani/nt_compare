@@ -1,148 +1,287 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="uk">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>{{ title }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>{{ title }}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
 </head>
-<body style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000000;">
-<div style="width: 680px;"><a href="{{ store_url }}" title="{{ store_name }}"><img src="{{ logo }}" alt="{{ store_name }}" style="background: #42424e; padding: 24px; border-radius: 5px;margin-bottom: 20px; border: none; max-width: 250px; display: block; margin: 20px auto;"/></a>
-  <p style="margin-top: 0px; margin-bottom: 20px;">{{ text_greeting }}</p>
-  {% if customer_id %}
-  <p style="margin-top: 0px; margin-bottom: 20px;">{{ text_link }}</p>
-  <p style="margin-top: 0px; margin-bottom: 20px;"><a href="{{ link }}">{{ link }}</a></p>
-  {% endif %}
-  {% if download %}
-  <p style="margin-top: 0px; margin-bottom: 20px;">{{ text_download }}</p>
-  <p style="margin-top: 0px; margin-bottom: 20px;"><a href="{{ download }}">{{ download }}</a></p>
-  <{% endif %}
-  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #E7E7E7; border-left: 1px solid #E7E7E7; margin-bottom: 20px;">
-    <thead>
-      <tr>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 15px 7px; color: #222222;" colspan="2">{{ text_order_detail }}</td>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;"><b>{{ text_order_id }}</b> {{ order_id }}<br />
-          <b>{{ text_date_added }}</b> {{ date_added }}<br />
-          <b>{{ text_payment_method }}</b> {{ payment_method }}<br />
-          {% if shipping_method %} <b>{{ text_shipping_method }}</b> {{ shipping_method }}
-          {% endif %}</td>
-        <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;"><b>{{ text_email }}</b> {{ email }}<br />
-          <b>{{ text_telephone }}</b> {{ telephone }}<br />
-          <b>{{ text_ip }}</b> {{ ip }}<br />
-          <b>{{ text_order_status }}</b> {{ order_status }}<br /></td>
-      </tr>
-    </tbody>
-  </table>
-  {% if comment %}
-  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #E7E7E7; border-left: 1px solid #E7E7E7; margin-bottom: 20px;">
-    <thead>
-      <tr>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 15px 7px; color: #222222;">{{ text_instruction }}</td>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;">{{ comment }}</td>
-      </tr>
-    </tbody>
-  </table>
-  {% endif %}
-  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #E7E7E7; border-left: 1px solid #E7E7E7; margin-bottom: 20px;">
-    <thead>
-      <tr>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 15px 7px; color: #222222;">{{ text_payment_address }}</td>
-        {% if shipping_address %}
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 15px 7px; color: #222222;">{{ text_shipping_address }}</td>
-        {% endif %} </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;">{{ payment_address }}</td>
-        {% if shipping_address %}
-        <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;">{{ shipping_address }}</td>
-        {% endif %} </tr>
-    </tbody>
-  </table>
-  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #E7E7E7; border-left: 1px solid #E7E7E7; margin-bottom: 20px;">
-    <thead>
-      <tr>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 15px 7px; color: #222222;">&nbsp;</td>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 15px 7px; color: #222222; width: 40%;">{{ text_product }}</td>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 15px 7px; color: #222222;">{{ text_model }}</td>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: right; padding: 15px 7px; color: #222222;">{{ text_quantity }}</td>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: right; padding: 15px 7px; color: #222222;">{{ text_price }}</td>
-        <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; background-color: #EFEFEF; font-weight: bold; text-align: right; padding: 15px 7px; color: #222222;">{{ text_total }}</td>
-      </tr>
-    </thead>
-    <tbody>
-    
-    {% for product in products %}
-    <tr>
-      <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;">
-		{% if product.image %}
-			<div style="float: left; text-align: center; margin-right: 20px;">
-				<a href="{{ product.href }}"><img src="{{ product.image }}" style="width:65px;"></a>
-			</div>
-        {% endif %}
-      </td>
-      <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px; width: 40%;"><a href="{{ product.href }}">{{ product.name }}</a>
-        {% for option in product.option %}<br />
-        &nbsp;<small> - {{ option.name }}: {{ option.value }}</small>{% endfor %}</td>
-      <td style="font-size: 12px; border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;">{{ product.model }}</td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;">{{ product.quantity }}</td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;">{{ product.price }}</td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;">{{ product.total }}</td>
-    </tr>
-    {% endfor %}
-    {% for voucher in vouchers %}
-    <tr>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;">{{ voucher.description }}</td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: left; padding: 7px;"></td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;">1</td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;">{{ voucher.amount }}</td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;">{{ voucher.amount }}</td>
-    </tr>
-    {% endfor %}
-      </tbody>
-    
-    <tfoot>
-    
-    {% for total in totals %}
-    <tr>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;" colspan="5"><b>{{ total.title }}:</b></td>
-      <td style="font-size: 12px;	border-right: 1px solid #E7E7E7; border-bottom: 1px solid #E7E7E7; text-align: right; padding: 7px;">{{ total.text }}</td>
-    </tr>
-    {% endfor %}
-      </tfoot>
-    
-  </table>
-  <p style="margin-top: 20px; margin-bottom: 20px; text-align: center;">{{ text_footer }}</p>
-	<div style="color: #757575; font-size: 12px; text-align: center; margin: 30px 0;">
-		{% if oct_showcase_contact_address %}
-		{{ oct_showcase_contact_address }}
-		{% endif %}
-		<div style="padding: 15px 0;">
-		{% if oct_showcase_contact_telephone %}
-			{% for phone in oct_showcase_contact_telephone %}
-				<a style="font-size: 16px; line-height: 24px; font-weight: bold; color: #333333;" href="tel:{{ phone }}">{{ phone }}</a><br />
-			{% endfor %}
-		{% endif %}
-		</div>
-		{% if oct_showcase_contact_open %}
-			{% for contact_open in oct_showcase_contact_open %}
-				{{ contact_open }}
-			{% endfor %}
-		{% endif %}
-		<div style="padding: 15px 0;">
-		{% if oct_showcase_socials %}
-			{% for social in oct_showcase_socials %}
-				<a style="font-size: 18px; line-height: 27px; font-weight: bold; color: #000000;" href="{{ social.link }}">{{ social.title }}</a><br />
-			{% endfor %}
-		{% endif %}
-		</div>
-	</div>
-</div>
+<body style="margin: 0; padding: 0; min-width: 100%; background-color: #EDEDED;">
+    <!--[if mso]>
+    <style type="text/css">
+        body, table, td {font-family: Arial, sans-serif !important;}
+    </style>
+    <![endif]-->
+    <!-- Preheader Text (показується в попередньому перегляді) -->
+    <div style="display: none; max-height: 0; overflow: hidden;">
+        Дякуємо за замовлення в магазині Nawiteh! Номер замовлення: {{ order_id }}
+    </div>
+    <!-- Основний контейнер -->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #EDEDED;">
+        <tr>
+            <td align="center" valign="top">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #212121;">
+                    <!-- Логотип -->
+                    <tr>
+                        <td align="center" style="padding: 20px;">
+                            <img src="https://nawiteh.ua/image/logo/logo_mail.png" alt="{{ store_name }}" width="200" style="display: block; max-width: 200px; height: auto;"/>
+                        </td>
+                    </tr>
+                    
+                    <!-- Повідомлення про замовлення -->
+                    <tr>
+                        <td style="padding: 0 20px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F1BC0F; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 30px; text-align: center;">
+                                        <p style="margin: 0; font-size: 16px;">Дякуємо за покупку в магазині Nawiteh!</p>
+                                        <p style="margin: 10px 0 0 0; font-size: 16px;">Ваше замовлення отримане і поступить в обробку найближчим часом.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Деталі замовлення -->
+                    <tr>
+                        <td style="padding: 30px 20px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #EDEDED; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <h3 style="margin: 0 0 20px 0; color: #212121; font-size: 18px; border-bottom: 2px solid #F1BC0F; padding-bottom: 10px;">Деталі замовлення:</h3>
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td width="50%" valign="top" style="padding-right: 10px;">
+                                                    <p style="margin: 0 0 12px 0;">
+                                                        <strong>Номер замовлення:</strong><br>
+                                                        {{ order_id }}
+                                                    </p>
+                                                    <p style="margin: 0 0 12px 0;">
+                                                        <strong>Дата:</strong><br>
+                                                        {{ date_added }}
+                                                    </p>
+                                                    <p style="margin: 0 0 12px 0;">
+                                                        <strong>Email:</strong><br>
+                                                        {{ email }}
+                                                    </p>
+                                                    <p style="margin: 0 0 12px 0;">
+                                                        <strong>Телефон:</strong><br>
+                                                        {{ telephone }}
+                                                    </p>
+                                                </td>
+                                                <td width="50%" valign="top" style="padding-left: 10px;">
+                                                    <p style="margin: 0 0 12px 0;">
+                                                        <strong>Спосіб оплати:</strong><br>
+                                                        {{ payment_method }}
+                                                    </p>
+                                                    {% if shipping_method %}
+                                                    <p style="margin: 0 0 12px 0;">
+                                                        <strong>Спосіб доставки:</strong><br>
+                                                        {{ shipping_method }}
+                                                    </p>
+                                                    {% endif %}
+                                                    <p style="margin: 0;">
+                                                        <strong>Адреса доставки:</strong><br>
+                                                        {% set address_parts = shipping_address|split('\n') %}
+                                                        {% for part in address_parts %}
+                                                            {{ part }}<br>
+                                                        {% endfor %}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Таблиця товарів -->
+                    <tr>
+                        <td style="padding: 0 20px 30px;">
+                            <h3 style="margin: 0 0 20px 0; color: #212121; font-size: 18px; border-bottom: 2px solid #F1BC0F; padding-bottom: 10px;">Ваше замовлення:</h3>
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr style="background-color: #EDEDED;">
+                                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #F1BC0F;">Товар</th>
+                                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid #F1BC0F;">Кількість</th>
+                                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #F1BC0F;">Ціна</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #EDEDED;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                <tr>
+                                                    {% if product.image %}
+                                                    <td width="50" style="padding-right: 10px;">
+                                                        <img src="{{ product.image }}" alt="{{ product.name }}" width="50" height="50" style="display: block; width: 50px; height: 50px; object-fit: cover;"/>
+                                                    </td>
+                                                    {% endif %}
+                                                    <td>
+                                                        <div style="font-weight: bold;">{{ product.name }}</div>
+                                                        {% for option in product.option %}
+                                                        <div style="font-size: 12px; color: #666;">{{ option.name }}: {{ option.value }}</div>
+                                                        {% endfor %}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #EDEDED;">{{ product.quantity }}</td>
+                                        <td style="padding: 12px; text-align: right; border-bottom: 1px solid #EDEDED;">{{ product.total }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" style="padding: 15px; text-align: right; font-weight: bold; font-size: 16px; background-color: #EDEDED; border-radius: 4px;">
+                                            Всього: {{ totals|last.text }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Контактна інформація -->
+                    <tr>
+                        <td style="padding: 0 20px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #EDEDED; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <h3 style="margin: 0 0 20px 0; color: #212121; font-size: 18px; border-bottom: 2px solid #F1BC0F; padding-bottom: 10px;">Наші контакти:</h3>
+                                        
+                                        <!-- Відділ продажу -->
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                                            <tr>
+                                                <td width="24" style="padding-right: 10px;">
+                                                    <img src="https://nawiteh.ua/image/mail/phone.png" alt="Phone" width="24" height="24" style="display: block;"/>
+                                                </td>
+                                                <td>
+                                                    <strong style="color: #212121;">Відділ продажу:</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="padding-left: 34px; padding-top: 8px;">
+                                                    <a href="tel:+380971000011" style="color: #212121; text-decoration: none; display: block; margin-bottom: 8px;">(097) 100 00 11</a>
+                                                    <a href="tel:+380931000011" style="color: #212121; text-decoration: none;">(093) 100 00 11</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Бухгалтерія -->
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                                            <tr>
+                                                <td width="24" style="padding-right: 10px;">
+                                                    <img src="https://nawiteh.ua/image/mail/phone.png" alt="Phone" width="24" height="24" style="display: block;"/>
+                                                </td>
+                                                <td>
+                                                    <strong style="color: #212121;">Бухгалтерія:</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="padding-left: 34px; padding-top: 8px;">
+                                                    <a href="tel:+380631234567" style="color: #212121; text-decoration: none;">(068) 608-10-10</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        {% if oct_showcase_contact_address %}
+                                        <!-- Адреса -->
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                                            <tr>
+                                                <td width="24" style="padding-right: 10px;">
+                                                    <img src="https://nawiteh.ua/image/mail/location.png" alt="Address" width="24" height="24" style="display: block;"/>
+                                                </td>
+                                                <td>
+                                                    <strong style="color: #212121;">Адреса:</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="padding-left: 34px; padding-top: 8px;">
+                                                    {% set address_parts = oct_showcase_contact_address|split('\n') %}
+                                                    {% for part in address_parts %}
+                                                        {{ part }}<br>
+                                                    {% endfor %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        {% endif %}
+
+                                        {% if oct_showcase_contact_open %}
+                                        <!-- Графік роботи -->
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td width="24" style="padding-right: 10px;">
+                                                    <img src="https://nawiteh.ua/image/mail/clock-icon.png" alt="Hours" width="24" height="24" style="display: block;"/>
+                                                </td>
+                                                <td>
+                                                    <strong style="color: #212121;">Графік роботи:</strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="padding-left: 34px; padding-top: 8px;">
+                                                    {% for contact_open in oct_showcase_contact_open %}
+                                                    <div style="margin-bottom: 8px;">{{ contact_open }}</div>
+                                                    {% endfor %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Соціальні мережі -->
+                    <tr>
+                        <td align="center" style="padding: 30px 20px 10px;">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 0 20px;">
+                                        <a href="https://www.facebook.com/Nawiteh/" style="display: inline-block; text-decoration: none;">
+                                            <img src="https://nawiteh.ua/image/mail/facebook-icon.png" 
+                                                alt="Facebook" 
+                                                width="32" 
+                                                height="32" 
+                                                style="display: block;"/>
+                                        </a>
+                                    </td>
+                                    <td style="padding: 0 20px;">
+                                        <a href="https://www.instagram.com/nawiteh_jcb/" style="display: inline-block; text-decoration: none;">
+                                            <img src="https://nawiteh.ua/image/mail/instagram-icon.png" 
+                                                alt="Instagram" 
+                                                width="32" 
+                                                height="32" 
+                                                style="display: block;"/>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Футер -->
+                    <tr>
+                        <td style="padding: 20px; text-align: center; border-top: 1px solid #EDEDED;">
+                            <p style="margin: 0; color: #666;">{{ text_footer }}</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

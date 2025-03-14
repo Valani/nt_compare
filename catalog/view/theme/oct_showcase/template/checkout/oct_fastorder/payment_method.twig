@@ -14,7 +14,7 @@
                          {% set code = payment_method.code %}
                          <input type="radio" class="form-check-input" name="payment_method" value="{{ payment_method.code }}" title="{{ payment_method.title }}" checked="checked" />
                     {% else %} 
-                         <input type="radio" class="form-check-input" name="payment_method" value="{{ payment_method.code }}" title="{{ payment_method.title }}" />
+                         <input type="radio" class="form-check-input" name="payment_method" value="{{ payment_method.code }}" title="{{ payment_method.title }}" я/>
                     {% endif %}
                     {{ payment_method.title }}
                </label>

@@ -52,7 +52,16 @@
                     <button type="button" id="button-clear-input-model" class="btn btn-default"><i class="fa fa-times"></i></button>
                   </div>
 				</div>
-				</div>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="input-id_1c">{{ entry_id_1c }}</label>
+              <div class="input-group">
+                <input type="text" name="filter_id_1c" value="{{ filter_id_1c }}" placeholder="{{ entry_id_1c }}" id="input-id_1c" class="form-control" />
+                <div class="input-group-btn">
+                  <button type="button" id="button-clear-input-id_1c" class="btn btn-default"><i class="fa fa-times"></i></button>
+                </div>
+              </div>
+            </div>
 			<div class="form-group">
                  <label class="control-label" for="input-category-name">{{ entry_category }}</label> <label class="control-label pull-right" for="input-sub-category">{{ entry_sub_category }} <input type="checkbox" class="checkbox-inline" name="filter_sub_category" id="input-sub-category" class="form-control"{{ filter_sub_category}}    {% if filter_sub_category %} checked="checked" {% endif %} /></label>
                 <div class="clearfix"></div>
@@ -315,6 +324,12 @@ $('#button-filter').on('click', function() {
 		url += '&filter_model=' + encodeURIComponent(filter_model);
 	}
 
+    var filter_id_1c = $('input[name=\'filter_id_1c\']').val();
+
+	if (filter_id_1c) {
+		url += '&filter_id_1c=' + encodeURIComponent(filter_id_1c);
+	}
+
 	var filter_price_min = $('input[name=\'filter_price_min\']').val();
 	if (filter_price_min) {
 		url += '&filter_price_min=' + encodeURIComponent(filter_price_min);
@@ -420,6 +435,31 @@ $('#button-clear-input-model').on('click',function(){
 	$('input[name=\'filter_model\']').val('');
 	$('#button-filter').trigger('click');
 });
+
+$('input[name=\'filter_id_1c\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_id_1c=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['id_1c'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_id_1c\']').val(item['label']);
+	}
+});
+$('#button-clear-input-id_1c').on('click',function(){
+	$('input[name=\'filter_id_1c\']').val('');
+	$('#button-filter').trigger('click');
+});
+
 $('input[name=\'filter_category_name\']').autocomplete({
 	'source': function(request, response) {
 		if ($('input[name=\'filter_category_name\']').val().length==0) {
@@ -505,7 +545,7 @@ $('#button-clear-input-quantity-max').on('click',function(){
 	$('input[name=\'filter_quantity_max\']').val('');
 	$('#button-filter').trigger('click');
 });
-$('input[name=\'filter_name\'], input[name=\'filter_model\'], input[name=\'filter_category_name\'], input[name=\'filter_manufacturer_id\'], input[name=\'filter_price_min\'], input[name=\'filter_price_max\'], input[name=\'filter_quantity_min\'], input[name=\'filter_quantity_max\']').keypress(function (e) {
+$('input[name=\'filter_name\'], input[name=\'filter_model\'], input[name=\'filter_id_1c\'], input[name=\'filter_category_name\'], input[name=\'filter_manufacturer_id\'], input[name=\'filter_price_min\'], input[name=\'filter_price_max\'], input[name=\'filter_quantity_min\'], input[name=\'filter_quantity_max\']').keypress(function (e) {
 	if (e.which == 13) {
 		$('#button-filter').trigger('click');
 		return false;

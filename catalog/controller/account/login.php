@@ -6,7 +6,71 @@ class ControllerAccountLogin extends Controller {
 	private $error = array();
 
 	public function index() {
-		$this->load->model('account/customer');
+        $this->load->model('account/customer');
+        if(isset($_GET['code'])){
+            $parameters = [
+                'client_id'     => GOOGLE_CLIENT_ID,
+                'client_secret' => GOOGLE_CLIENT_SECRET,
+                'redirect_uri'  => GOOGLE_REDIRECT_URI,
+                'grant_type'    => 'authorization_code',
+                'code'          => $_GET['code'],
+            ];
+
+            $ch = curl_init('https://accounts.google.com/o/oauth2/token');
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            $data = curl_exec($ch);
+            curl_close($ch);
+
+            $data = json_decode($data, true);
+            if (!empty($data['access_token'])) {
+                // Токен получили, получаем данные пользователя.
+                $params = array(
+                    'access_token' => $data['access_token'],
+                    'id_token'     => $data['id_token'],
+                    'token_type'   => 'Bearer',
+                    'expires_in'   => 3599
+                );
+
+                $info = file_get_contents('https://www.googleapis.com/oauth2/v1/userinfo?' . urldecode(http_build_query($params)));
+                $info = json_decode($info, true);
+                if(isset($info['email'])){
+                    $customer_info = $this->model_account_customer->getCustomerByEmail($info['email']);
+                    /*if ($customer_info) {
+                        $this->customer->login($info['email'], '', 1);
+                        $this->model_account_customer->deleteLoginAttempts($info['email']);
+                    }else{*/
+                    if(!$customer_info){
+                        $args_reg = [
+                            'customer_group_id' => 1,
+                            'firstname' => $info['given_name'],
+                            'lastname' => $info['family_name'],
+                            'email' => $info['email'],
+                            'telephone' => '',
+                            'password' => '12345@nawiteh!!@'
+                        ];
+                        $customer_id = $this->model_account_customer->addCustomer($args_reg);
+                    }
+                    
+                    if($this->validate($info['email'])){
+                        $this->customer->login($info['email'], '', 1);
+                        $this->model_account_customer->deleteLoginAttempts($info['email']);
+                        $this->response->redirect($this->url->link('account/account', '', true));
+                    }else{
+                        $this->response->redirect($this->url->link('account/login', '', true));
+                    }
+
+                    //}
+
+
+                }
+            }
+        }
+
+
 
 		// Login override for admin users
 		if (!empty($this->request->get['token'])) {
@@ -51,7 +115,7 @@ class ControllerAccountLogin extends Controller {
 		$this->load->language('account/login');
 
 		$this->document->setTitle($this->language->get('heading_title'));
-		$this->document->setRobots('noindex,follow');
+        $this->document->setRobots('noindex,nofollow');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 			// Unset guest
@@ -156,23 +220,51 @@ class ControllerAccountLogin extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
+        $parameters = [
+            'redirect_uri'  => GOOGLE_REDIRECT_URI,
+            'response_type' => 'code',
+            'client_id'     => GOOGLE_CLIENT_ID,
+            'scope'         => implode(' ', GOOGLE_SCOPES),
+        ];
+        $data['uri_google'] = GOOGLE_AUTH_URI . '?' . http_build_query($parameters);
+        $data['entry_google_in'] = $this->language->get('entry_google_in');
+        $data['entry_abo'] = $this->language->get('entry_abo');
+
 		$this->response->setOutput($this->load->view('account/login', $data));
 	}
 
-	protected function validate() {
+	protected function validate($email = '') {
+        if($email == '') $email = $this->request->post['email'];
 		// Check how many login attempts have been made.
-		$login_info = $this->model_account_customer->getLoginAttempts($this->request->post['email']);
+		$login_info = $this->model_account_customer->getLoginAttempts($email);
 
 		if ($login_info && ($login_info['total'] >= $this->config->get('config_login_attempts')) && strtotime('-1 hour') < strtotime($login_info['date_modified'])) {
 			$this->error['warning'] = $this->language->get('error_attempts');
 		}
 
 		// Check if customer has been approved.
-		$customer_info = $this->model_account_customer->getCustomerByEmail($this->request->post['email']);
+		$customer_info = $this->model_account_customer->getCustomerByEmail($email);
 
 		if ($customer_info && !$customer_info['status']) {
 			$this->error['warning'] = $this->language->get('error_approved');
 		}
+
+        if($customer_info && trim($customer_info['allowed_ips']) != ''){
+            $ips = explode("\n",$customer_info['allowed_ips']);
+            $cur_ip = $this->request->server['REMOTE_ADDR'];
+            if(!empty($ips)){
+                $allow = false;
+                foreach($ips as $ip){
+                    if(trim($ip) == $cur_ip){
+                        $allow = true;
+                        break;
+                    }
+                }
+                if(!$allow){
+                    $this->error['warning'] = $this->language->get('error_approved');
+                }
+            }
+        }
 
 		if (!$this->error) {
 			if (!$this->customer->login($this->request->post['email'], $this->request->post['password'])) {

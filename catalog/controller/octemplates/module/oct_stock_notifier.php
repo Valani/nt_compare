@@ -10,77 +10,133 @@ class ControllerOctemplatesModuleOctStockNotifier extends Controller {
 	private $error = array();
 
     public function index() {
-        if ($this->isValidRequest()) {
-            $this->language->load('octemplates/module/oct_stock_notifier');
-
-            if (isset($this->request->post['product_id'])) {
-				$product_id = (int) $this->request->post['product_id'];
+		if ($this->isValidRequest()) {
+			$this->language->load('octemplates/module/oct_stock_notifier');
+	
+			if (isset($this->request->post['product_id'])) {
+				$product_id = (int)$this->request->post['product_id'];
 			} else {
 				$product_id = 0;
 			}
-
-			$this->load->model('catalog/product');
-
-			$product_info = $this->model_catalog_product->getProduct($product_id);
-
-            if ($product_info) {
+	
+			$product_info = $this->getProductInfo($product_id);
+	
+			if ($product_info) {
 				$data['oct_stock_notifier_data'] = $oct_stock_notifier_data = $this->config->get('oct_stock_notifier_data');
-
-                $this->load->model('tool/image');
-
-				if ($product_info['image']) {
-					$data['thumb'] = $this->model_tool_image->resize($product_info['image'], 100, 100);
+	
+				// Для JCB продуктів використовуємо фіксоване зображення
+				if (isset($product_info['seo_url'])) {
+					$data['thumb'] = '/image/catalog/jcb-parts-all/pre-order.jpg';
 				} else {
-					$data['thumb'] = '';
+					// Для звичайних товарів OpenCart
+					$this->load->model('tool/image');
+					if ($product_info['image']) {
+						$data['thumb'] = $this->model_tool_image->resize($product_info['image'], 100, 100);
+					} else {
+						$data['thumb'] = '';
+					}
 				}
-
+	
 				if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
-					$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+					$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], isset($product_info['tax_class_id']) ? $product_info['tax_class_id'] : 0, $this->config->get('config_tax')), $this->session->data['currency']);
 				} else {
 					$data['price'] = false;
 				}
-
-				if ((float) $product_info['special']) {
+	
+				// Перевіряємо спеціальну ціну тільки для OpenCart продуктів
+				if (!isset($product_info['seo_url']) && (float)$product_info['special']) {
 					$data['special'] = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 				} else {
 					$data['special'] = false;
 				}
-
+	
 				$data['heading_title_product'] = $product_info['name'];
-				$data['href']                  = $this->url->link('product/product', 'product_id=' . $product_id, true);
-				$data['product_id']            = (int) $product_id;
-				$data['model']                 = $product_info['model'];
-				$data['name']      			   = $this->customer->isLogged() ? $this->customer->getFirstName() . " " . $this->customer->getLastName() : '';
-				$data['phone'] 				   = $this->customer->isLogged() ? $this->customer->getTelephone() : '';
-				$data['email']     			   = $this->customer->isLogged() ? $this->customer->getEmail() : '';
-		        $data['mask']    			   = isset($oct_stock_notifier_data['mask']) ? $oct_stock_notifier_data['mask'] : '';
-
+				
+				// Формуємо посилання в залежності від типу продукту
+				if (isset($product_info['seo_url'])) {
+					$data['href'] = '/all-jcb-parts/item/' . $product_info['seo_url'];
+				} else {
+					$data['href'] = $this->url->link('product/product', 'product_id=' . $product_id);
+				}
+				
+				$data['product_id'] = (int)$product_id;
+				$data['model'] = isset($product_info['sku']) ? $product_info['sku'] : $product_info['model'];
+				$data['name'] = $this->customer->isLogged() ? $this->customer->getFirstName() . " " . $this->customer->getLastName() : '';
+				$data['phone'] = $this->customer->isLogged() ? $this->customer->getTelephone() : '';
+				$data['email'] = $this->customer->isLogged() ? $this->customer->getEmail() : '';
+				$data['mask'] = isset($oct_stock_notifier_data['mask']) ? $oct_stock_notifier_data['mask'] : '';
+	
+				// Додаємо умови використання
 				if ($this->config->get('config_account_id')) {
-		            $this->load->model('catalog/information');
-
-		            $information_info = $this->model_catalog_information->getInformation($this->config->get('config_account_id'));
-
-		            if ($information_info) {
-		                $data['text_terms'] = sprintf($this->language->get('text_oct_terms'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), true), $information_info['title'], $information_info['title']);
-		            } else {
-		                $data['text_terms'] = '';
-		            }
-		        } else {
-		            $data['text_terms'] = '';
-		        }
-
-		        $this->response->setOutput($this->load->view('octemplates/module/oct_stock_notifier', $data));
+					$this->load->model('catalog/information');
+					$information_info = $this->model_catalog_information->getInformation($this->config->get('config_account_id'));
+	
+					if ($information_info) {
+						$data['text_terms'] = sprintf($this->language->get('text_oct_terms'), $this->url->link('information/information', 'information_id=' . $this->config->get('config_account_id'), true), $information_info['title'], $information_info['title']);
+					} else {
+						$data['text_terms'] = '';
+					}
+				} else {
+					$data['text_terms'] = '';
+				}
+	
+				$this->response->setOutput($this->load->view('octemplates/module/oct_stock_notifier', $data));
 			} else {
 				$this->redirectToNotFound();
-			} 
-        } else {
-            $this->redirectToNotFound();
-        }
-    }
+			}
+		} else {
+			$this->redirectToNotFound();
+		}
+	}
+
+	private function getProductInfo($product_id) {
+		// Спочатку перевіряємо, чи це JCB продукт
+		$query = $this->db->query("SELECT id as product_id, sku, name, price, seo_url FROM " . DB_PREFIX . "simple_products WHERE id = '" . (int)$product_id . "'");
+		
+		if ($query->num_rows) {
+			// Це JCB продукт
+			return $query->row;
+		}
+		
+		// Якщо не знайдено в JCB, перевіряємо звичайні товари OpenCart
+		$this->load->model('catalog/product');
+		return $this->model_catalog_product->getProduct($product_id);
+	}
 
 	public function add() {
 		if ($this->isValidRequest()) {
-			$this->processSubscription();
+			$this->language->load('octemplates/module/oct_stock_notifier');
+			
+			$json = [];
+			$data['oct_stock_notifier_data'] = $this->config->get('oct_stock_notifier_data');
+			
+			// Отримуємо інформацію про продукт
+			$product_info = $this->getProductInfo((int)$this->request->post['pid']);
+			
+			if ($this->validate() && $product_info) {
+				$this->load->model('octemplates/module/oct_stock_notifier');
+				
+				$data = [
+					'name' => $this->request->post['name'] ?? null,
+					'phone' => $this->request->post['phone'] ?? null,
+					'email' => $this->request->post['email'] ?? null,
+					'pid' => (int)$this->request->post['pid'],
+					'customer_id' => $this->customer->isLogged() ? $this->customer->getId() : 0
+				];
+				
+				if (!$this->model_octemplates_module_oct_stock_notifier->isAlreadySubscribed($data)) {
+					$this->model_octemplates_module_oct_stock_notifier->addRequest($data);
+					$this->notifyAdmin($data);
+					$json['output'] = $this->language->get('text_success_send');
+				} else {
+					$json['error']['subscribed'] = $this->language->get('error_already_subscribed');
+				}
+			} else {
+				$json['error'] = $this->error;
+			}
+			
+			$this->response->addHeader('Content-Type: application/json');
+			$this->response->setOutput(json_encode($json));
 		} else {
 			$this->redirectToNotFound();
 		}
@@ -278,39 +334,42 @@ class ControllerOctemplatesModuleOctStockNotifier extends Controller {
 
 	protected function validate() {
 		$oct_stock_notifier_data = $this->config->get('oct_stock_notifier_data');
-
+	
 		if (isset($this->request->post['name']) && (isset($oct_stock_notifier_data['name']) && $oct_stock_notifier_data['name'] == 2) && (utf8_strlen(trim($this->request->post['name'])) < 1 || utf8_strlen(trim($this->request->post['name'])) > 32)) {
 			$this->error['name'] = $this->language->get('error_name');
 		}
-
+	
 		if (isset($this->request->post['phone'])) {
 			$this->request->post['phone'] = preg_replace("/[^0-9,\(\),\-,_,+]/", '', $this->request->post['phone']);
 		}
-
-		if (isset($this->request->post['phone']) && !empty($oct_stock_notifier_data['mask'])) {
+	
+		// Обов'язкова перевірка телефону
+		if (!isset($this->request->post['phone']) || empty($this->request->post['phone'])) {
+			$this->error['phone'] = $this->language->get('error_phone');
+		} elseif (!empty($oct_stock_notifier_data['mask'])) {
 			$phone_count = utf8_strlen(str_replace(['_', '-', '(', ')', '+', ' '], "", $oct_stock_notifier_data['mask']));
-
-			if ((isset($oct_stock_notifier_data['phone']) && $oct_stock_notifier_data['phone'] == 2) && (utf8_strlen(str_replace(['_', '-', '(', ')', '+', ' '], "", $this->request->post['phone'])) < $phone_count || !preg_match('/[0-9,\-,+,\(,\),_]/', $this->request->post['phone']))) {
+			
+			if (utf8_strlen(str_replace(['_', '-', '(', ')', '+', ' '], "", $this->request->post['phone'])) < $phone_count || !preg_match('/[0-9,\-,+,\(,\),_]/', $this->request->post['phone'])) {
 				$this->error['phone'] = $this->language->get('error_phone_mask');
 			}
-		} elseif (isset($this->request->post['phone']) && ((isset($oct_stock_notifier_data['phone']) && $oct_stock_notifier_data['phone'] == 2) && (utf8_strlen(str_replace(['_', '-', '(', ')', '+', ' '], "", $this->request->post['phone'])) > 15 || utf8_strlen(str_replace(['_', '-', '(', ')', '+', ' '], "", $this->request->post['phone'])) < 3) || !preg_match('/[0-9,\-,+,\(,\),_]/', $this->request->post['phone']))) {
-			$this->error['phone'] = $this->language->get('error_phone');
 		}
-
-		if (isset($this->request->post['email']) && (utf8_strlen($this->request->post['email']) > 96 || !preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $this->request->post['email']))) {
-			$this->error['email'] = $this->language->get('error_email');
+	
+		// Email тепер необов'язковий
+		if (!empty($this->request->post['email'])) {
+			if (utf8_strlen($this->request->post['email']) > 96 || !preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $this->request->post['email'])) {
+				$this->error['email'] = $this->language->get('error_email');
+			}
 		}
-
+	
 		if ($this->config->get('config_account_id') && !isset($this->request->post['agree'])) {
 			$this->load->model('catalog/information');
-
 			$information_info = $this->model_catalog_information->getInformation($this->config->get('config_account_id'));
+			
 			if (isset($information_info) && !empty($information_info)) {
 				$this->error['agree'] = sprintf($this->language->get('error_oct_terms'), $information_info['title']);
 			}
 		}
-
+	
 		return !$this->error;
 	}
-
 }

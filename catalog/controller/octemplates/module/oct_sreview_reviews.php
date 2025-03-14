@@ -304,9 +304,9 @@ class ControllerOCTemplatesModuleOCTSreviewReviews extends Controller {
 	                $json['error']['author'] = $this->language->get('error_author');
 	            }
 
-	            if ((utf8_strlen($this->request->post['text']) < 25) || (utf8_strlen($this->request->post['text']) > 1000)) {
+	            /*if ((utf8_strlen($this->request->post['text']) < 25) || (utf8_strlen($this->request->post['text']) > 1000)) {
 	                $json['error']['text'] = $this->language->get('error_text');
-	            }
+	            }*/
 
 	            if (!isset($this->request->post['rating'])) {
 					$json['error']['rating'] = $this->language->get('error_rating');

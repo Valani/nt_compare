@@ -116,17 +116,33 @@ class ModelOCTemplatesMenuOCTMenu extends Controller {
                         }
 
                         if ((isset($child['name']) && !empty($child['name'])) && (isset($child['category_id']) && !empty($child['category_id']))) {
+                            $pathes = $this->db->query("SELECT path_id FROM ".DB_PREFIX."category_path WHERE category_id = ".intval($child['category_id'])." ORDER BY level");
+                            $pathes = $pathes->rows;
+                            $path_id = [];
+                            if(!empty($pathes)){
+                                foreach($pathes as $p){
+                                    $path_id[] = $p['path_id'];
+                                }
+                            }
                             $children_data[] = [
                                 'name' => $child['name'],
                                 'children' => $children_data2,
                                 'oct_pages' => (isset($oct_showcase_data['megamenu']['page']) && !empty($child['page_group_links'])) ? unserialize($child['page_group_links']) : [],
-                                'href' => $this->url->link('product/category', 'path=' . $child['category_id'])
+                                'href' => $this->url->link('product/category', 'path='.(!empty($path_id) ? implode('_',$path_id) : $child['category_id']) )
                             ];
                         }
                     }
                 }
 
                 if ((isset($result['name']) && !empty($result['name'])) && (isset($result['category_id']) && !empty($result['category_id']))) {
+                    $pathes = $this->db->query("SELECT path_id FROM ".DB_PREFIX."category_path WHERE category_id = ".intval($result['category_id'])." ORDER BY level");
+                    $pathes = $pathes->rows;
+                    $path_id = [];
+                    if(!empty($pathes)){
+                        foreach($pathes as $p){
+                            $path_id[] = $p['path_id'];
+                        }
+                    }
                     $categories[] = [
                         'name'     => $result['name'],
                         'sort' 	=> $result['sort_order'],
@@ -135,7 +151,7 @@ class ModelOCTemplatesMenuOCTMenu extends Controller {
                         'oct_image'=> (isset($settings['show_image']) && $settings['show_image']) ? $this->model_tool_image->resize($result['image'] ? $result['image'] : 'no-thumb.png', $settings['width'], $settings['height']) : false,
                         'width' => $settings['width'],
                         'height' => $settings['height'],
-                        'href'     => $this->url->link('product/category', 'path=' . $result['category_id'])
+                        'href'     => $this->url->link('product/category', 'path='.(!empty($path_id) ? implode('_',$path_id) : $result['category_id']) )
                     ];
                 }
             }

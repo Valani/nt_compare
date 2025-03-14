@@ -10,6 +10,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>{{ title }}</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/image/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/image/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/image/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/image/favicons/site.webmanifest">
+    <link rel="mask-icon" href="/image/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#000000">
 {% if (oct_showcase_data.open_graph is defined and oct_showcase_data.open_graph) and octOpenGraphs is not empty %}
 {% for octOpenGraph in octOpenGraphs %}
 {% if octOpenGraph.content is not empty %}
@@ -235,9 +242,10 @@ $('#oct-infobar-btn').on('click', function () {
                         </button>
                         {% if product_views_count %}
                             <button type="button" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between align-items-center d-md-none header-buttons-viewed align-self-stretch" onclick="scSidebar('{{ oct_menu }}', 'menu', 'viewed');">
-                                <svg viewBox="0 0 16 16" width="16" height="16">
+                                <svg viewBox="0 0 16 16" width="16" height="16" class="hide-mobile">
                                     <use href="catalog/view/theme/oct_showcase/img/sprite.svg#include--header-btns-viewed"></use>
                                 </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" class="hide-desktop" viewBox="0 0 576 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M288 80c-65.2 0-118.8 29.6-159.9 67.7C89.6 183.5 63 226 49.4 256c13.6 30 40.2 72.5 78.6 108.3C169.2 402.4 222.8 432 288 432s118.8-29.6 159.9-67.7C486.4 328.5 513 286 526.6 256c-13.6-30-40.2-72.5-78.6-108.3C406.8 109.6 353.2 80 288 80zM95.4 112.6C142.5 68.8 207.2 32 288 32s145.5 36.8 192.6 80.6c46.8 43.5 78.1 95.4 93 131.1c3.3 7.9 3.3 16.7 0 24.6c-14.9 35.7-46.2 87.7-93 131.1C433.5 443.2 368.8 480 288 480s-145.5-36.8-192.6-80.6C48.6 356 17.3 304 2.5 268.3c-3.3-7.9-3.3-16.7 0-24.6C17.3 208 48.6 156 95.4 112.6zM288 336c44.2 0 80-35.8 80-80s-35.8-80-80-80c-.7 0-1.3 0-2 0c1.3 5.1 2 10.5 2 16c0 35.3-28.7 64-64 64c-5.5 0-10.9-.7-16-2c0 .7 0 1.3 0 2c0 44.2 35.8 80 80 80zm0-208a128 128 0 1 1 0 256 128 128 0 1 1 0-256z" fill="#fff"/></svg>
                                 <span class="text-lowercase">{{ oct_sidebar_views }}</span>
                                 <span class="header-buttons-cart-quantity px-1">{{ viewed_total }}</span>
                             </button>
@@ -256,16 +264,18 @@ $('#oct-infobar-btn').on('click', function () {
                             {% endif %}
                         {% endif %}
                         <a href="{{ compare_link }}" {% if oct_showcase_data.isbuttoninteractive is defined %}data-compare-ids="{{ compare_ids }}"{% endif %} data-compare-text="{{ compare_text }}" data-compare-text-in="{{ compare_text_in }}" class="sc-btn sc-btn-with-icon no-btn header-buttons-compare d-flex flex-column justify-content-between fsz-12 align-items-center align-self-stretch">
-                            <svg viewBox="0 0 16 16" width="16" height="16">
+                            <svg viewBox="0 0 16 16" width="16" height="16" class="hide-mobile">
                                 <use href="catalog/view/theme/oct_showcase/img/sprite.svg#include--header-btns-compare"></use>
                             </svg>
+                            <svg id="_Шар_1" width="16" class="hide-desktop" data-name="Шар 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 344.9 318.4" style="width:16px;"><defs><style>.cls-1{fill:none;stroke:#fff;stroke-linejoin:round;stroke-width:20.13px}</style></defs><path class="cls-1" d="M21 251h303M93 310l-83-59 79-59M324 67H21M252 8l83 59-79 59"/></svg>
                             <span class="text-lowercase">{{ oct_compare }}</span>
                             <span class="header-buttons-cart-quantity px-1">{{ compare_total }}</span>
                         </a>
                         <a href="{{ wishlist }}" {% if oct_showcase_data.isbuttoninteractive is defined %}data-wishlist-ids="{{ wishlist_ids }}"{% endif %} data-wishlist-text="{{ wishlist_text }}" data-wishlist-text-in="{{ wishlist_text_in }}" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between header-buttons-wishlist fsz-12 align-items-center align-self-stretch">
-                            <svg viewBox="0 0 16 16" width="16" height="16">
+                            <svg viewBox="0 0 16 16" width="16" height="16" class="hide-mobile">
                                 <use href="catalog/view/theme/oct_showcase/img/sprite.svg#include--header-btns-wishlist"></use>
                             </svg>
+                            <svg data-name="Шар 1" width="16" class="hide-desktop" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 327.2 280.3" style="width:16px;"><path d="M317 84c0 75-129 185-151 186-21 1-156-115-156-189 0-41 41-73 87-71 26 1 48 13 63 30 16-18 41-30 70-30 48 0 87 33 87 74Z" style="fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:20.17px"/></svg>
                             <span class="text-lowercase">{{ oct_wishlist }}</span>
                             <span class="header-buttons-cart-quantity px-1">{{ wishlist_total }}</span>
                         </a>

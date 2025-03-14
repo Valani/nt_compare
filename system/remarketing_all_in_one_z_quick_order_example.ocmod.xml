@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Remarketing All in One Quick Order Example</name>
+    <code>remarketing_all_in_one_quick_order_example</code>
+    <version>7.2</version>
+    <author>spectre</author>
+    <link>https://freelancer.od.ua/</link>
+	<!--
+	if (typeof remarketingAddToCart == 'function') {
+		remarketingAddToCart(json);
+	}
+	if (typeof remarketingQuickOrder == 'function') {
+		remarketingQuickOrder(json);
+	}
+	-->
+      <file path="catalog/view/theme/*/template/extension/module/quick_order.tpl \\example">
+	<operation error="skip">
+      <search><![CDATA[// Search for open popup]]></search>
+      <add position="before">
+      <![CDATA[
+	  <?php if (isset($quick)) { ?>
+	    <script>
+		if (typeof remarketingAddToCart == 'function') {
+			remarketingAddToCart(<?php echo $quick; ?>);
+		}
+		</script>
+      <?php } ?>
+	  ]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[// Search for success]]></search>
+      <add position="before">
+      <![CDATA[
+	if (typeof remarketingQuickOrder == 'function') {
+		remarketingQuickOrder(json);
+	}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+  <file path="catalog/view/theme/*/template/extension/module/quick_order.twig \\example">
+	<operation error="skip">
+      <search><![CDATA[// Search for open popup]]></search>
+      <add position="before">
+      <![CDATA[
+	  {% if quick %}
+	  <script>
+	  if (typeof remarketingAddToCart == 'function') {
+		  remarketingAddToCart({{ quick|json_encode() }});
+	  }
+	  </script>
+	  {% endif %}
+	  ]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[// Search for success]]></search>
+      <add position="before">
+      <![CDATA[
+	if (typeof remarketingQuickOrder == 'function') {
+		remarketingQuickOrder(json);
+	}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+     <file path="catalog/controller/extension/module/quick_order.php \\example">
+	<operation error="skip">
+      <search><![CDATA[// Search for open popup]]></search>
+      <add position="before">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$data['quick'] = json_encode($this->model_tool_remarketing->getQuickOrderOpen($product_info));
+		}
+		]]>
+      </add>
+    </operation>
+	<operation error="skip">
+      <search><![CDATA[// Search for success]]></search>
+      <add position="before">
+      <![CDATA[
+		if ($this->config->get('remarketing_status')) {
+			$this->load->model('tool/remarketing');
+			$json['remarketing'] = $this->model_tool_remarketing->getQuickOrderSuccess($order_id, true);
+		}
+	  ]]>
+      </add>
+    </operation>
+  </file>
+</modification>

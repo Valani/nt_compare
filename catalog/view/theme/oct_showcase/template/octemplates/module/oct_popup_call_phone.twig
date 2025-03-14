@@ -28,10 +28,11 @@
 						</div>
 					{% endif %}
 					{% if text_terms %}
-						<div class="form-check d-flex pb-3">
-							<input id="agreeCallbackCheck" type="checkbox" class="form-check-input" name="agree">
+						<div class="d-flex pb-3">
+							<input id="agreeCallbackCheck" type="checkbox" class="form-check-input hidden" name="agree" checked>
 							<label class="form-check-label" for="agreeCallbackCheck">
-								{{ text_terms }}
+								<p>{{ text_agree2 }}:</p>
+								<p><a href="{{ privacy_link }}" class="agree">{{ text_privacy2 }}</a></p>
 							</label>
 						</div>
 					{% endif %}

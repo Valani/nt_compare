@@ -254,7 +254,7 @@ class SeoPro {
 
             switch ($key) {
                 case 'product_id':
-                    $product_id = (int)$value;
+                    $product_id = (int)$value;;
                     $queries[] = 'product_id=' . $product_id;
                     $postfix = true;
                     unset($data[$key]);
@@ -484,6 +484,7 @@ class SeoPro {
                 'extension/feed/google_sitemap',
                 'extension/feed/google_base',
                 'extension/feed/sitemap_pro',
+                'extension/feed/yandex_feed'
             ];
 
             if (in_array($this->request->get['route'], $break_routes))

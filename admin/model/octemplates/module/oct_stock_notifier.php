@@ -18,15 +18,20 @@ class ModelOctemplatesModuleOctStockNotifier extends Model {
     }
 
     public function getSubscribers($data = array()) {
-        $sql = "SELECT s.*, pd.name AS product_name FROM " . DB_PREFIX . "oct_stock_notifier s 
-                LEFT JOIN " . DB_PREFIX . "product_description pd ON (s.product_id = pd.product_id AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "') WHERE 1";
+        $sql = "SELECT s.*, 
+                COALESCE(pd.name, sp.name) as product_name,
+                COALESCE(pd.product_id, sp.id) as final_product_id 
+                FROM " . DB_PREFIX . "oct_stock_notifier s 
+                LEFT JOIN " . DB_PREFIX . "product_description pd ON (s.product_id = pd.product_id AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "')
+                LEFT JOIN " . DB_PREFIX . "simple_products sp ON (s.product_id = sp.id)
+                WHERE 1";
 
         if (!empty($data['filter_email'])) {
             $sql .= " AND s.email LIKE '" . $this->db->escape($data['filter_email']) . "%'";
         }
 
         if (!empty($data['filter_product'])) {
-            $sql .= " AND pd.name LIKE '" . $this->db->escape($data['filter_product']) . "%'";
+            $sql .= " AND (COALESCE(pd.name, sp.name) LIKE '" . $this->db->escape($data['filter_product']) . "%')";
         }
 
         if (!empty($data['filter_phone'])) {
@@ -58,14 +63,16 @@ class ModelOctemplatesModuleOctStockNotifier extends Model {
 
     public function getTotalSubscribers($data = array()) {
         $sql = "SELECT COUNT(*) as total FROM " . DB_PREFIX . "oct_stock_notifier s 
-                LEFT JOIN " . DB_PREFIX . "product_description pd ON (s.product_id = pd.product_id AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "') WHERE 1";
+                LEFT JOIN " . DB_PREFIX . "product_description pd ON (s.product_id = pd.product_id AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "')
+                LEFT JOIN " . DB_PREFIX . "simple_products sp ON (s.product_id = sp.id)
+                WHERE 1";
 
         if (!empty($data['filter_email'])) {
             $sql .= " AND s.email LIKE '" . $this->db->escape($data['filter_email']) . "%'";
         }
 
         if (!empty($data['filter_product'])) {
-            $sql .= " AND pd.name LIKE '" . $this->db->escape($data['filter_product']) . "%'";
+            $sql .= " AND (COALESCE(pd.name, sp.name) LIKE '" . $this->db->escape($data['filter_product']) . "%')";
         }
 
         if (!empty($data['filter_phone'])) {
@@ -82,10 +89,13 @@ class ModelOctemplatesModuleOctStockNotifier extends Model {
     }
 
     public function getSubscribersByProductId($product_id) {
-        $sql = "SELECT *
-                FROM " . DB_PREFIX . "oct_stock_notifier 
-                WHERE product_id = '" . (int)$product_id . "'
-                AND status = '0'";
+        $sql = "SELECT sn.*,
+                COALESCE(pd.name, sp.name) as product_name
+                FROM " . DB_PREFIX . "oct_stock_notifier sn
+                LEFT JOIN " . DB_PREFIX . "product_description pd ON (sn.product_id = pd.product_id AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "')
+                LEFT JOIN " . DB_PREFIX . "simple_products sp ON (sn.product_id = sp.id)
+                WHERE sn.product_id = '" . (int)$product_id . "'
+                AND sn.status = '0'";
 
         $query = $this->db->query($sql);
 
@@ -100,12 +110,39 @@ class ModelOctemplatesModuleOctStockNotifier extends Model {
         $sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "oct_stock_notifier`";
         
         if (isset($data['filter_processed']) && !is_null($data['filter_processed'])) {
-	        $sql .= " WHERE status = '". (int)$data['filter_processed'] ."'";
-        }	
-        	
+            $sql .= " WHERE status = '". (int)$data['filter_processed'] ."'";
+        }   
+            
         $query = $this->db->query($sql);
         
         return $query->row['total'];
+    }
+
+    public function addRequest($data) {
+        // Встановлюємо шаблонний email, якщо користувач не ввів свій
+        $email = !empty($data['email']) ? $data['email'] : 'nawitehad@gmail.com';
+        
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "oct_stock_notifier` SET 
+            product_id = '" . (int)$data['pid'] . "',
+            customer_id = '" . (int)$data['customer_id'] . "',
+            customer_name = '" . $this->db->escape($data['name']) . "',
+            store_id = '" . (int)$this->config->get('config_store_id') . "',
+            language_id = '" . (int)$this->config->get('config_language_id') . "',
+            email = '" . $this->db->escape($email) . "',
+            phone = '" . $this->db->escape($data['phone']) . "',
+            subscribed_date = NOW(),
+            status = '0'");
+            
+        return $this->db->getLastId();
+    }
+
+    public function isAlreadySubscribed($data) {
+        $query = $this->db->query("SELECT COUNT(*) as total FROM `" . DB_PREFIX . "oct_stock_notifier` 
+            WHERE product_id = '" . (int)$data['pid'] . "' 
+            AND (phone = '" . $this->db->escape($data['phone']) . "' OR email = '" . $this->db->escape($data['email']) . "')
+            AND status = '0'");
+            
+        return $query->row['total'] > 0;
     }
 
     public function install() {
@@ -134,5 +171,4 @@ class ModelOctemplatesModuleOctStockNotifier extends Model {
     public function uninstall() {
         $this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "oct_stock_notifier`");
     }
-        
 }

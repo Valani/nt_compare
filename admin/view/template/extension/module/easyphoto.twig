@@ -1,0 +1,479 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <script>
+    function hided_setting(selector, selector2 = false){
+      $('[name="' + selector + '"]').parent().parent().slideToggle(200);
+      if(selector2){
+        $('[name="' + selector2 + '"]').parent().parent().slideToggle(200);
+      }
+    }
+  </script>
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-easyphoto" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumbs in breadcrumb %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit}}</h3>
+      </div>
+      <div class="panel-body">
+        {% if module_easyphoto_key %}
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-easyphoto" class="form-horizontal">
+          <input type="hidden" value="{{ module_easyphoto_key }}" name="module_easyphoto_key">
+
+          <ul class="nav nav-tabs" role="tablist">
+					  <li class="active"><a href="#main" aria-controls="settings" role="tab" data-toggle="tab"><i class="fa fa-sliders" aria-hidden="true"></i> Настройки</a></li>
+				    <li><a href="#service" aria-controls="settings" role="tab" data-toggle="tab"><i class="fa fa-wrench" aria-hidden="true"></i> Сервис</a></li>
+				    <li><a href="#info" aria-controls="settings" role="tab" data-toggle="tab"><i class="fa fa-list-ul" aria-hidden="true"></i> Информация</a></li>
+				  </ul>
+
+          <div class="tab-content">
+
+            <div id="main" role="tabpanel" class="tab-pane fade in active">
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                <div class="col-sm-10">
+                  <select name="module_easyphoto_status" id="input-status" class="form-control">
+                    {% if module_easyphoto_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-easyphoto_direct">{{ entry_direct }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_easyphoto_direct" value="{{ module_easyphoto_direct }}" placeholder="easyphoto" id="input-easyphoto_direct" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-easyphoto_separate">{{ entry_separate }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_easyphoto_separate" value="{{ module_easyphoto_separate }}" placeholder="{{ separate_placeholder }}" id="input-easyphoto_separate" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-easyphoto_main" style="padding-top:0px;">{{ entry_first_main }}</label>
+                <div class="col-sm-10">
+                  <input type="checkbox" name="module_easyphoto_main" value="1" {% if module_easyphoto_main %}checked="checked"{% endif %} id="input-easyphoto_main" class="form-control" />
+                </div>
+              </div>
+
+    		      <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-easyphoto_name" style="padding-top:0px;">{{ entry_photo_name }}</label>
+                <div class="col-sm-10">
+                  <input type="checkbox" onchange="hided_setting('easyphoto_language', 'easyphoto_from')" name="module_easyphoto_name" value="1" {% if module_easyphoto_name %}checked="checked"{% endif %} id="input-easyphoto_name" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-group" {% if not module_easyphoto_name %}style="display:none;"{% endif %}>
+               <label class="col-sm-2 control-label" for="input-easyphoto_from">{{ entry_from }}</label>
+               <div class="col-sm-10">
+                <select name="module_easyphoto_from" id="input-easyphoto_from" class="form-control">
+                  {% for field in fields %}
+                  {% if field  == module_easyphoto_from %}
+                  <option value="{{ field }}" selected="selected">{{ field }}</option>
+                  {% else %}
+                  <option value="{{ field }}">{{ field }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+               </div>
+              </div>
+
+              <div class="form-group" {% if not module_easyphoto_name %}style="display:none;"{% endif %}>
+               <label class="col-sm-2 control-label" for="input-easyphoto_language">{{ entry_language }}</label>
+               <div class="col-sm-10">
+                <select name="module_easyphoto_language" id="input-easyphoto_language" class="form-control">
+                  {% for language in languages %}
+                    {% if language.language_id  == module_easyphoto_language %}
+                    <option value="{{ language.language_id }}" selected="selected">{{ language.name }}</option>
+                    {% else %}
+                    <option value="{{ language.language_id }}">{{ language.name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+               </div>
+              </div>
+
+            </div><!--/main-->
+
+            <div id="service" role="tabpanel" class="tab-pane fade active">
+              <h3>Easyphoto позволяет переименовать фото товаров</h3>
+
+              <div class="alert alert-info">
+                <p>Правильные фото товара не только + к SEO но и гарантия безпроблемной работы интернет магазина. Easyphoto называет изображения транслитом от выбранного поля.</p>
+                <p>Всего за 3 простых шага Вы можете навести порядок с изображениям в магазине. Крайне полезная вещь на которую часто не обращают внимание, а зря.</p>
+                <p>Это делает название фото правильным, а также освобождает очень много места на хостинге.</p>
+              </div>
+
+              <div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_direct">Выберите папку для фото</label>
+                  <div class="col-sm-10">
+                    <div class="input-group">
+                      <span class="input-group-addon" id="input-easyphoto_rename_direct">{{ https_catalog }}image/catalog/</span>
+                      <input type="text" name="module_easyphoto_rename_direct" value="{{ module_easyphoto_rename_direct }}" placeholder="easyphoto" class="form-control" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_category">Категория</label>
+                  <div class="col-sm-10">
+                    <select name="module_easyphoto_rename_category" id="input-easyphoto_rename_category" class="form-control">
+                      <option value="" {% if not module_easyphoto_rename_category %}selected="selected"{% endif %}>Пропустить категории</option>
+                      <option value="1" {% if module_easyphoto_rename_category == "1" %}selected="selected"{% endif %}>Последняя категория (транслит)</option>
+                      <option value="2" {% if module_easyphoto_rename_category == "2" %}selected="selected"{% endif %}>Последняя категория (id)</option>
+                      <option value="3" {% if module_easyphoto_rename_category == "3" %}selected="selected"{% endif %}>Полная вложенность категорий (транслит)</option>
+                      <option value="4" {% if module_easyphoto_rename_category == "4" %}selected="selected"{% endif %}>Полная вложенность категорий (id)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_dir">Папка с фото товара</label>
+                  <div class="col-sm-10">
+                    <select name="module_easyphoto_rename_dir" id="input-easyphoto_rename_dir" class="form-control">
+                      <option value="" {% if not module_easyphoto_rename_dir %}selected="selected"{% endif %}>Не помещать фото в папку</option>
+                      <option value="1" {% if module_easyphoto_rename_dir == "1" %}selected="selected"{% endif %}>id товара (так будет и при загрузке через Easyphoto) - рекомендуется!</option>
+                      {% for field in fields %}
+                        <option value="{{ field }}" {% if module_easyphoto_rename_dir == field %}selected="selected"{% endif %}>{{ field }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_name">Генерируем название фото с поля</label>
+                  <div class="col-sm-10">
+                    <select name="module_easyphoto_rename_name" id="input-easyphoto_rename_name" class="form-control">
+                      {% for field in fields %}
+                        <option value="{{ field }}" {% if module_easyphoto_rename_name == field %}selected="selected"{% endif %}>{{ field }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_mode">Режим переименования</label>
+                  <div class="col-sm-10">
+                    <select name="module_easyphoto_rename_mode" id="input-easyphoto_rename_mode" class="form-control">
+                      <option value="" {% if not module_easyphoto_rename_mode %}selected="selected"{% endif %}>Удаляем старые фото (фото копируются с новым именем и удаляются)</option>
+                      <option value="1" {% if module_easyphoto_rename_mode == "1" %}selected="selected"{% endif %}>Не удаляем старые фото (будут создаваться копии, но их можно будет почистить с помощью easyphoto)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_allowed_ext">Разрешенные расширения фото</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="module_easyphoto_allowed_ext" value="{{ module_easyphoto_allowed_ext }}" id="input-easyphoto_allowed_ext" class="form-control" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_backup">Записать в базу лог работы <small>(таблица easyphoto_rename_backup)</small></label>
+                  <div class="col-sm-10">
+                    <select name="module_easyphoto_rename_backup" id="input-easyphoto_rename_backup" class="form-control">
+                      <option value="" {% if not module_easyphoto_rename_backup %}selected="selected"{% endif %}>Не записываем в базу</option>
+                      <option value="1" {% if module_easyphoto_rename_backup == "1" %}selected="selected"{% endif %}>Записываем на всякий случай</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_search">Проверять, не используется ли фото товара еще где-то на сайте</label>
+                  <div class="col-sm-10">
+                    <select onchange="hided_setting('module_easyphoto_rename_table')"  name="module_easyphoto_rename_search" id="input-easyphoto_rename_search" class="form-control">
+                      <option value="" {% if not module_easyphoto_rename_search %}selected="selected"{% endif %}>Не проверять (фото товара только в товаре)</option>
+                      <option value="1" {% if module_easyphoto_rename_search == "1" %}selected="selected"{% endif %}>Проверять (повышенная нагрузка на базу, но более безопасно)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group" {% if not module_easyphoto_rename_search %}style="display:none;"{% endif %}>
+                  <label class="col-sm-2 control-label" for="input-easyphoto_rename_table">В каких таблицах ищем фото (чем больше таблиц - тем больше нагрузки)</label>
+                  <div class="col-sm-10">
+                    <textarea style="height:120px;" name="module_easyphoto_rename_table" id="input-easyphoto_rename_table" class="form-control">{{ easyphoto_rename_table }}</textarea>
+                    Таблица=Поле (Каждая таблица с новой строки. Список таблиц для поиска можно посмотреть в phpmyadmin)
+                  </div>
+                </div>
+
+              </div>
+
+              <hr>
+
+              <div class="alert alert-warning">
+                <p><strong>Внимание!</strong> Переименование фото это серьезные работы по сайту.</p>
+                <p><b style="color:red;">Перед выполнением убедитесь что сохранили настройки</b> а также что сделали <b style="color:red;">бекап базы данных и папки image</b> сайта.</p>
+                <p>Разработчик модуля не несет ответственности за неправильное использование функционала модуля. Лучше что бы это сделал сам разработчик (info@microdata.pro)</p>
+                <p>Если у вас есть полная уверенность в действиях, пожалуйста, сделайте бекапы и нажимайте кнопку ниже.</p>
+              </div>
+
+              <div class="alert alert-info">
+                <p><strong>Важная информация!</strong> Переименование фото на сервере лучше делать когда на сайте минимум трафика. Это сильная нагрузка на файловую систему и базу данных.</p>
+                <p>После того как закончится процесс необходимо почистить папку image/cache</p>
+                <p>Если в настройках стоит сохранение лога переименований записи старое фото = новое фото можно увидеть в таблице easyphoto_rename_backup</p>
+              </div>
+
+              <div>
+                <button type="button" class="btn btn-success" id="start">1) <i class="fa fa-wrench" aria-hidden="true"></i> Запустить переименование главных фото ({{ count_image }})</button>
+                <script>
+                $(document).on('click', '#start', function(e){
+                 e.preventDefault();
+                 $(this).prop('disabled', true);
+                  //главные фото
+                  $.ajax({
+                    url: 'index.php?route={{ path }}/getCountPhoto&user_token={{ user_token }}',
+                    dataType: 'json',
+                    method: 'post',
+                    success: function(json) {
+                      $('#start').after('<div id="count_image">Обработано главных фото: <span class="count">0</span> из ' + json + '. Переименовано <span class="renamed">0</span> фото.</div><div id="main_load"><div><nobr><span>0</span>%</nobr></div></div>');
+                      count = Math.ceil(json/100);
+                      rename_block(0, count, json);
+                    }
+                  });
+                  //главные фото
+                });
+                function rename_block(i, count, all){
+                  $.ajax({
+                    url: 'index.php?route={{ path }}/selectPercent&user_token={{ user_token }}&i=' + i + '&count=' + count + '&all=' + all,
+                    dataType: 'json',
+                    method: 'post',
+                    success: function(json) {
+
+                      if(json['error']){
+                        html_error = '';
+                        $.each(json['error'], function(key, image) {
+                          html_error += image['text'] + '\r\n';
+                        });
+                        if(!$('#error_block').length){
+                          $('#main_load').after('<div id="error_block"><h4 style="color:red;margin-top:10px;">Лог ошибок по переименованию главных фото</h4><textarea class="form-control" style="margin-bottom:20px;">' + html_error + '</textarea></div>');
+                        }else{
+                          $('#error_block textarea').height(parseInt($('#error_block textarea').height()) + (18 * json['error'].length));
+                          $('#error_block textarea').val($('#error_block textarea').val() + html_error);
+                        }
+                      }
+
+                      setTimeout(function(){
+                        if(json['i'] < 100){
+                          rename_block(json['i'], count, all);
+                          stat(json['i'], json['i'] * count, json['renamed']);
+                        }else{
+                          stat(json['i'], json['all'], json['renamed']);
+                        }
+                      }, 300); //10
+
+                    },
+                    async: false
+                  });
+
+                }
+                function stat(i, count, renamed){
+                  $('#count_image span.count').text(count);
+                  $('#count_image span.renamed').text(parseInt($('#count_image span.renamed').text()) + renamed);
+                  $('#main_load div').width(i + '%');
+                  $('#main_load span').text(i);
+                }
+                </script>
+                <style>
+                  #count_image{margin-top:10px;}
+                  #main_load{border:2px solid #ccc;background:#fefefe;height:30px;line-height:30px;}
+                  #main_load div{text-align:center;background:green;width:0%;height:26px;color:#fff;overflow:hidden;}
+                  #error_block textarea{max-height:300px;}
+                </style>
+              </div>
+
+              <!--дополнительные фото-->
+              <div style="margin-top:15px;">
+                <button type="button" class="btn btn-success" id="start_images">2) <i class="fa fa-wrench" aria-hidden="true"></i> Запустить переименование дополнительных фото ({{ count_images }})</button>
+                <script>
+                $(document).on('click', '#start_images', function(e){
+                 e.preventDefault();
+                 // $(this).prop('disabled', true);
+                  //дополнительные фото
+                  html_load  = '<div id="images_load"><div><nobr><span>0</span>%</nobr></div></div>';
+
+                  $.ajax({
+                    url: 'index.php?route={{ path }}/getCountPhoto&user_token={{ user_token }}&table=product_image',
+                    dataType: 'json',
+                    method: 'post',
+                    success: function(json) {
+                      $('#start_images').after('<div id="count_images">Обработано дополнительных фото: <span class="count">0</span> из ' + json + '. Переименовано <span class="renamed">0</span> фото.</div><div id="images_load"><div><nobr><span>0</span>%</nobr></div></div>');
+                      count = Math.ceil(json/100);
+                      rename_block_images(0, count, json);
+                    }
+                  });
+                  //дополнительные фото
+                });
+
+                function rename_block_images(i, count, all){
+                  $.ajax({
+                    url: 'index.php?route={{ path }}/selectPercent&user_token={{ user_token }}&i=' + i + '&count=' + count + '&table=product_image&all=' + all,
+                    dataType: 'json',
+                    method: 'post',
+                    timeout: 30000,
+                    async:true,
+                    success: function(json) {
+
+                      if(json['error']){
+                        html_error = '';
+                        $.each(json['error'], function(key, image) {
+                          html_error += image['text'] + '\r\n';
+                        });
+                        if(!$('#error_images').length){
+                          $('#count_images').after('<div id="error_images"><h4 style="color:red;margin-top:10px;">Лог ошибок по переименованию дополнителных фото</h4><textarea class="form-control" style="margin-bottom:20px;">' + html_error + '</textarea></div>');
+                        }else{
+                          $('#error_images textarea').height(parseInt($('#error_images textarea').height()) + (17 * json['error'].length));
+                          $('#error_images textarea').val($('#error_images textarea').val() + html_error);
+                        }
+                      }
+
+                      setTimeout(function(){
+                        if(json['i'] < 100){ //1000
+                          rename_block_images(json['i'], count, all);
+                          stat_images(json['i'], json['i'] * count, json['renamed']);
+                        }else{
+                          stat_images(json['i'], json['all'], json['renamed']);
+                        }
+                      }, 10); //10
+
+                    }
+                  });
+
+                }
+
+                function stat_images(i, count, renamed){
+                  $('#count_images span.count').text(count);
+                  $('#count_images span.renamed').text(parseInt($('#count_images span.renamed').text()) + renamed);
+                  $('#images_load div').width(i + '%'); //10
+                  $('#images_load span').text(i); //10
+                }
+                </script>
+                <style>
+                  #count_images{margin-top:10px;}
+                  #images_load{border:2px solid #ccc;background:#fefefe;height:30px;line-height:30px;}
+                  #images_load div{text-align:center;background:green;width:0%;height:26px;color:#fff;overflow:hidden;}
+                  #error_images textarea{max-height:300px;}
+
+                </style>
+
+              </div>
+              <!--/дополнительные фото-->
+              <br><hr><br>
+              <h3>Easyphoto позволяет найти лишние фото и удалить их физически с сервера</h3>
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-easyphoto_delete_direct">Выберите папку для фото</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon" id="input-easyphoto_delete_direct">{{ https_catalog}}image/catalog/</span>
+                    <input type="text" name="module_easyphoto_delete_direct" value="{{ module_easyphoto_delete_direct }}" placeholder="Если указать корневую папку чистка будет по всем вложенным" class="form-control" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-easyphoto_delete_table">В каких таблицах ищем фото (чем больше таблиц - тем больше нагрузки)</label>
+                <div class="col-sm-10">
+                  <textarea style="height:120px;" name="module_easyphoto_delete_table" id="input-easyphoto_delete_table" class="form-control">{{ easyphoto_delete_table }}</textarea>
+                  Таблица=Поле (Каждая таблица с новой строки. Список таблиц для поиска можно посмотреть в phpmyadmin)
+                </div>
+              </div>
+
+              <div class="alert alert-warning">
+                <p><strong>Внимание!</strong> Удаление фото это серьезные работы по сайту.</p>
+                <p><b style="color:red;">Перед выполнением убедитесь что сохранили настройки</b> а также что сделали <b style="color:red;">бекап базы данных и папки image</b> сайта.</p>
+                <p>Разработчик модуля не несет ответственности за неправильное использование функционала модуля. Лучше что бы это сделал сам разработчик (info@microdata.pro)</p>
+                <p>На данный момент размер папки {{ dir_image_const }}catalog/ составляет {{ dir_image }}</p>
+              </div>
+
+              <button type="button" class="btn btn-success" id="start_delete">3) <i class="fa fa-wrench" aria-hidden="true"></i> Запустить поиск и удаление неиспользуемых файлов</button>
+
+              <script>
+              $(document).on('click', '#start_delete', function(e){
+               e.preventDefault();
+                $(this).prop('disabled', true);
+                $('#start_delete').after('<div id="count_delete">Сканирование файлов, базы и удаление...</div>');
+                $.ajax({
+                  url: 'index.php?route={{ path }}/startDelete&user_token={{ user_token }}',
+                  dataType: 'json',
+                  method: 'post',
+                  success: function(json) {
+                    $('#count_delete').text(json);
+                  }
+                });
+              });
+              </script>
+              <style>
+                #count_delete{margin-top:10px;}
+              </style>
+
+            </div><!--/service-->
+
+            <div id="info" role="tabpanel" class="tab-pane fade active">
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-10">
+                  {{ text_manual }}
+    		        </div>
+              </div>
+
+              {# 3.1  #}
+              <div class="form-group">
+                <div class="col-sm-12">
+                  {{ more_info }}
+    		        </div>
+              </div>
+              {# 3.1  #}
+            </div><!--/info-->
+
+          </div>
+
+        </form>
+        {% else %}
+          <div style="font-size:22px;text-align:center;">{{ text_no_active}}</div>
+          <style>
+            .easyphoto_img_main{border:2px solid #ccc;padding:5px;margin:30px auto;width:600px;}
+            .easyphoto_img_main img{max-width:100%;}
+          </style>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function(){
+    $('#form-easyphoto input[type="checkbox"]').wrap('<label class="swl"></label>').after('<span></span>');
+  });
+</script>
+<style>
+  .swl input[type="checkbox"] {position: absolute;z-index: -1;opacity: 0;margin: 10px 0 0 20px;}
+  .swl input[type="checkbox"] + span {position: relative;padding: 0 0 0 60px;cursor: pointer;}
+  .swl input[type="checkbox"] + span:before {content: '';position: absolute;top: 1px;left: 0;width: 50px;height: 26px;border-radius: 13px;background: #CDD1DA;box-shadow: inset 0 2px 3px rgba(0,0,0,.2);transition: .2s;}
+  .swl input[type="checkbox"] + span:after {content: '';position: absolute;top: 3px;left: 2px;width: 22px;height: 22px;border-radius: 10px;background: #FFF;box-shadow: 0 2px 5px rgba(0,0,0,.3);transition: .2s;}
+  .swl input[type="checkbox"]:checked + span:before {background:#9FD468;}
+  .swl input[type="checkbox"]:checked + span:after {left: 26px;}
+  .swl input[type="checkbox"]:focus + span:before {box-shadow: inset 0 2px 3px rgba(0,0,0,.2), 0 0 0 3px rgba(255,255,0,.7);}
+</style>
+{{ footer}}

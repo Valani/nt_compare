@@ -13,7 +13,7 @@ class ControllerAccountRegister extends Controller {
 		$this->load->language('account/register');
 
 		$this->document->setTitle($this->language->get('heading_title'));
-		$this->document->setRobots('noindex,follow');
+        $this->document->setRobots('noindex,nofollow');
 
 		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment.min.js');
 		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment-with-locales.min.js');
@@ -217,6 +217,15 @@ class ControllerAccountRegister extends Controller {
 		$data['content_bottom'] = $this->load->controller('common/content_bottom');
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
+
+        $parameters = [
+            'redirect_uri'  => GOOGLE_REDIRECT_URI,
+            'response_type' => 'code',
+            'client_id'     => GOOGLE_CLIENT_ID,
+            'scope'         => implode(' ', GOOGLE_SCOPES),
+        ];
+        $data['uri_google'] = GOOGLE_AUTH_URI . '?' . http_build_query($parameters);
+        $data['entry_google_in'] = $this->language->get('entry_google_in');
 
 		$this->response->setOutput($this->load->view('account/register', $data));
 	}

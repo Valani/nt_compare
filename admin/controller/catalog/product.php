@@ -37,6 +37,10 @@ class ControllerCatalogProduct extends Controller {
 				$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 			}
 
+            if (isset($this->request->get['filter_id_1c'])) {
+				$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
+			}
+
 			if (isset($this->request->get['filter_price'])) {
 				$url .= '&filter_price=' . $this->request->get['filter_price'];
 			}
@@ -120,6 +124,10 @@ class ControllerCatalogProduct extends Controller {
 				$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 			}
 
+            if (isset($this->request->get['filter_id_1c'])) {
+				$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
+			}
+
 			if (isset($this->request->get['filter_price'])) {
 				$url .= '&filter_price=' . $this->request->get['filter_price'];
 			}
@@ -198,7 +206,64 @@ class ControllerCatalogProduct extends Controller {
 
 		if (isset($this->request->post['selected']) && $this->validateDelete()) {
 			foreach ($this->request->post['selected'] as $product_id) {
-				$this->model_catalog_product->deleteProduct($product_id);
+				//$this->model_catalog_product->deleteProduct($product_id);
+                // OCFilter start
+                $this->db->query("DELETE FROM " . DB_PREFIX . "ocfilter_filter_value_to_product WHERE product_id = '" . $this->db->escape((string)$product_id) . "'");
+                // OCFilter end
+
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product_id . "'");
+                // SEO URL Generator . begin
+                $this->db->query("DELETE FROM " . DB_PREFIX . "seo_url_generator_redirects WHERE query = 'product_id=" . (int)$product_id . "'");
+                // SEO URL Generator . end
+
+                $oct_product_tabs_status = $this->config->get('oct_product_tabs_status');
+
+                if (isset($oct_product_tabs_status) && $oct_product_tabs_status) {
+                    $this->db->query("DELETE FROM " . DB_PREFIX . "oct_product_extra_tabs WHERE product_id = '" . (int)$product_id . "'");
+
+                    if (isset($data['oct_product_extra_tab']) && !empty($data['oct_product_extra_tab'])) {
+                        foreach ($data['oct_product_extra_tab'] as $oct_product_extra_tab) {
+                            if ($oct_product_extra_tab['extra_tab_id']) {
+                                foreach ($oct_product_extra_tab['oct_product_extra_tab_description'] as $language_id => $oct_product_extra_tab_description) {
+                                    $this->db->query("INSERT INTO " . DB_PREFIX . "oct_product_extra_tabs SET product_id = '" . (int)$product_id . "', extra_tab_id = '" . (int)$oct_product_extra_tab['extra_tab_id'] . "', language_id = '" . (int)$language_id . "', text = '" .  $this->db->escape($oct_product_extra_tab_description['text']) . "'");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_filter WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
+
+                $oct_product_main_image_option_status = $this->config->get('oct_product_main_image_option_status');
+                if (isset($oct_product_main_image_option_status) && $oct_product_main_image_option_status) {
+                    $this->db->query("DELETE FROM " . DB_PREFIX . "oct_product_image_by_option WHERE product_id = '" . (int)$product_id . "'");
+                }
+
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_option WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE related_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_related_article WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_special WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring WHERE product_id = " . (int)$product_id);
+                $this->db->query("DELETE FROM " . DB_PREFIX . "review WHERE product_id = '" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'product_id=" . (int)$product_id . "'");
+                $this->db->query("DELETE FROM " . DB_PREFIX . "coupon_product WHERE product_id = '" . (int)$product_id . "'");
+
+                $this->cache->delete('product');
+
+                if($this->config->get('config_seo_pro')){
+                    $this->cache->delete('seopro');
+                }
 			}
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -211,6 +276,10 @@ class ControllerCatalogProduct extends Controller {
 
 			if (isset($this->request->get['filter_model'])) {
 				$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
+			}
+
+            if (isset($this->request->get['filter_id_1c'])) {
+				$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
 			}
 
 			if (isset($this->request->get['filter_price'])) {
@@ -298,6 +367,10 @@ class ControllerCatalogProduct extends Controller {
 				$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 			}
 
+            if (isset($this->request->get['filter_id_1c'])) {
+				$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
+			}
+
 			if (isset($this->request->get['filter_price'])) {
 				$url .= '&filter_price=' . $this->request->get['filter_price'];
 			}
@@ -370,6 +443,12 @@ class ControllerCatalogProduct extends Controller {
 			$filter_model = $this->request->get['filter_model'];
 		} else {
 			$filter_model = '';
+		}
+
+        if (isset($this->request->get['filter_id_1c'])) {
+			$filter_id_1c = $this->request->get['filter_id_1c'];
+		} else {
+			$filter_id_1c = '';
 		}
 
 		if (isset($this->request->get['filter_price'])) {
@@ -523,6 +602,10 @@ class ControllerCatalogProduct extends Controller {
 			$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 		}
 
+        if (isset($this->request->get['filter_id_1c'])) {
+			$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
+		}
+
 		if (isset($this->request->get['filter_price'])) {
 			$url .= '&filter_price=' . $this->request->get['filter_price'];
 		}
@@ -598,6 +681,7 @@ class ControllerCatalogProduct extends Controller {
 		$filter_data = array(
 			'filter_name'	  => $filter_name,
 			'filter_model'	  => $filter_model,
+			'filter_id_1c'	  => $filter_id_1c,
 			'filter_price'	  => $filter_price,
 			'filter_price_min'=> $filter_price_min,
 			'filter_price_max'=> $filter_price_max,
@@ -688,6 +772,10 @@ class ControllerCatalogProduct extends Controller {
 			$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 		}
 
+        if (isset($this->request->get['filter_id_1c'])) {
+			$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
+		}
+
 		if (isset($this->request->get['filter_price'])) {
 			$url .= '&filter_price=' . $this->request->get['filter_price'];
 		}
@@ -759,6 +847,10 @@ class ControllerCatalogProduct extends Controller {
 			$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 		}
 
+        if (isset($this->request->get['filter_id_1c'])) {
+			$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
+		}
+
 		if (isset($this->request->get['filter_price'])) {
 			$url .= '&filter_price=' . $this->request->get['filter_price'];
 		}
@@ -822,6 +914,7 @@ class ControllerCatalogProduct extends Controller {
 
 		$data['filter_name'] = $filter_name;
 		$data['filter_model'] = $filter_model;
+		$data['filter_id_1c'] = $filter_id_1c;
 		$data['filter_price'] = $filter_price;
 		$data['filter_price_min'] = $filter_price_min;
 		$data['filter_price_max'] = $filter_price_max;
@@ -893,6 +986,10 @@ class ControllerCatalogProduct extends Controller {
 
 		if (isset($this->request->get['filter_model'])) {
 			$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
+		}
+
+        if (isset($this->request->get['filter_id_1c'])) {
+			$url .= '&filter_id_1c=' . urlencode(html_entity_decode($this->request->get['filter_id_1c'], ENT_QUOTES, 'UTF-8'));
 		}
 
 		if (isset($this->request->get['filter_price'])) {
@@ -1005,7 +1102,15 @@ class ControllerCatalogProduct extends Controller {
 			$data['model'] = '';
 		}
 
-		if (isset($this->request->post['sku'])) {
+		if (isset($this->request->post['id_1c'])) {
+			$data['id_1c'] = $this->request->post['id_1c'];
+		} elseif (!empty($product_info)) {
+			$data['id_1c'] = $product_info['id_1c'];
+		} else {
+			$data['id_1c'] = '';
+		}
+
+        if (isset($this->request->post['sku'])) {
 			$data['sku'] = $this->request->post['sku'];
 		} elseif (!empty($product_info)) {
 			$data['sku'] = $product_info['sku'];
@@ -1751,7 +1856,7 @@ class ControllerCatalogProduct extends Controller {
 	public function autocomplete() {
 		$json = array();
 
-		if (isset($this->request->get['filter_name']) || isset($this->request->get['filter_model'])) {
+		if (isset($this->request->get['filter_name']) || isset($this->request->get['filter_model']) || isset($this->request->get['filter_id_1c'])) {
 			$this->load->model('catalog/product');
 			$this->load->model('catalog/option');
 
@@ -1767,6 +1872,12 @@ class ControllerCatalogProduct extends Controller {
 				$filter_model = '';
 			}
 
+            if (isset($this->request->get['filter_id_1c'])) {
+				$filter_id_1c = $this->request->get['filter_id_1c'];
+			} else {
+				$filter_id_1c = '';
+			}
+
 			if (isset($this->request->get['limit'])) {
 				$limit = (int)$this->request->get['limit'];
 			} else {
@@ -1776,6 +1887,7 @@ class ControllerCatalogProduct extends Controller {
 			$filter_data = array(
 				'filter_name'  => $filter_name,
 				'filter_model' => $filter_model,
+				'filter_id_1c' => $filter_id_1c,
 				'start'        => 0,
 				'limit'        => $limit
 			);
@@ -1823,6 +1935,7 @@ class ControllerCatalogProduct extends Controller {
 					'product_id' => $result['product_id'],
 					'name'       => strip_tags(html_entity_decode($result['name'], ENT_QUOTES, 'UTF-8')),
 					'model'      => $result['model'],
+					'id_1c'      => $result['id_1c'],
 					'option'     => $option_data,
 					'price'      => $result['price']
 				);

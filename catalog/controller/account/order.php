@@ -56,6 +56,8 @@ class ControllerAccountOrder extends Controller {
 			$product_total = $this->model_account_order->getTotalOrderProductsByOrderId($result['order_id']);
 			$voucher_total = $this->model_account_order->getTotalOrderVouchersByOrderId($result['order_id']);
 
+			$token = md5($result['order_id'] . $this->config->get('config_encryption'));
+    
 			$data['orders'][] = array(
 				'order_id'   => $result['order_id'],
 				'name'       => $result['firstname'] . ' ' . $result['lastname'],
@@ -64,6 +66,7 @@ class ControllerAccountOrder extends Controller {
 				'products'   => ($product_total + $voucher_total),
 				'total'      => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
 				'view'       => $this->url->link('account/order/info', 'order_id=' . $result['order_id'], true),
+				'pdf_url'    => $this->url->link('checkout/invoice_pdf', 'order_id=' . $result['order_id'] . '&token=' . $token, true)
 			);
 		}
 

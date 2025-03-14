@@ -1,0 +1,1498 @@
+
+<!--author sv2109 (sv2109@gmail.com) license for 1 product copy granted for Nawiteh (andrew.pv.mm@gmail.com nawiteh.com.ua,www.nawiteh.com.ua,stage.nawiteh.com.ua)-->
+{{ header }} 
+
+<script type="text/javascript" src="view/javascript/jquery/ui/jquery-ui.min.js"></script>
+<script>
+/*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap 
+ *   see https://stackoverflow.com/questions/13731400/jqueryui-tooltips-are-competing-with-twitter-bootstrap
+ * ***/
+$.widget.bridge('uibutton', $.ui.button);
+$.widget.bridge('uitooltip', $.ui.tooltip);
+</script>
+<link rel="stylesheet" type="text/css" href="view/javascript/jquery/ui/jquery-ui.theme.min.css" />
+<!-- need to add bootstrap after jquery-ui-->
+<script type="text/javascript" src="view/javascript/bootstrap/js/bootstrap.min.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="view/javascript/codemirror-5/lib/codemirror.css" />
+<script type="text/javascript" src="view/javascript/codemirror-5/lib/codemirror.js"></script>
+<script type="text/javascript" src="view/javascript/codemirror-5/mode/css/css.js"></script>
+
+<link rel="stylesheet" type="text/css" href="view/javascript/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css" />
+<script type="text/javascript" src="view/javascript/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.js"></script>
+
+{{ column_left }} 
+
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-search-suggestion" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %} 
+          <li><a href="{{ breadcrumb['href'] }}">{{ breadcrumb['text'] }}</a></li>
+          {% endfor %} 
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if (error_warning) %} 
+      <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }} 
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %} 
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-search-suggestion" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+            <li><a href="#tab-product" data-toggle="tab">{{ tab_product }}</a></li>
+            <li><a href="#tab-category-filter" data-toggle="tab">{{ tab_category_filter }}</a></li>
+            <li><a href="#tab-category" data-toggle="tab">{{ tab_category }}</a></li>
+            <li><a href="#tab-manufacturer" data-toggle="tab">{{ tab_manufacturer }}</a></li>
+            <li><a href="#tab-information" data-toggle="tab">{{ tab_information }}</a></li>            
+            <li><a href="#tab-support" data-toggle="tab">{{ tab_support }}</a></li>
+          </ul>
+          <div class="tab-content">
+            
+            <div class="tab-pane active" id="tab-general">
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_status }}</label>
+                <div class="col-sm-10">
+                  <select name="module_search_suggestion_status" class="form-control">
+                    {% if (module_search_suggestion_status) %} 
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                    {% else %} 
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %} 
+                  </select>
+                </div>
+              </div>          
+                                    
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_search_type_order }}</label>
+                <div class="col-sm-3">                  
+                  
+                  <table id="search-order" class="table table-striped table-bordered table-hover sorted_table">
+                    <thead>
+                      <tr>
+                        <td class="text-left">{{ column_search_type }}</td>
+                        <td class="text-left">{{ column_search_type_sort }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for type_name, type_options in options['types_order'] %}
+                      <tr>
+                        <td class="text-left">{{ attribute(_context, 'tab_' ~ type_name) }}</td>              
+                        <td class="text-left">                          
+                          <input type="text" name="module_search_suggestion_options[types_order][{{ type_name }}][sort]" value="{{ type_options['sort'] is defined ? type_options['sort'] : 0 }}" class="form-control">
+                        </td>  
+                      </tr>      
+                      {% endfor %}
+                    </tbody>
+                  </table>              
+                  
+                </div>
+              </div>          
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label" >{{ entry_element }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_search_suggestion_options[element]" value="{{ options['element'] is defined ? options['element'] : '' }}" class="form-control">
+                </div>
+              </div>          
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_width }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_search_suggestion_options[width]" value="{{ options['width'] is defined ? options['width'] : '' }}"  class="form-control">
+                </div>
+              </div>          
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_color_scheme }}</label>
+                <div class="col-sm-10">
+                  <div class="input-group colorpicker-component colorpicker-input">                      
+                    <input type="text" name="module_search_suggestion_options[color_scheme]" value="{{ options['color_scheme'] is defined ? options['color_scheme'] : '' }}"  class="form-control" id="color-scheme">
+                    <span class="input-group-addon"><i></i></span>
+                  </div>
+                </div>
+              </div>          
+
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_css }}</label>
+                <div class="col-sm-10">
+                  <textarea name="module_search_suggestion_options[css]" rows="32" cols="60" class="form-control" id="css-texarea">{{ options['css'] is defined ? options['css'] : '' }}</textarea>                  
+                </div>
+              </div>                        
+
+              <input type="hidden" name="module_search_suggestion_module[0][search_suggestion]" value="1"/>
+
+            </div>
+                
+            <div class="tab-pane" id="tab-product">
+              
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-product-settings" data-toggle="tab">{{ tab_settings }}</a></li>
+                <li><a href="#tab-product-search-by" data-toggle="tab">{{ tab_search_by }}</a></li>
+                <li><a href="#tab-product-fields" data-toggle="tab">{{ tab_fields }}</a></li>
+              </ul>
+              <div class="tab-content">
+
+                <div class="tab-pane active" id="tab-product-settings">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_status }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[product][status]" class="form-control">
+                        {% if (options['product']['status']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+                  
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_title }}</label>
+                    <div class="col-sm-10">
+                      {% for language in languages %}                      
+                      <div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_search_suggestion_options[product][title][{{ language.language_id }}]" value="{{ options['product']['title'][language.language_id] is defined ? options['product']['title'][language.language_id] : '' }}" class="form-control">
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                      <span data-toggle="tooltip" title="{{ help_product_order }}">
+                        {{ entry_order }} 
+                      </span>
+                    </label>
+                    <div class="col-sm-10">
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[product][order]" class="form-control">
+                            <option value="name" {{ options['product']['order'] is defined and options['product']['order'] == 'name' ? 'selected="selected"' : "" }}>{{ text_order_name }}</option>
+                            <option value="rating" {{ options['product']['order'] is defined and options['product']['order'] == 'rating' ? 'selected="selected"' : "" }}>{{ text_order_rating }}</option>
+                            <option value="relevance" {{ options['product']['order'] is defined and options['product']['order'] == 'relevance' ? 'selected="selected"' : "" }}>{{ text_order_relevance }}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[product][order_dir]" id="input-search-order-dir" class="form-control">
+                            <option value="asc" {{ options['product']['order_dir'] is defined and options['product']['order_dir'] == 'asc' ? 'selected="selected"' : "" }}>{{ text_order_dir_asc }}</option>
+                            <option value="desc" {{ options['product']['order_dir'] is defined and options['product']['order_dir'] == 'desc' ? 'selected="selected"' : "" }}>{{ text_order_dir_desc }}</option>
+                          </select>              
+                        </div>
+                      </div>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                      <span data-toggle="tooltip" title="{{ help_product_logic }}">  
+                        {{ entry_logic }} 
+                      </span>
+                    </label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[product][logic]"  class="form-control">
+                        <option value="or" {{ options['product']['logic'] is defined and options['product']['logic'] == 'or' ? 'selected="selected"' : "" }}>{{ text_logic_or }}</option>
+                        <option value="and" {{ options['product']['logic'] is defined and options['product']['logic'] == 'and' ? 'selected="selected"' : "" }}>{{ text_logic_and }}</option>
+                      </select>              
+                    </div>
+                  </div>          
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_limit }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="module_search_suggestion_options[product][limit]" value="{{ options['product']['limit'] is defined ? options['product']['limit'] : 0 }}" class="form-control">
+                    </div>
+                  </div>  
+                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_keyboard_layout }}">{{ entry_fix_keyboard_layout }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[product][fix_keyboard_layout]" class="form-control">
+                        {% if (options['product']['fix_keyboard_layout']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_transliteration }}">{{ entry_fix_transliteration }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[product][fix_transliteration]" class="form-control">
+                        {% if (options['product']['fix_transliteration']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_more }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[product][more]" class="form-control">
+                        {% if (options['product']['more']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[product][inline]" class="form-control">
+                        {% if (options['product']['inline']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline_tooltip }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[product][inline_tooltip]" class="form-control">
+                        {% if (options['product']['inline_tooltip']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                </div>
+
+                <div class="tab-pane" id="tab-product-search-by">
+                  
+                  <table id="where" class="table table-striped table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" onclick="$('input[type=checkbox][name*=\'module_search_suggestion_options[product][search_by]\']').prop('checked', this.checked);" />
+                        </td>
+                        <td class="text-left">{{ column_search_by }}</td>  
+                        <td class="text-left">{{ column_relevance_weight }}</td>
+                      </tr>
+                    </thead>
+                    <tbody >
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[product][search_by][name]" value="1" {{ options['product']['search_by']['name'] is defined and options['product']['search_by']['name'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_product_field_name }}</td>  
+                        <td class="text-left">{{ text_relevance_weight_mr }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[product][search_by][tags]" value="1" {{ options['product']['search_by']['tags'] is defined and options['product']['search_by']['tags'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_product_field_tag }}</td>
+                        <td class="text-left">{{ text_relevance_weight_mr }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[product][search_by][description]" value="1" {{ options['product']['search_by']['description'] is defined and options['product']['search_by']['description'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_product_field_description }}</td>  
+                        <td class="text-left">{{ text_relevance_weight_mr }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[product][search_by][model]" value="1" {{ options['product']['search_by']['model'] is defined and options['product']['search_by']['model'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_product_field_model }}</td> 
+                        <td class="text-left">{{ text_relevance_weight_mr }}</td>              
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[product][search_by][sku]" value="1" {{ options['product']['search_by']['sku'] is defined and options['product']['search_by']['sku'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_product_field_sku }}</td>  
+                        <td class="text-left">{{ text_relevance_weight_mr }}</td>              
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[product][search_by][more]" value="1"  disabled />
+                        </td>
+                        <td class="text-left">{{ text_product_field_more }}</td>  
+                        <td class="text-left">{{ text_relevance_weight_mr }}</td>              
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[product][search_by][custom]" value="1"  disabled />
+                        </td>
+                        <td class="text-left">{{ text_product_field_custom }}</td>  
+                        <td class="text-left">{{ text_relevance_weight_mr }}</td>              
+                      </tr>
+
+                    </tbody>
+                  </table>
+                  {{ help_tab_product_search_by }}  
+                  
+                </div>
+
+                <div class="tab-pane" id="tab-product-fields">
+
+                  <table id="fields" class="table table-striped table-bordered table-hover sorted_table">
+                    <thead>
+                      <tr>
+                        <td class="text-left">{{ column_fields_show }}</td>
+                        <td class="text-left">{{ column_fields }}</td>              
+                        <td class="text-left">{{ column_fields_show_field_name }}</td>  
+                        <td class="text-left">{{ column_fields_settings }}</td>  
+                        <td class="text-left">{{ column_fields_column }}</td>  
+                        <td class="text-left">{{ column_fields_location }}</td>  
+                        <td class="text-left">{{ column_fields_sort }}</td>  
+                        <td class="text-left">{{ column_fields_css }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {% for field_name,field_options in options['product']['fields'] %} 
+                        <tr>
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[product][fields][{{ field_name }}][show]" value="1" {{ field_options['show'] is defined and field_options['show'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">{{ attribute(_context, 'text_product_field_' ~ field_name) }}</td>              
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[product][fields][{{ field_name }}][show_field_name]" value="1" {{ field_options['show_field_name'] is defined and field_options['show_field_name'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">
+                            {% if (field_name == 'attributes') %} 
+                              {{ text_fields_cut }}: <input type="text" name="module_search_suggestion_options[product][fields][attributes][cut]" value="{{ field_options['cut'] is defined ? field_options['cut'] : 0 }}" size="4" class="form-control">
+                              {{ text_fields_separator }}: <input type="text" name="module_search_suggestion_options[product][fields][attributes][separator]" value="{{ field_options['separator'] is defined ? field_options['separator'] : '/' }}" size="2" class="form-control">
+                            {% elseif (field_name == 'rating') %}
+                              {{ text_fields_show_empty }}: <input type="checkbox" name="module_search_suggestion_options[product][fields][rating][show_empty]" value="1" {{ field_options['show_empty'] is defined and field_options['show_empty'] ? "checked=checked" : "" }} /> 
+                            {% elseif (field_name == 'stock') %}
+                              {{ text_fields_in_stock_statuses }}: 
+                              
+                              {% for stock_status in stock_statuses %}
+                                  <div class="form-group" style="margin-left: 0; margin-right: 0;">
+                                    <div class="col-sm-2">
+                                      <input type="checkbox" name="module_search_suggestion_options[product][fields][stock][in_stock_statuses][{{ stock_status['stock_status_id'] }}]" value="{{ stock_status['stock_status_id'] }}" {{ field_options['in_stock_statuses'] is defined and stock_status['stock_status_id'] in field_options['in_stock_statuses']|keys ? 'checked="checked"' : '' }} class="form-control">
+                                    </div>
+                                    <div class="col-sm-10">{{ stock_status['name'] }}</div>
+                                  </div>
+                              {% endfor %}
+                                                          
+                            {% elseif (field_name == 'image') %} 
+                              {{ text_field_image_width }}: <input type="text" name="module_search_suggestion_options[product][fields][image][width]" value="{{ field_options['width'] is defined ? field_options['width'] : 0 }}" size="3" class="form-control">  
+                              {{ text_field_image_height }}: <input type="text" name="module_search_suggestion_options[product][fields][image][height]" value="{{ field_options['height'] is defined ? field_options['height'] : 0 }}" size="3" class="form-control">                
+                            {% elseif (field_name == 'description') %} 
+                              {{ text_fields_cut }}: <input type="text" name="module_search_suggestion_options[product][fields][description][cut]" value="{{ field_options['cut'] is defined ? field_options['cut'] : 0 }}" size="4" class="form-control">
+                            {% elseif (field_name == 'cart') %} 
+                              {{ text_product_field_cart_code }}:<br />
+															<textarea name="module_search_suggestion_options[product][fields][cart][code]" rows="5" cols="40" class="form-control">{{ field_options['code'] is defined ? field_options['code'] : "" }}</textarea>
+                            {% endif %} 
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[product][fields][{{ field_name }}][column]" class="form-control">
+                              {% for column in columns %} 
+                                <option value="{{ column }}" {{ field_options['column'] is defined and field_options['column'] == column ? "selected='selected'" : "" }}>
+                                  {{ attribute(_context, 'fields_column_' ~ column) }}
+                                </option>            
+                              {% endfor %}
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[product][fields][{{ field_name }}][location]" class="form-control">
+                              <option value="newline" {{ field_options['location'] is defined and field_options['location'] == 'newline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_newline }} 
+                              </option>            
+                              <option value="inline" {{ field_options['location'] is defined and field_options['location'] == 'inline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_inline }} 
+                              </option>
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <input type="text" name="module_search_suggestion_options[product][fields][{{ field_name }}][sort]" value="{{ field_options['sort'] is defined ? field_options['sort'] : 0 }}" size="3" class="form-control"/>
+                          </td>  
+                          <td class="text-left">
+                            .{{ field_name }} {<br />
+                            <textarea name="module_search_suggestion_options[product][fields][{{ field_name }}][css]" rows="4" cols="40" class="form-control">{{ field_options['css'] is defined ? field_options['css'] : '' }}</textarea>}
+                          </td>
+                        </tr>      
+                      {% endfor %} 
+
+                    </tbody>
+                  </table>              
+
+                  <table id="fields_attributes" class="table table-striped table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <td class="text-left">{{ column_fields_attributes }}</td>              
+                        <td class="text-left">{{ column_fields_attributes_show }}</td>
+                        <td class="text-left">{{ column_fields_attributes_replace_text }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {% for attribute in attributes %} 
+                        <tr>
+                          <td class="text-left">{{ attribute['name'] }}</td>              
+                          <td>
+
+                            <select name="module_search_suggestion_options[product][fields][attributes][{{ attribute['attribute_id'] }}][show]" class="form-control">
+
+                              <option value="0" {{ options['product']['fields']['attributes'][attribute['attribute_id']]['show'] is defined and options['product']['fields']['attributes'][attribute['attribute_id']]['show'] == '0' ? 'selected="selected"' : "" }}>{{ text_fields_attributes_hide }}</option>
+                              <option value="1" {{ options['product']['field']['attributes'][attribute['attribute_id']]['show'] is defined and options['product']['fields']['attributes'][attribute['attribute_id']]['show'] == '1' ? 'selected="selected"' : "" }}>{{ text_fields_attributes_show }}</option>
+                              <option value="2" {{ options['product']['field']['attributes'][attribute['attribute_id']]['show'] is defined and options['product']['fields']['attributes'][attribute['attribute_id']]['show'] == '2' ? 'selected="selected"' : "" }}>{{ text_fields_attributes_replace }}</option>
+
+                            </select>
+
+                          </td>
+
+                          <td class="text-left">
+                            <input type="text" name="module_search_suggestion_options[product][fields][attributes][{{ attribute['attribute_id'] }}][replace]" value="{{ options['product']['fields']['attributes'][attribute['attribute_id']]['replace'] is defined ? options['product']['fields']['attributes'][attribute['attribute_id']]['replace'] : '' }}" class="form-control">
+                          </td>  
+
+                        </tr>
+                      {% endfor %} 
+                    </tbody>
+                  </table>
+                  
+                </div>
+
+              </div>  
+                                          
+            </div>
+
+            <div class="tab-pane" id="tab-category-filter">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-category-filer-settings" data-toggle="tab">{{ tab_settings }}</a></li>
+                <li><a href="#tab-category-filer-fields" data-toggle="tab">{{ tab_fields }}</a></li>
+              </ul>
+              <div class="tab-content">
+
+                <div class="tab-pane active" id="tab-category-filer-settings">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_status }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category_filter][status]" class="form-control">
+                        {% if (options['category_filter']['status']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+                  
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_title }}</label>
+                    <div class="col-sm-10">
+                      {% for language in languages %}                      
+                      <div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_search_suggestion_options[category_filter][title][{{ language.language_id }}]" value="{{ options['category_filter']['title'][language.language_id] is defined ? options['category_filter']['title'][language.language_id] : '' }}" class="form-control">
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                      {{ entry_order }} 
+                    </label>
+                    <div class="col-sm-10">
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[category_filter][order]" class="form-control">
+                            <option value="name" {{ options['category_filter']['order'] is defined and options['category_filter']['order'] == 'name' ? 'selected="selected"' : "" }}>{{ text_order_name }}</option>
+                            <option value="count" {{ options['category_filter']['order'] is defined and options['category_filter']['order'] == 'count' ? 'selected="selected"' : "" }}>{{ text_order_count }}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[category_filter][order_dir]" id="input-search-order-dir" class="form-control">
+                            <option value="asc" {{ options['category_filter']['order_dir'] is defined and options['category_filter']['order_dir'] == 'asc' ? 'selected="selected"' : "" }}>{{ text_order_dir_asc }}</option>
+                            <option value="desc" {{ options['category_filter']['order_dir'] is defined and options['category_filter']['order_dir'] == 'desc' ? 'selected="selected"' : "" }}>{{ text_order_dir_desc }}</option>
+                          </select>              
+                        </div>
+                      </div>
+                    </div>
+                  </div>          
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_limit }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="module_search_suggestion_options[category_filter][limit]" value="{{ options['category_filter']['limit'] is defined ? options['category_filter']['limit'] : 0 }}" class="form-control">
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_count }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category_filter][count]" class="form-control">
+                        {% if (options['category_filter']['count']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category_filter][inline]" class="form-control">
+                        {% if (options['category_filter']['inline']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline_tooltip }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category_filter][inline_tooltip]" class="form-control">
+                        {% if (options['category_filter']['inline_tooltip']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+                                          
+                </div>
+
+                <div class="tab-pane" id="tab-category-filer-fields">
+
+                  <table id="fields" class="table table-striped table-bordered table-hover sorted_table">
+                    <thead>
+                      <tr>
+                        <td class="text-left">{{ column_fields_show }}</td>
+                        <td class="text-left">{{ column_fields }}</td>              
+                        <td class="text-left">{{ column_fields_show_field_name }}</td>  
+                        <td class="text-left">{{ column_fields_settings }}</td>  
+                        <td class="text-left">{{ column_fields_column }}</td>
+                        <td class="text-left">{{ column_fields_location }}</td>  
+                        <td class="text-left">{{ column_fields_sort }}</td>  
+                        <td class="text-left">{{ column_fields_css }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {% for field_name,field_options in options['category_filter']['fields'] %} 
+                        <tr>
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[category_filter][fields][{{ field_name }}][show]" value="1" {{ field_options['show'] is defined and field_options['show'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">{{ attribute(_context, 'text_category_field_' ~ field_name) }}</td>              
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[category_filter][fields][{{ field_name }}][show_field_name]" value="1" {{ field_options['show_field_name'] is defined and field_options['show_field_name'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">
+                            {% if (field_name == 'image') %} 
+                              {{ text_field_image_width }}: <input type="text" name="module_search_suggestion_options[category_filter][fields][image][width]" value="{{ field_options['width'] is defined ? field_options['width'] : 0 }}" size="3" class="form-control">  
+                              {{ text_field_image_height }}: <input type="text" name="module_search_suggestion_options[category_filter][fields][image][height]" value="{{ field_options['height'] is defined ? field_options['height'] : 0 }}" size="3" class="form-control">                
+                            {% elseif (field_name == 'description') %} 
+                              {{ text_fields_cut }}: <input type="text" name="module_search_suggestion_options[category_filter][fields][description][cut]" value="{{ field_options['cut'] is defined ? field_options['cut'] : 0 }}" size="4" class="form-control">
+                            {% endif %} 
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[category_filter][fields][{{ field_name }}][column]" class="form-control">
+                              {% for column in columns %} 
+                                <option value="{{ column }}" {{ field_options['column'] is defined and field_options['column'] == column ? "selected='selected'" : "" }}>
+                                  {{ attribute(_context, 'fields_column_' ~ column) }}
+                                </option>            
+                              {% endfor %}
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[category_filter][fields][{{ field_name }}][location]" class="form-control">
+                              <option value="newline" {{ field_options['location'] is defined and field_options['location'] == 'newline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_newline }} 
+                              </option>            
+                              <option value="inline" {{ field_options['location'] is defined and field_options['location'] == 'inline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_inline }} 
+                              </option>
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <input type="text" name="module_search_suggestion_options[category_filter][fields][{{ field_name }}][sort]" value="{{ field_options['sort'] is defined ? field_options['sort'] : 0 }}" size="3" class="form-control"/>
+                          </td>  
+                          <td class="text-left">
+                            .{{ field_name }} {<br />
+                            <textarea name="module_search_suggestion_options[category_filter][fields][{{ field_name }}][css]" rows="4" cols="40" class="form-control">{{ field_options['css'] is defined ? field_options['css'] : '' }}</textarea>}
+                          </td>
+                        </tr>      
+                      {% endfor %} 
+
+                    </tbody>
+                  </table>              
+
+                </div>
+
+              </div>  
+              
+              {{ help_tab_category_filter }}
+
+            </div>
+
+            <div class="tab-pane" id="tab-category">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-category-settings" data-toggle="tab">{{ tab_settings }}</a></li>
+                <li><a href="#tab-category-search-by" data-toggle="tab">{{ tab_search_by }}</a></li>
+                <li><a href="#tab-category-fields" data-toggle="tab">{{ tab_fields }}</a></li>
+              </ul>
+              <div class="tab-content">
+
+                <div class="tab-pane active" id="tab-category-settings">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_status }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category][status]" class="form-control">
+                        {% if (options['category']['status']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+                  
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_title }}</label>
+                    <div class="col-sm-10">
+                      {% for language in languages %}                      
+                      <div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_search_suggestion_options[category][title][{{ language.language_id }}]" value="{{ options['category']['title'][language.language_id] is defined ? options['category']['title'][language.language_id] : '' }}" class="form-control">
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                      {{ entry_order }} 
+                    </label>
+                    <div class="col-sm-10">
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[category][order]" class="form-control">
+                            <option value="name" {{ options['category']['order'] is defined and options['category']['order'] == 'name' ? 'selected="selected"' : "" }}>{{ text_order_name }}</option>
+                            <option value="relevance" {{ options['category']['order'] is defined and options['category']['order'] == 'relevance' ? 'selected="selected"' : "" }}>{{ text_order_relevance }}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[category][order_dir]" id="input-search-order-dir" class="form-control">
+                            <option value="asc" {{ options['category']['order_dir'] is defined and options['category']['order_dir'] == 'asc' ? 'selected="selected"' : "" }}>{{ text_order_dir_asc }}</option>
+                            <option value="desc" {{ options['category']['order_dir'] is defined and options['category']['order_dir'] == 'desc' ? 'selected="selected"' : "" }}>{{ text_order_dir_desc }}</option>
+                          </select>              
+                        </div>
+                      </div>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                      {{ entry_logic }} 
+                    </label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category][logic]" class="form-control">
+                        <option value="or" {{ options['category']['logic'] is defined and options['category']['logic'] == 'or' ? 'selected="selected"' : "" }}>{{ text_logic_or }}</option>
+                        <option value="and" {{ options['category']['logic'] is defined and options['category']['logic'] == 'and' ? 'selected="selected"' : "" }}>{{ text_logic_and }}</option>
+                      </select>              
+                    </div>
+                  </div>          
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_limit }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="module_search_suggestion_options[category][limit]" value="{{ options['category']['limit'] is defined ? options['category']['limit'] : 0 }}" class="form-control">
+                    </div>
+                  </div>          
+                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_keyboard_layout }}">{{ entry_fix_keyboard_layout }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category][fix_keyboard_layout]" class="form-control">
+                        {% if (options['category']['fix_keyboard_layout']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_transliteration }}">{{ entry_fix_transliteration }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category][fix_transliteration]" class="form-control">
+                        {% if (options['category']['fix_transliteration']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category][inline]" class="form-control">
+                        {% if (options['category']['inline']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline_tooltip }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[category][inline_tooltip]" class="form-control">
+                        {% if (options['category']['inline_tooltip']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                </div>
+
+                <div class="tab-pane" id="tab-category-search-by">
+                  
+                  <table id="where" class="table table-striped table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" onclick="$('input[type=checkbox][name*=\'module_search_suggestion_options[category][search_by]\']').prop('checked', this.checked);" />
+                        </td>
+                        <td class="text-left">{{ column_search_by }}</td>  
+                        <td class="text-left">{{ column_relevance_weight }}</td>
+                      </tr>
+                    </thead>
+                    <tbody >
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[category][search_by][name][status]" value="1" {{ options['category']['search_by']['name']['status'] is defined and options['category']['search_by']['name']['status'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_category_field_name }}</td>  
+                        <td class="text-left">
+                          <input type="text" name="module_search_suggestion_options[category][search_by][name][weight]" value="{{ options['category']['search_by']['name']['weight'] is defined ? options['category']['search_by']['name']['weight'] : 0 }}" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[category][search_by][description][status]" value="1" {{ options['category']['search_by']['description']['status'] is defined and options['category']['search_by']['description']['status'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_category_field_description }}</td>  
+                        <td class="text-left">
+                          <input type="text" name="module_search_suggestion_options[category][search_by][description][weight]" value="{{ options['category']['search_by']['description']['weight'] is defined ? options['category']['search_by']['description']['weight'] : 0 }}" class="form-control">
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+                  
+                </div>
+
+                <div class="tab-pane" id="tab-category-fields">
+
+                  <table id="fields" class="table table-striped table-bordered table-hover sorted_table">
+                    <thead>
+                      <tr>
+                        <td class="text-left">{{ column_fields_show }}</td>
+                        <td class="text-left">{{ column_fields }}</td>              
+                        <td class="text-left">{{ column_fields_show_field_name }}</td>  
+                        <td class="text-left">{{ column_fields_settings }}</td>  
+                        <td class="text-left">{{ column_fields_column }}</td>
+                        <td class="text-left">{{ column_fields_location }}</td>  
+                        <td class="text-left">{{ column_fields_sort }}</td>  
+                        <td class="text-left">{{ column_fields_css }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {% for field_name,field_options in options['category']['fields'] %} 
+                        <tr>
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[category][fields][{{ field_name }}][show]" value="1" {{ field_options['show'] is defined and field_options['show'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">{{ attribute(_context, 'text_category_field_' ~ field_name) }}</td>              
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[category][fields][{{ field_name }}][show_field_name]" value="1" {{ field_options['show_field_name'] is defined and field_options['show_field_name'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">
+                            {% if (field_name == 'image') %} 
+                              {{ text_field_image_width }}: <input type="text" name="module_search_suggestion_options[category][fields][image][width]" value="{{ field_options['width'] is defined ? field_options['width'] : 0 }}" size="3" class="form-control">  
+                              {{ text_field_image_height }}: <input type="text" name="module_search_suggestion_options[category][fields][image][height]" value="{{ field_options['height'] is defined ? field_options['height'] : 0 }}" size="3" class="form-control">                
+                            {% elseif (field_name == 'description') %} 
+                              {{ text_fields_cut }}: <input type="text" name="module_search_suggestion_options[category][fields][description][cut]" value="{{ field_options['cut'] is defined ? field_options['cut'] : 0 }}" size="4" class="form-control">
+                            {% endif %} 
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[category][fields][{{ field_name }}][column]" class="form-control">
+                              {% for column in columns %} 
+                                <option value="{{ column }}" {{ field_options['column'] is defined and field_options['column'] == column ? "selected='selected'" : "" }}>
+                                  {{ attribute(_context, 'fields_column_' ~ column) }}
+                                </option>            
+                              {% endfor %}
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[category][fields][{{ field_name }}][location]" class="form-control">
+                              <option value="newline" {{ field_options['location'] is defined and field_options['location'] == 'newline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_newline }} 
+                              </option>            
+                              <option value="inline" {{ field_options['location'] is defined and field_options['location'] == 'inline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_inline }} 
+                              </option>
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <input type="text" name="module_search_suggestion_options[category][fields][{{ field_name }}][sort]" value="{{ field_options['sort'] is defined ? field_options['sort'] : 0 }}" size="3" class="form-control"/>
+                          </td>  
+                          <td class="text-left">
+                            .{{ field_name }} {<br />
+                            <textarea name="module_search_suggestion_options[category][fields][{{ field_name }}][css]" rows="4" cols="40" class="form-control">{{ field_options['css'] is defined ? field_options['css'] : '' }}</textarea>}
+                          </td>
+                        </tr>      
+                      {% endfor %} 
+
+                    </tbody>
+                  </table>              
+
+                </div>
+
+              </div>  
+              
+            </div>
+                
+            <div class="tab-pane" id="tab-manufacturer">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-manufacturer-settings" data-toggle="tab">{{ tab_settings }}</a></li>
+                <li><a href="#tab-manufacturer-search-by" data-toggle="tab">{{ tab_search_by }}</a></li>
+                <li><a href="#tab-manufacturer-fields" data-toggle="tab">{{ tab_fields }}</a></li>
+              </ul>
+              <div class="tab-content">
+
+                <div class="tab-pane active" id="tab-manufacturer-settings">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_status }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[manufacturer][status]" class="form-control">
+                        {% if (options['manufacturer']['status']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+                  
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_title }}</label>
+                    <div class="col-sm-10">
+                      {% for language in languages %}                      
+                      <div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_search_suggestion_options[manufacturer][title][{{ language.language_id }}]" value="{{ options['manufacturer']['title'][language.language_id] is defined ? options['manufacturer']['title'][language.language_id] : '' }}" class="form-control">
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_order }}</label>
+                    <div class="col-sm-10">
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[manufacturer][order]" class="form-control">
+                            <option value="name" {{ options['manufacturer']['order'] is defined and options['manufacturer']['order'] == 'name' ? 'selected="selected"' : "" }}>{{ text_order_name }}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[manufacturer][order_dir]" id="input-search-order-dir" class="form-control">
+                            <option value="asc" {{ options['manufacturer']['order_dir'] is defined and options['manufacturer']['order_dir'] == 'asc' ? 'selected="selected"' : "" }}>{{ text_order_dir_asc }}</option>
+                            <option value="desc" {{ options['manufacturer']['order_dir'] is defined and options['manufacturer']['order_dir'] == 'desc' ? 'selected="selected"' : "" }}>{{ text_order_dir_desc }}</option>
+                          </select>              
+                        </div>
+                      </div>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_logic }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[manufacturer][logic]"  class="form-control">
+                        <option value="or" {{ options['manufacturer']['logic'] is defined and options['manufacturer']['logic'] == 'or' ? 'selected="selected"' : "" }}>{{ text_logic_or }}</option>
+                        <option value="and" {{ options['manufacturer']['logic'] is defined and options['manufacturer']['logic'] == 'and' ? 'selected="selected"' : "" }}>{{ text_logic_and }}</option>
+                      </select>              
+                    </div>
+                  </div>          
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_limit }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="module_search_suggestion_options[manufacturer][limit]" value="{{ options['manufacturer']['limit'] is defined ? options['manufacturer']['limit'] : 0 }}" class="form-control">
+                    </div>
+                  </div>          
+                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_keyboard_layout }}">{{ entry_fix_keyboard_layout }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[manufacturer][fix_keyboard_layout]" class="form-control">
+                        {% if (options['manufacturer']['fix_keyboard_layout']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_transliteration }}">{{ entry_fix_transliteration }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[manufacturer][fix_transliteration]" class="form-control">
+                        {% if (options['manufacturer']['fix_transliteration']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[manufacturer][inline]" class="form-control">
+                        {% if (options['manufacturer']['inline']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline_tooltip }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[manufacturer][inline_tooltip]" class="form-control">
+                        {% if (options['manufacturer']['inline_tooltip']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                </div>
+
+                <div class="tab-pane" id="tab-manufacturer-search-by">
+                  
+                  <table id="where" class="table table-striped table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" onclick="$('input[type=checkbox][name*=\'module_search_suggestion_options[manufacturer][search_by]\']').prop('checked', this.checked);" />
+                        </td>
+                        <td class="text-left">{{ column_search_by }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody >
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[manufacturer][search_by][name]" value="1" {{ options['manufacturer']['search_by']['name'] is defined and options['manufacturer']['search_by']['name'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_manufacturer_field_name }}</td>  
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                </div>
+
+                <div class="tab-pane" id="tab-manufacturer-fields">
+
+                  <table id="fields" class="table table-striped table-bordered table-hover sorted_table">
+                    <thead>
+                      <tr>
+                        <td class="text-left">{{ column_fields_show }}</td>
+                        <td class="text-left">{{ column_fields }}</td>              
+                        <td class="text-left">{{ column_fields_show_field_name }}</td>  
+                        <td class="text-left">{{ column_fields_settings }}</td> 
+                        <td class="text-left">{{ column_fields_column }}</td> 
+                        <td class="text-left">{{ column_fields_location }}</td>  
+                        <td class="text-left">{{ column_fields_sort }}</td>  
+                        <td class="text-left">{{ column_fields_css }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {% for field_name,field_options in options['manufacturer']['fields'] %} 
+                        <tr>
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[manufacturer][fields][{{ field_name }}][show]" value="1" {{ field_options['show'] is defined and field_options['show'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">{{ attribute(_context, 'text_manufacturer_field_' ~ field_name) }}</td>              
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[manufacturer][fields][{{ field_name }}][show_field_name]" value="1" {{ field_options['show_field_name'] is defined and field_options['show_field_name'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">
+                            {% if (field_name == 'image') %} 
+                              {{ text_field_image_width }}: <input type="text" name="module_search_suggestion_options[manufacturer][fields][image][width]" value="{{ field_options['width'] is defined ? field_options['width'] : 0 }}" size="3" class="form-control">  
+                              {{ text_field_image_height }}: <input type="text" name="module_search_suggestion_options[manufacturer][fields][image][height]" value="{{ field_options['height'] is defined ? field_options['height'] : 0 }}" size="3" class="form-control">                
+                            {% endif %} 
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[manufacturer][fields][{{ field_name }}][column]" class="form-control">
+                              {% for column in columns %} 
+                                <option value="{{ column }}" {{ field_options['column'] is defined and field_options['column'] == column ? "selected='selected'" : "" }}>
+                                  {{ attribute(_context, 'fields_column_' ~ column) }}
+                                </option>            
+                              {% endfor %}
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[manufacturer][fields][{{ field_name }}][location]" class="form-control">
+                              <option value="newline" {{ field_options['location'] is defined and field_options['location'] == 'newline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_newline }} 
+                              </option>            
+                              <option value="inline" {{ field_options['location'] is defined and field_options['location'] == 'inline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_inline }} 
+                              </option>
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <input type="text" name="module_search_suggestion_options[manufacturer][fields][{{ field_name }}][sort]" value="{{ field_options['sort'] is defined ? field_options['sort'] : 0 }}" size="3" class="form-control"/>
+                          </td>  
+                          <td class="text-left">
+                            .{{ field_name }} {<br />
+                            <textarea name="module_search_suggestion_options[manufacturer][fields][{{ field_name }}][css]" rows="4" cols="40" class="form-control">{{ field_options['css'] is defined ? field_options['css'] : '' }}</textarea>}
+                          </td>
+                        </tr>      
+                      {% endfor %} 
+
+                    </tbody>
+                  </table>              
+
+                </div>
+
+              </div>  
+
+            </div>
+                
+            <div class="tab-pane" id="tab-information">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-information-settings" data-toggle="tab">{{ tab_settings }}</a></li>
+                <li><a href="#tab-information-search-by" data-toggle="tab">{{ tab_search_by }}</a></li>
+                <li><a href="#tab-information-fields" data-toggle="tab">{{ tab_fields }}</a></li>
+              </ul>
+              <div class="tab-content">
+
+                <div class="tab-pane active" id="tab-information-settings">
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_status }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[information][status]" class="form-control">
+                        {% if (options['information']['status']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+                  
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_title }}</label>
+                    <div class="col-sm-10">
+                      {% for language in languages %}                      
+                      <div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_search_suggestion_options[information][title][{{ language.language_id }}]" value="{{ options['information']['title'][language.language_id] is defined ? options['information']['title'][language.language_id] : '' }}" class="form-control">
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_order }}</label>
+                    <div class="col-sm-10">
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[information][order]" class="form-control">
+                            <option value="name" {{ options['information']['order'] is defined and options['information']['order'] == 'name' ? 'selected="selected"' : "" }}>{{ text_order_name }}</option>
+                            <option value="relevance" {{ options['information']['order'] is defined and options['information']['order'] == 'relevance' ? 'selected="selected"' : "" }}>{{ text_order_relevance }}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-6">
+                          <select name="module_search_suggestion_options[information][order_dir]" id="input-search-order-dir" class="form-control">
+                            <option value="asc" {{ options['information']['order_dir'] is defined and options['information']['order_dir'] == 'asc' ? 'selected="selected"' : "" }}>{{ text_order_dir_asc }}</option>
+                            <option value="desc" {{ options['information']['order_dir'] is defined and options['information']['order_dir'] == 'desc' ? 'selected="selected"' : "" }}>{{ text_order_dir_desc }}</option>
+                          </select>              
+                        </div>
+                      </div>
+                    </div>
+                  </div>          
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_logic }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[information][logic]" class="form-control">
+                        <option value="or" {{ options['information']['logic'] is defined and options['information']['logic'] == 'or' ? 'selected="selected"' : "" }}>{{ text_logic_or }}</option>
+                        <option value="and" {{ options['information']['logic'] is defined and options['information']['logic'] == 'and' ? 'selected="selected"' : "" }}>{{ text_logic_and }}</option>
+                      </select>              
+                    </div>
+                  </div>          
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">{{ entry_limit }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="module_search_suggestion_options[information][limit]" value="{{ options['information']['limit'] is defined ? options['information']['limit'] : 0 }}" class="form-control">
+                    </div>
+                  </div>          
+                    
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_keyboard_layout }}">{{ entry_fix_keyboard_layout }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[information][fix_keyboard_layout]" class="form-control">
+                        {% if (options['information']['fix_keyboard_layout']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fix_transliteration }}">{{ entry_fix_transliteration }}</span></label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[information][fix_transliteration]" class="form-control">
+                        {% if (options['information']['fix_transliteration']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>
+                      
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" >{{ entry_inline }}</label>
+                    <div class="col-sm-10">
+                      <select name="module_search_suggestion_options[information][inline]" class="form-control">
+                        {% if (options['information']['inline']) %} 
+                          <option value="1" selected="selected">{{ text_enabled }}</option>
+                          <option value="0">{{ text_disabled }}</option>
+                        {% else %} 
+                          <option value="1">{{ text_enabled }}</option>
+                          <option value="0" selected="selected">{{ text_disabled }}</option>
+                        {% endif %} 
+                      </select>
+                    </div>
+                  </div>          
+
+                </div>
+
+                <div class="tab-pane" id="tab-information-search-by">
+                  
+                  <table id="where" class="table table-striped table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" onclick="$('input[type=checkbox][name*=\'module_search_suggestion_options[information][search_by]\']').prop('checked', this.checked);" />
+                        </td>
+                        <td class="text-left">{{ column_search_by }}</td>  
+                        <td class="text-left">{{ column_relevance_weight }}</td>
+                      </tr>
+                    </thead>
+                    <tbody >
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[information][search_by][title][status]" value="1" {{ options['information']['search_by']['title']['status'] is defined and options['information']['search_by']['title']['status'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_information_field_title }}</td>  
+                        <td class="text-left">
+                          <input type="text" name="module_search_suggestion_options[information][search_by][title][weight]" value="{{ options['information']['search_by']['title']['weight'] is defined ? options['information']['search_by']['title']['weight'] : 0 }}" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-center">
+                          <input type="checkbox" name="module_search_suggestion_options[information][search_by][description][status]" value="1" {{ options['information']['search_by']['description']['status'] is defined and options['information']['search_by']['description']['status'] ? "checked=checked" : "" }} />
+                        </td>
+                        <td class="text-left">{{ text_information_field_description }}</td>  
+                        <td class="text-left">
+                          <input type="text" name="module_search_suggestion_options[information][search_by][description][weight]" value="{{ options['information']['search_by']['description']['weight'] is defined ? options['information']['search_by']['description']['weight'] : 0 }}" class="form-control">
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+                  
+                </div>
+
+                <div class="tab-pane" id="tab-information-fields">
+
+                  <table id="fields" class="table table-striped table-bordered table-hover sorted_table">
+                    <thead>
+                      <tr>
+                        <td class="text-left">{{ column_fields_show }}</td>
+                        <td class="text-left">{{ column_fields }}</td>              
+                        <td class="text-left">{{ column_fields_show_field_name }}</td>  
+                        <td class="text-left">{{ column_fields_settings }}</td>  
+                        <td class="text-left">{{ column_fields_column }}</td>
+                        <td class="text-left">{{ column_fields_location }}</td>  
+                        <td class="text-left">{{ column_fields_sort }}</td>  
+                        <td class="text-left">{{ column_fields_css }}</td>  
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {% for field_name,field_options in options['information']['fields'] %} 
+                        <tr>
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[information][fields][{{ field_name }}][show]" value="1" {{ field_options['show'] is defined and field_options['show'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">{{ attribute(_context, 'text_information_field_' ~ field_name) }}</td>              
+                          <td class="text-center">
+                            <input type="checkbox" name="module_search_suggestion_options[information][fields][{{ field_name }}][show_field_name]" value="1" {{ field_options['show_field_name'] is defined and field_options['show_field_name'] ? "checked=checked" : "" }} />
+                          </td>
+                          <td class="text-left">
+                            {% if (field_name == 'description') %} 
+                              {{ text_fields_cut }}: <input type="text" name="module_search_suggestion_options[information][fields][description][cut]" value="{{ field_options['cut'] is defined ? field_options['cut'] : 0 }}" size="4" class="form-control">
+                            {% endif %} 
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[information][fields][{{ field_name }}][column]" class="form-control">
+                              {% for column in columns %} 
+                                <option value="{{ column }}" {{ field_options['column'] is defined and field_options['column'] == column ? "selected='selected'" : "" }}>
+                                  {{ attribute(_context, 'fields_column_' ~ column) }}
+                                </option>            
+                              {% endfor %}
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <select name="module_search_suggestion_options[information][fields][{{ field_name }}][location]" class="form-control">
+                              <option value="newline" {{ field_options['location'] is defined and field_options['location'] == 'newline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_newline }} 
+                              </option>            
+                              <option value="inline" {{ field_options['location'] is defined and field_options['location'] == 'inline' ? "selected='selected'" : "" }}>
+                                {{ text_field_location_inline }} 
+                              </option>
+                            </select>  
+                          </td>  
+                          <td class="text-left">
+                            <input type="text" name="module_search_suggestion_options[information][fields][{{ field_name }}][sort]" value="{{ field_options['sort'] is defined ? field_options['sort'] : 0 }}" size="3" class="form-control"/>
+                          </td>  
+                          <td class="text-left">
+                            .{{ field_name }} {<br />
+                            <textarea name="module_search_suggestion_options[information][fields][{{ field_name }}][css]" rows="4" cols="40" class="form-control">{{ field_options['css'] is defined ? field_options['css'] : '' }}</textarea>}
+                          </td>
+                        </tr>      
+                      {% endfor %} 
+
+                    </tbody>
+                  </table>              
+
+                </div>
+
+              </div>  
+              
+            </div>
+                
+            <div class="tab-pane" id="tab-support">
+              {{ support_text }} 
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="copyright">author sv2109 (sv2109@gmail.com) license for 1 product copy granted for Nawiteh (andrew.pv.mm@gmail.com nawiteh.com.ua,www.nawiteh.com.ua,stage.nawiteh.com.ua)</div>
+
+  <style type="text/css">
+    .sorted_table tbody tr {
+      cursor: move;
+    }
+  </style>
+
+  <script type="text/javascript"><!--
+
+    $(document).ready(function () {
+
+      // Sortable rows
+      $('.sorted_table tbody').sortable({
+        cursor: 'move',
+        update: function (event, ui) {
+          ui.item.parent().find('tr').each(function (i, row) {
+            $(row).find('input[name*="[sort]"]').val(i);
+          });
+        }
+      });
+
+      // Hide attributes
+      if ($('input[name=\'module_search_suggestion_options[product][fields][attributes][show]\']').is(':not(:checked)')) {
+        $('#fields_attributes').hide();
+      }
+    });
+
+    $('input[name=\'module_search_suggestion_options[product][fields][attributes][show]\']').on('change', function () {
+      if ($(this).is(':checked')) {
+        $('#fields_attributes').show();
+      } else {
+        $('#fields_attributes').hide();
+      }
+            
+    });
+    
+    $('.colorpicker-input').colorpicker();
+
+  //--></script> 
+  <script type="text/javascript"><!--
+  var el = document.getElementById("css-texarea");
+  if (el) {
+    editor = CodeMirror.fromTextArea(el, {
+      mode: "css",
+      integer: 2,
+      lineNumbers: true,
+      viewportMargin: Infinity,
+      autofocus: false,
+      alignCDATA: true,
+      lineWrapping: true,
+      indentWithTabs: true,
+      tabSize: 2,
+      indentUnit: 2,
+      styleActiveLine: true,
+      autoCloseTags: true
+    });
+  }
+  //--></script>
+
+<style>
+select option {
+  background-color: #fff;
+}
+select.on, option.on, input.on {
+  background-color: #ecf3e6 !important;
+}
+select.off, option.off, input.off {
+  background-color: #fcefe6 !important;
+}
+</style>
+<script type="text/javascript"><!--                        
+  function style_select(select) {
+    $(select).removeClass('on off');
+    var selected_value = $(select).val()    
+    var selectedClass = selected_value == 0 ? 'off' : selected_value == 1 ? 'on' : '';
+    selectedClass && $(select).addClass(selectedClass)
+
+    $(select).find('option').each(function(){
+      var optionClass = $(this).val() == 0 ? 'off' : $(this).val() == 1 ? 'on' : '';
+      optionClass && $(this).addClass(optionClass)
+    })
+  }
+  function style_checkbox(checkbox) {
+    $(checkbox).removeClass('on off');
+    var checked = $(checkbox).is(":checked")
+    var selectedClass = checked ? 'on' : 'off';
+    selectedClass && $(checkbox).addClass(selectedClass)  
+  }
+
+  $(document).ready(function () {                        
+    $('select').each(function(){
+      style_select(this);
+    })
+    $('select').change(function(){
+      style_select(this);
+    })
+    $('input[type="checkbox"]').each(function(){
+      style_checkbox(this);
+    })
+    $('input[type="checkbox"]').change(function(){
+      style_checkbox(this);
+    })
+  });  
+//--></script>
+    
+</div>
+{{ footer }}

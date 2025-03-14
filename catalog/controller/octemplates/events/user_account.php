@@ -52,13 +52,17 @@ class ControllerOCTemplatesEventsUserAccount extends Controller {
         foreach ($results as $result) {
             $product_total = $this->model_account_order->getTotalOrderProductsByOrderId($result['order_id']);
             $voucher_total = $this->model_account_order->getTotalOrderVouchersByOrderId($result['order_id']);
-
+        
+            // Генеруємо токен для безпечного доступу до PDF
+            $token = md5($result['order_id'] . $this->config->get('config_encryption'));
+        
             $data['orders'][] = [
                 'order_id'   => $result['order_id'],
                 'status'     => $result['status'],
                 'date_added' => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
                 'total'      => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
                 'href'       => $this->url->link('account/order/info', 'order_id=' . $result['order_id'], 'SSL'),
+                'pdf_url'    => $this->url->link('checkout/invoice_pdf', 'order_id=' . $result['order_id'] . '&token=' . $token, true)
             ];
         }
     }

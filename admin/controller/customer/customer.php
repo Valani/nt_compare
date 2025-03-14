@@ -737,6 +737,14 @@ class ControllerCustomerCustomer extends Controller {
 			$data['telephone'] = '';
 		}
 
+        if (isset($this->request->post['allowed_ips'])) {
+			$data['allowed_ips'] = $this->request->post['allowed_ips'];
+		} elseif (!empty($customer_info)) {
+			$data['allowed_ips'] = $customer_info['allowed_ips'];
+		} else {
+			$data['allowed_ips'] = '';
+		}
+
 		// Custom Fields
 		$this->load->model('customer/custom_field');
 
@@ -1446,6 +1454,7 @@ class ControllerCustomerCustomer extends Controller {
 					'lastname'          => $result['lastname'],
 					'email'             => $result['email'],
 					'telephone'         => $result['telephone'],
+					'allowed_ips'       => $result['allowed_ips'],
 					'custom_field'      => json_decode($result['custom_field'], true),
 					'address'           => $this->model_customer_customer->getAddresses($result['customer_id'])
 				);

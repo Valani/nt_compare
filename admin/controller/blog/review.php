@@ -554,9 +554,9 @@ class ControllerBlogReview extends Controller {
 			$this->error['author'] = $this->language->get('error_author');
 		}
 
-		if (utf8_strlen($this->request->post['text']) < 1) {
+		/*if (utf8_strlen($this->request->post['text']) < 1) {
 			$this->error['text'] = $this->language->get('error_text');
-		}
+		}*/
 
 		if (!isset($this->request->post['rating']) || $this->request->post['rating'] < 0 || $this->request->post['rating'] > 5) {
 			$this->error['rating'] = $this->language->get('error_rating');

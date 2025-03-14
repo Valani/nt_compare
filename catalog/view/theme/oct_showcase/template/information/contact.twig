@@ -53,12 +53,16 @@
 									</div>
 									{{ captcha }}
 									{% if text_terms %}
-									<div class="form-check d-flex pb-4">
-										<input id="agreeCheaperCheck" type="checkbox" class="form-check-input{% if error_oct_terms %} error_style{% endif %}" name="scales"{% if scales_in is defined and scales_in %} checked{% endif %}>
+									<div class="form-check d-flex pb-4 hidden">
+										<input id="agreeCheaperCheck" type="checkbox" class="form-check-input{% if error_oct_terms %} error_style{% endif %}" name="scales" checked>
 										<label class="form-check-label" for="agreeCheaperCheck">{{ text_terms }}</label>
 									</div>
+									<div class="wrapper-links pb-4">
+										<p>{{ text_agree2 }}:</p>
+										<p><a href="{{ privacy_link }}" class="agree">{{ text_privacy2 }}</a></p>
+									</div>
 									{% endif %}
-									<button class="sc-btn sc-btn-primary br-4" type="submit">{{ button_submit }}</button>
+									<button class="sc-btn sc-btn-primary br-4" type="submit">{{ button_submit_send }}</button>
 								</div>
 							</form>
 							<script>
@@ -109,7 +113,7 @@
 													<div class="sc-contact-us-item-subtitle d-flex align-items-center mb-2 fw-500 dark-text">{{ text_socials_contact }}</div>
 													<div class="sc-footer-socials-box d-flex align-items-center justify-content-start mt-0 pt-0">
 														{% for contact_social in contact_socials %}
-															<a rel="noopener noreferrer" href="{% if contact_social.link %}{{ contact_social.link }}{% else %}javascript:;{% endif %}" class="sc-footer-socials-item sc-footer-socials-item-fa-facebook-f d-flex align-items-center justify-content-center content-block" target="_blank">
+															<a rel="noopener noreferrer nofollow" href="{% if contact_social.link %}{{ contact_social.link }}{% else %}javascript:;{% endif %}" class="sc-footer-socials-item sc-footer-socials-item-fa-facebook-f d-flex align-items-center justify-content-center content-block" target="_blank">
 															<i class="{{ contact_social.icone }}"></i></a>
 														{% endfor %}
 													</div>

@@ -130,6 +130,7 @@ class ControllerInformationContact extends Controller {
 		} else {
 			$data['captcha'] = '';
 		}
+        $data['privacy_link'] = $this->url->link('information/information/agree', 'information_id=3');
 
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['column_right'] = $this->load->controller('common/column_right');
